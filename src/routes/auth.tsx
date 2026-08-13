@@ -75,6 +75,16 @@ function AuthPage() {
     setMessage(`We sent a magic link to ${trimmed}. Open the email to finish signing in.`);
   }
 
+  async function signInWithGoogle() {
+    const redirectTo =
+      typeof window === "undefined" ? undefined : `${window.location.origin}${redirectTarget}`;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo },
+    });
+    if (error) setMessage(error.message);
+  }
+
   return (
     <div
       className="min-h-screen px-4 py-10 sm:px-6 sm:py-14"
@@ -113,6 +123,38 @@ function AuthPage() {
           onSubmit={handleSubmit}
           className="w-full max-w-xl rounded-[24px] border border-[#e8e2d9] bg-white/95 p-6 shadow-[0_24px_80px_-36px_rgba(61,56,50,0.22)] sm:p-8"
         >
+          <button
+            type="button"
+            onClick={signInWithGoogle}
+            className="flex w-full items-center justify-center gap-3 rounded-full border border-[#e0d9cf] bg-white px-6 py-3 text-sm font-medium text-[#2c2824] transition-colors hover:bg-[#f7f3ee]"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+              <path
+                fill="#4285F4"
+                d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-8.9z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1A12 12 0 0 0 12 24z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.4 14.4a7.2 7.2 0 0 1 0-4.6V6.7H1.4a12 12 0 0 0 0 10.8l4-3.1z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 4.8c1.8 0 3.3.6 4.5 1.8l3.4-3.4A12 12 0 0 0 1.4 6.7l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"
+              />
+            </svg>
+            Continue with Google
+          </button>
+
+          <div className="my-6 flex items-center gap-4 text-xs uppercase tracking-widest text-[#a39a90]">
+            <span className="h-px flex-1 bg-[#e8e2d9]" />
+            or continue with email
+            <span className="h-px flex-1 bg-[#e8e2d9]" />
+          </div>
+
           <div className="flex items-center gap-3 text-sm text-[#8a8178]">
             <Mail className="h-4 w-4" />
             Email address

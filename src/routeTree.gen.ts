@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsOfUseRouteImport } from './routes/terms-of-use'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
 import { Route as ServicesRouteImport } from './routes/services'
-import { Route as ReachUsRouteImport } from './routes/reach-us'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as ReachUsRouteImport } from './routes/reach-us'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -40,6 +40,11 @@ const ServicesRoute = ServicesRouteImport.update({
   path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReachUsRoute = ReachUsRouteImport.update({
   id: '/reach-us',
   path: '/reach-us',
@@ -48,11 +53,6 @@ const ReachUsRoute = ReachUsRouteImport.update({
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
   id: '/privacy-policy',
   path: '/privacy-policy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RefundPolicyRoute = RefundPolicyRouteImport.update({
-  id: '/refund-policy',
-  path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -247,18 +247,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reach-us': {
-      id: '/reach-us'
-      path: '/reach-us'
-      fullPath: '/reach-us'
-      preLoaderRoute: typeof ReachUsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/refund-policy': {
       id: '/refund-policy'
       path: '/refund-policy'
       fullPath: '/refund-policy'
       preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reach-us': {
+      id: '/reach-us'
+      path: '/reach-us'
+      fullPath: '/reach-us'
+      preLoaderRoute: typeof ReachUsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
