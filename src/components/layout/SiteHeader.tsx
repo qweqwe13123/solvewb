@@ -34,6 +34,9 @@ export function SiteHeader({
           <Link to="/services" className={`text-sm transition-colors ${textMuted}`}>
             Services
           </Link>
+          <Link to="/courses" className={`text-sm transition-colors ${textMuted}`}>
+            Courses
+          </Link>
           <Link to="/subscriptions" className={`text-sm transition-colors ${textMuted}`}>
             Subscriptions
           </Link>

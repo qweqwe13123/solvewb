@@ -7,6 +7,7 @@ import { useBodyScrollLock } from "./use-body-scroll-lock";
 const LINKS = [
   { label: "Home", to: "/" as const },
   { label: "Services", to: "/services" as const },
+  { label: "Courses", to: "/courses" as const },
   { label: "Subscriptions", to: "/subscriptions" as const },
   { label: "Refund Policy", to: "/refund-policy" as const },
   { label: "Reach Us", to: "/contact" as const },
