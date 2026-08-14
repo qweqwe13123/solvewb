@@ -85,7 +85,7 @@ export function priceIdToPlanId(priceId: string): { plan: PlanId; period: Billin
 export const BRAND = {
   name: "Solver",
   supportEmail: "manager@solverwebsite.com",
-  websiteUrl: "https://solverwebsite.com",
+  websiteUrl: "https://www.solverwebsite.com",
   tagline: "Web Design & Business Automation for Growing Companies",
   color: "#111827",
   fromEmail: "Solver <noreply@mail.solverwebsite.com>",

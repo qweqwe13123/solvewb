@@ -120,7 +120,7 @@ export const createBillingPortalSession = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!profile?.stripe_customer_id) throw new Error("No Stripe customer found");
 
-    const origin = process.env.SITE_URL || "https://solverwebsite.com";
+    const origin = process.env.SITE_URL || "https://www.solverwebsite.com";
     const portal = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
       return_url: `${origin}/account/billing`,
