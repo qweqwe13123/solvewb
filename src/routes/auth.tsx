@@ -11,7 +11,7 @@ export const Route = createFileRoute("/auth")({
     const redirect =
       typeof search.redirect === "string" && search.redirect.startsWith("/")
         ? search.redirect
-        : "/account/billing";
+        : "/courses";
     const provider = typeof search.provider === "string" ? search.provider : undefined;
     const code = typeof search.code === "string" ? search.code : undefined;
     const error = typeof search.error === "string" ? search.error : undefined;
