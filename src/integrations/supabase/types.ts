@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      payment_history: {
+payment_history: {
         Row: {
           amount: number
           created_at: string
@@ -154,15 +154,336 @@ export type Database = {
         }
         Relationships: []
       }
-    }
+calendar_events: {
+        Row: {
+          created_at: string
+          description: string
+          duration_minutes: number
+          id: string
+          is_published: boolean
+          link_url: string | null
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          duration_minutes?: number
+          id?: string
+          is_published?: boolean
+          link_url?: string | null
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          duration_minutes?: number
+          id?: string
+          is_published?: boolean
+          link_url?: string | null
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      classroom_classes: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          description: string
+          id: string
+          is_published: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      community_profile: {
+        Row: {
+          admins_label: string
+          body: string
+          cover_url: string | null
+          created_at: string
+          description: string
+          gallery: Json
+          handle_label: string
+          id: string
+          members_label: string
+          name: string
+          online_label: string
+          owner_label: string
+          price_label: string
+          privacy_label: string
+          tagline: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          admins_label?: string
+          body?: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          gallery?: Json
+          handle_label?: string
+          id?: string
+          members_label?: string
+          name?: string
+          online_label?: string
+          owner_label?: string
+          price_label?: string
+          privacy_label?: string
+          tagline?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          admins_label?: string
+          body?: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          gallery?: Json
+          handle_label?: string
+          id?: string
+          members_label?: string
+          name?: string
+          online_label?: string
+          owner_label?: string
+          price_label?: string
+          privacy_label?: string
+          tagline?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      courses: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          description: string
+          gallery: Json
+          id: string
+          is_published: boolean
+          price_label: string
+          slug: string
+          sort_order: number
+          summary: string
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          gallery?: Json
+          id?: string
+          is_published?: boolean
+          price_label?: string
+          slug: string
+          sort_order?: number
+          summary?: string
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          gallery?: Json
+          id?: string
+          is_published?: boolean
+          price_label?: string
+          slug?: string
+          sort_order?: number
+          summary?: string
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      post_comments: {
+        Row: {
+          author_avatar: string | null
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_name?: string
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_avatar?: string | null
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_avatar: string | null
+          author_id: string
+          author_name: string
+          body: string
+          category: string
+          cover_url: string | null
+          created_at: string
+          id: string
+          is_pinned: boolean
+          is_published: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_id: string
+          author_name?: string
+          body?: string
+          category?: string
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          is_published?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_avatar?: string | null
+          author_id?: string
+          author_name?: string
+          body?: string
+          category?: string
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          is_published?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      }
     Views: {
-      [_ in never]: never
-    }
+[_ in never]: never
+claim_admin_role: { Args: never; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      }
     Functions: {
       [_ in never]: never
     }
     Enums: {
-      billing_period: "monthly" | "annually"
+billing_period: "monthly" | "annually"
       payment_status: "succeeded" | "failed" | "pending" | "refunded"
       subscription_plan: "starter" | "pro" | "ultra"
       subscription_status:
@@ -174,7 +495,8 @@ export type Database = {
         | "incomplete_expired"
         | "unpaid"
         | "paused"
-    }
+app_role: "admin" | "member"
+      }
     CompositeTypes: {
       [_ in never]: never
     }

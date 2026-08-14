@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsOfUseRouteImport } from './routes/terms-of-use'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as ReachUsRouteImport } from './routes/reach-us'
@@ -18,13 +19,40 @@ import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CRouteImport } from './routes/c'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings.index'
+import { Route as CIndexRouteImport } from './routes/c.index'
+import { Route as SettingsThemeRouteImport } from './routes/settings.theme'
+import { Route as SettingsProfileRouteImport } from './routes/settings.profile'
+import { Route as SettingsPayoutsRouteImport } from './routes/settings.payouts'
+import { Route as SettingsPaymentMethodsRouteImport } from './routes/settings.payment-methods'
+import { Route as SettingsPaymentHistoryRouteImport } from './routes/settings.payment-history'
+import { Route as SettingsNotificationsRouteImport } from './routes/settings.notifications'
+import { Route as SettingsCommunitiesRouteImport } from './routes/settings.communities'
+import { Route as SettingsChatRouteImport } from './routes/settings.chat'
+import { Route as SettingsAffiliatesRouteImport } from './routes/settings.affiliates'
+import { Route as SettingsAccountRouteImport } from './routes/settings.account'
+import { Route as CourseSlugRouteImport } from './routes/course.$slug'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout/success'
+import { Route as CMembersRouteImport } from './routes/c.members'
+import { Route as CLeaderboardsRouteImport } from './routes/c.leaderboards'
+import { Route as CClassroomRouteImport } from './routes/c.classroom'
+import { Route as CCalendarRouteImport } from './routes/c.calendar'
+import { Route as CAboutRouteImport } from './routes/c.about'
 import { Route as ApiLeadRouteImport } from './routes/api/lead'
 import { Route as AccountBillingRouteImport } from './routes/account/billing'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 import { Route as ApiStripeCheckoutRouteImport } from './routes/api/stripe/checkout'
+import { Route as AuthenticatedAdminPostsRouteImport } from './routes/_authenticated/admin.posts'
+import { Route as AuthenticatedAdminCommunityRouteImport } from './routes/_authenticated/admin.community'
+import { Route as AuthenticatedAdminClassroomRouteImport } from './routes/_authenticated/admin.classroom'
+import { Route as AuthenticatedAdminCalendarRouteImport } from './routes/_authenticated/admin.calendar'
+import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media.$'
 
 const TermsOfUseRoute = TermsOfUseRouteImport.update({
   id: '/terms-of-use',
@@ -34,6 +62,11 @@ const TermsOfUseRoute = TermsOfUseRouteImport.update({
 const SubscriptionsRoute = SubscriptionsRouteImport.update({
   id: '/subscriptions',
   path: '/subscriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesRoute = ServicesRouteImport.update({
@@ -71,9 +104,18 @@ const CheckoutRoute = CheckoutRouteImport.update({
   path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CRoute = CRouteImport.update({
+  id: '/c',
+  path: '/c',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -81,10 +123,100 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const CIndexRoute = CIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CRoute,
+} as any)
+const SettingsThemeRoute = SettingsThemeRouteImport.update({
+  id: '/theme',
+  path: '/theme',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsProfileRoute = SettingsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsPayoutsRoute = SettingsPayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsPaymentMethodsRoute = SettingsPaymentMethodsRouteImport.update({
+  id: '/payment-methods',
+  path: '/payment-methods',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsPaymentHistoryRoute = SettingsPaymentHistoryRouteImport.update({
+  id: '/payment-history',
+  path: '/payment-history',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsCommunitiesRoute = SettingsCommunitiesRouteImport.update({
+  id: '/communities',
+  path: '/communities',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsChatRoute = SettingsChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsAffiliatesRoute = SettingsAffiliatesRouteImport.update({
+  id: '/affiliates',
+  path: '/affiliates',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsAccountRoute = SettingsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const CourseSlugRoute = CourseSlugRouteImport.update({
+  id: '/course/$slug',
+  path: '/course/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   id: '/success',
   path: '/success',
   getParentRoute: () => CheckoutRoute,
+} as any)
+const CMembersRoute = CMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => CRoute,
+} as any)
+const CLeaderboardsRoute = CLeaderboardsRouteImport.update({
+  id: '/leaderboards',
+  path: '/leaderboards',
+  getParentRoute: () => CRoute,
+} as any)
+const CClassroomRoute = CClassroomRouteImport.update({
+  id: '/classroom',
+  path: '/classroom',
+  getParentRoute: () => CRoute,
+} as any)
+const CCalendarRoute = CCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => CRoute,
+} as any)
+const CAboutRoute = CAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => CRoute,
 } as any)
 const ApiLeadRoute = ApiLeadRouteImport.update({
   id: '/api/lead',
@@ -96,6 +228,16 @@ const AccountBillingRoute = AccountBillingRouteImport.update({
   path: '/account/billing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   id: '/api/stripe/webhook',
   path: '/api/stripe/webhook',
@@ -106,10 +248,39 @@ const ApiStripeCheckoutRoute = ApiStripeCheckoutRouteImport.update({
   path: '/api/stripe/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminPostsRoute = AuthenticatedAdminPostsRouteImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminCommunityRoute =
+  AuthenticatedAdminCommunityRouteImport.update({
+    id: '/community',
+    path: '/community',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminClassroomRoute =
+  AuthenticatedAdminClassroomRouteImport.update({
+    id: '/classroom',
+    path: '/classroom',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCalendarRoute =
+  AuthenticatedAdminCalendarRouteImport.update({
+    id: '/calendar',
+    path: '/calendar',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const ApiPublicMediaSplatRoute = ApiPublicMediaSplatRouteImport.update({
+  id: '/api/public/media/$',
+  path: '/api/public/media/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/c': typeof CRouteWithChildren
   '/checkout': typeof CheckoutRouteWithChildren
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
@@ -117,13 +288,39 @@ export interface FileRoutesByFullPath {
   '/reach-us': typeof ReachUsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/services': typeof ServicesRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/subscriptions': typeof SubscriptionsRoute
   '/terms-of-use': typeof TermsOfUseRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/account/billing': typeof AccountBillingRoute
   '/api/lead': typeof ApiLeadRoute
+  '/c/about': typeof CAboutRoute
+  '/c/calendar': typeof CCalendarRoute
+  '/c/classroom': typeof CClassroomRoute
+  '/c/leaderboards': typeof CLeaderboardsRoute
+  '/c/members': typeof CMembersRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/course/$slug': typeof CourseSlugRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/affiliates': typeof SettingsAffiliatesRoute
+  '/settings/chat': typeof SettingsChatRoute
+  '/settings/communities': typeof SettingsCommunitiesRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payment-history': typeof SettingsPaymentHistoryRoute
+  '/settings/payment-methods': typeof SettingsPaymentMethodsRoute
+  '/settings/payouts': typeof SettingsPayoutsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/theme': typeof SettingsThemeRoute
+  '/c/': typeof CIndexRoute
+  '/settings/': typeof SettingsIndexRoute
+  '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/classroom': typeof AuthenticatedAdminClassroomRoute
+  '/admin/community': typeof AuthenticatedAdminCommunityRoute
+  '/admin/posts': typeof AuthenticatedAdminPostsRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,14 +336,40 @@ export interface FileRoutesByTo {
   '/terms-of-use': typeof TermsOfUseRoute
   '/account/billing': typeof AccountBillingRoute
   '/api/lead': typeof ApiLeadRoute
+  '/c/about': typeof CAboutRoute
+  '/c/calendar': typeof CCalendarRoute
+  '/c/classroom': typeof CClassroomRoute
+  '/c/leaderboards': typeof CLeaderboardsRoute
+  '/c/members': typeof CMembersRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/course/$slug': typeof CourseSlugRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/affiliates': typeof SettingsAffiliatesRoute
+  '/settings/chat': typeof SettingsChatRoute
+  '/settings/communities': typeof SettingsCommunitiesRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payment-history': typeof SettingsPaymentHistoryRoute
+  '/settings/payment-methods': typeof SettingsPaymentMethodsRoute
+  '/settings/payouts': typeof SettingsPayoutsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/theme': typeof SettingsThemeRoute
+  '/c': typeof CIndexRoute
+  '/settings': typeof SettingsIndexRoute
+  '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/classroom': typeof AuthenticatedAdminClassroomRoute
+  '/admin/community': typeof AuthenticatedAdminCommunityRoute
+  '/admin/posts': typeof AuthenticatedAdminPostsRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/c': typeof CRouteWithChildren
   '/checkout': typeof CheckoutRouteWithChildren
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
@@ -154,19 +377,46 @@ export interface FileRoutesById {
   '/reach-us': typeof ReachUsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/services': typeof ServicesRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/subscriptions': typeof SubscriptionsRoute
   '/terms-of-use': typeof TermsOfUseRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/account/billing': typeof AccountBillingRoute
   '/api/lead': typeof ApiLeadRoute
+  '/c/about': typeof CAboutRoute
+  '/c/calendar': typeof CCalendarRoute
+  '/c/classroom': typeof CClassroomRoute
+  '/c/leaderboards': typeof CLeaderboardsRoute
+  '/c/members': typeof CMembersRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/course/$slug': typeof CourseSlugRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/affiliates': typeof SettingsAffiliatesRoute
+  '/settings/chat': typeof SettingsChatRoute
+  '/settings/communities': typeof SettingsCommunitiesRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payment-history': typeof SettingsPaymentHistoryRoute
+  '/settings/payment-methods': typeof SettingsPaymentMethodsRoute
+  '/settings/payouts': typeof SettingsPayoutsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/theme': typeof SettingsThemeRoute
+  '/c/': typeof CIndexRoute
+  '/settings/': typeof SettingsIndexRoute
+  '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/_authenticated/admin/classroom': typeof AuthenticatedAdminClassroomRoute
+  '/_authenticated/admin/community': typeof AuthenticatedAdminCommunityRoute
+  '/_authenticated/admin/posts': typeof AuthenticatedAdminPostsRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/c'
     | '/checkout'
     | '/contact'
     | '/courses'
@@ -174,13 +424,39 @@ export interface FileRouteTypes {
     | '/reach-us'
     | '/refund-policy'
     | '/services'
+    | '/settings'
     | '/subscriptions'
     | '/terms-of-use'
+    | '/admin'
     | '/account/billing'
     | '/api/lead'
+    | '/c/about'
+    | '/c/calendar'
+    | '/c/classroom'
+    | '/c/leaderboards'
+    | '/c/members'
     | '/checkout/success'
+    | '/course/$slug'
+    | '/settings/account'
+    | '/settings/affiliates'
+    | '/settings/chat'
+    | '/settings/communities'
+    | '/settings/notifications'
+    | '/settings/payment-history'
+    | '/settings/payment-methods'
+    | '/settings/payouts'
+    | '/settings/profile'
+    | '/settings/theme'
+    | '/c/'
+    | '/settings/'
+    | '/admin/calendar'
+    | '/admin/classroom'
+    | '/admin/community'
+    | '/admin/posts'
     | '/api/stripe/checkout'
     | '/api/stripe/webhook'
+    | '/admin/'
+    | '/api/public/media/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -196,13 +472,39 @@ export interface FileRouteTypes {
     | '/terms-of-use'
     | '/account/billing'
     | '/api/lead'
+    | '/c/about'
+    | '/c/calendar'
+    | '/c/classroom'
+    | '/c/leaderboards'
+    | '/c/members'
     | '/checkout/success'
+    | '/course/$slug'
+    | '/settings/account'
+    | '/settings/affiliates'
+    | '/settings/chat'
+    | '/settings/communities'
+    | '/settings/notifications'
+    | '/settings/payment-history'
+    | '/settings/payment-methods'
+    | '/settings/payouts'
+    | '/settings/profile'
+    | '/settings/theme'
+    | '/c'
+    | '/settings'
+    | '/admin/calendar'
+    | '/admin/classroom'
+    | '/admin/community'
+    | '/admin/posts'
     | '/api/stripe/checkout'
     | '/api/stripe/webhook'
+    | '/admin'
+    | '/api/public/media/$'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/auth'
+    | '/c'
     | '/checkout'
     | '/contact'
     | '/courses'
@@ -210,18 +512,46 @@ export interface FileRouteTypes {
     | '/reach-us'
     | '/refund-policy'
     | '/services'
+    | '/settings'
     | '/subscriptions'
     | '/terms-of-use'
+    | '/_authenticated/admin'
     | '/account/billing'
     | '/api/lead'
+    | '/c/about'
+    | '/c/calendar'
+    | '/c/classroom'
+    | '/c/leaderboards'
+    | '/c/members'
     | '/checkout/success'
+    | '/course/$slug'
+    | '/settings/account'
+    | '/settings/affiliates'
+    | '/settings/chat'
+    | '/settings/communities'
+    | '/settings/notifications'
+    | '/settings/payment-history'
+    | '/settings/payment-methods'
+    | '/settings/payouts'
+    | '/settings/profile'
+    | '/settings/theme'
+    | '/c/'
+    | '/settings/'
+    | '/_authenticated/admin/calendar'
+    | '/_authenticated/admin/classroom'
+    | '/_authenticated/admin/community'
+    | '/_authenticated/admin/posts'
     | '/api/stripe/checkout'
     | '/api/stripe/webhook'
+    | '/_authenticated/admin/'
+    | '/api/public/media/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CRoute: typeof CRouteWithChildren
   CheckoutRoute: typeof CheckoutRouteWithChildren
   ContactRoute: typeof ContactRoute
   CoursesRoute: typeof CoursesRoute
@@ -229,12 +559,15 @@ export interface RootRouteChildren {
   ReachUsRoute: typeof ReachUsRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ServicesRoute: typeof ServicesRoute
+  SettingsRoute: typeof SettingsRouteWithChildren
   SubscriptionsRoute: typeof SubscriptionsRoute
   TermsOfUseRoute: typeof TermsOfUseRoute
   AccountBillingRoute: typeof AccountBillingRoute
   ApiLeadRoute: typeof ApiLeadRoute
+  CourseSlugRoute: typeof CourseSlugRoute
   ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
+  ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -251,6 +584,13 @@ declare module '@tanstack/react-router' {
       path: '/subscriptions'
       fullPath: '/subscriptions'
       preLoaderRoute: typeof SubscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services': {
@@ -302,11 +642,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/c': {
+      id: '/c'
+      path: '/c'
+      fullPath: '/c'
+      preLoaderRoute: typeof CRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -316,12 +670,138 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/c/': {
+      id: '/c/'
+      path: '/'
+      fullPath: '/c/'
+      preLoaderRoute: typeof CIndexRouteImport
+      parentRoute: typeof CRoute
+    }
+    '/settings/theme': {
+      id: '/settings/theme'
+      path: '/theme'
+      fullPath: '/settings/theme'
+      preLoaderRoute: typeof SettingsThemeRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/profile': {
+      id: '/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof SettingsProfileRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/payouts': {
+      id: '/settings/payouts'
+      path: '/payouts'
+      fullPath: '/settings/payouts'
+      preLoaderRoute: typeof SettingsPayoutsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/payment-methods': {
+      id: '/settings/payment-methods'
+      path: '/payment-methods'
+      fullPath: '/settings/payment-methods'
+      preLoaderRoute: typeof SettingsPaymentMethodsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/payment-history': {
+      id: '/settings/payment-history'
+      path: '/payment-history'
+      fullPath: '/settings/payment-history'
+      preLoaderRoute: typeof SettingsPaymentHistoryRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/notifications': {
+      id: '/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof SettingsNotificationsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/communities': {
+      id: '/settings/communities'
+      path: '/communities'
+      fullPath: '/settings/communities'
+      preLoaderRoute: typeof SettingsCommunitiesRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/chat': {
+      id: '/settings/chat'
+      path: '/chat'
+      fullPath: '/settings/chat'
+      preLoaderRoute: typeof SettingsChatRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/affiliates': {
+      id: '/settings/affiliates'
+      path: '/affiliates'
+      fullPath: '/settings/affiliates'
+      preLoaderRoute: typeof SettingsAffiliatesRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/account': {
+      id: '/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof SettingsAccountRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/course/$slug': {
+      id: '/course/$slug'
+      path: '/course/$slug'
+      fullPath: '/course/$slug'
+      preLoaderRoute: typeof CourseSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout/success': {
       id: '/checkout/success'
       path: '/success'
       fullPath: '/checkout/success'
       preLoaderRoute: typeof CheckoutSuccessRouteImport
       parentRoute: typeof CheckoutRoute
+    }
+    '/c/members': {
+      id: '/c/members'
+      path: '/members'
+      fullPath: '/c/members'
+      preLoaderRoute: typeof CMembersRouteImport
+      parentRoute: typeof CRoute
+    }
+    '/c/leaderboards': {
+      id: '/c/leaderboards'
+      path: '/leaderboards'
+      fullPath: '/c/leaderboards'
+      preLoaderRoute: typeof CLeaderboardsRouteImport
+      parentRoute: typeof CRoute
+    }
+    '/c/classroom': {
+      id: '/c/classroom'
+      path: '/classroom'
+      fullPath: '/c/classroom'
+      preLoaderRoute: typeof CClassroomRouteImport
+      parentRoute: typeof CRoute
+    }
+    '/c/calendar': {
+      id: '/c/calendar'
+      path: '/calendar'
+      fullPath: '/c/calendar'
+      preLoaderRoute: typeof CCalendarRouteImport
+      parentRoute: typeof CRoute
+    }
+    '/c/about': {
+      id: '/c/about'
+      path: '/about'
+      fullPath: '/c/about'
+      preLoaderRoute: typeof CAboutRouteImport
+      parentRoute: typeof CRoute
     }
     '/api/lead': {
       id: '/api/lead'
@@ -337,6 +817,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountBillingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/stripe/webhook': {
       id: '/api/stripe/webhook'
       path: '/api/stripe/webhook'
@@ -351,8 +845,93 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStripeCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/posts': {
+      id: '/_authenticated/admin/posts'
+      path: '/posts'
+      fullPath: '/admin/posts'
+      preLoaderRoute: typeof AuthenticatedAdminPostsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/community': {
+      id: '/_authenticated/admin/community'
+      path: '/community'
+      fullPath: '/admin/community'
+      preLoaderRoute: typeof AuthenticatedAdminCommunityRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/classroom': {
+      id: '/_authenticated/admin/classroom'
+      path: '/classroom'
+      fullPath: '/admin/classroom'
+      preLoaderRoute: typeof AuthenticatedAdminClassroomRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/calendar': {
+      id: '/_authenticated/admin/calendar'
+      path: '/calendar'
+      fullPath: '/admin/calendar'
+      preLoaderRoute: typeof AuthenticatedAdminCalendarRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/media/$': {
+      id: '/api/public/media/$'
+      path: '/api/public/media/$'
+      fullPath: '/api/public/media/$'
+      preLoaderRoute: typeof ApiPublicMediaSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminCalendarRoute: typeof AuthenticatedAdminCalendarRoute
+  AuthenticatedAdminClassroomRoute: typeof AuthenticatedAdminClassroomRoute
+  AuthenticatedAdminCommunityRoute: typeof AuthenticatedAdminCommunityRoute
+  AuthenticatedAdminPostsRoute: typeof AuthenticatedAdminPostsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminCalendarRoute: AuthenticatedAdminCalendarRoute,
+  AuthenticatedAdminClassroomRoute: AuthenticatedAdminClassroomRoute,
+  AuthenticatedAdminCommunityRoute: AuthenticatedAdminCommunityRoute,
+  AuthenticatedAdminPostsRoute: AuthenticatedAdminPostsRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface CRouteChildren {
+  CAboutRoute: typeof CAboutRoute
+  CCalendarRoute: typeof CCalendarRoute
+  CClassroomRoute: typeof CClassroomRoute
+  CLeaderboardsRoute: typeof CLeaderboardsRoute
+  CMembersRoute: typeof CMembersRoute
+  CIndexRoute: typeof CIndexRoute
+}
+
+const CRouteChildren: CRouteChildren = {
+  CAboutRoute: CAboutRoute,
+  CCalendarRoute: CCalendarRoute,
+  CClassroomRoute: CClassroomRoute,
+  CLeaderboardsRoute: CLeaderboardsRoute,
+  CMembersRoute: CMembersRoute,
+  CIndexRoute: CIndexRoute,
+}
+
+const CRouteWithChildren = CRoute._addFileChildren(CRouteChildren)
 
 interface CheckoutRouteChildren {
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
@@ -366,9 +945,43 @@ const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
   CheckoutRouteChildren,
 )
 
+interface SettingsRouteChildren {
+  SettingsAccountRoute: typeof SettingsAccountRoute
+  SettingsAffiliatesRoute: typeof SettingsAffiliatesRoute
+  SettingsChatRoute: typeof SettingsChatRoute
+  SettingsCommunitiesRoute: typeof SettingsCommunitiesRoute
+  SettingsNotificationsRoute: typeof SettingsNotificationsRoute
+  SettingsPaymentHistoryRoute: typeof SettingsPaymentHistoryRoute
+  SettingsPaymentMethodsRoute: typeof SettingsPaymentMethodsRoute
+  SettingsPayoutsRoute: typeof SettingsPayoutsRoute
+  SettingsProfileRoute: typeof SettingsProfileRoute
+  SettingsThemeRoute: typeof SettingsThemeRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsAccountRoute: SettingsAccountRoute,
+  SettingsAffiliatesRoute: SettingsAffiliatesRoute,
+  SettingsChatRoute: SettingsChatRoute,
+  SettingsCommunitiesRoute: SettingsCommunitiesRoute,
+  SettingsNotificationsRoute: SettingsNotificationsRoute,
+  SettingsPaymentHistoryRoute: SettingsPaymentHistoryRoute,
+  SettingsPaymentMethodsRoute: SettingsPaymentMethodsRoute,
+  SettingsPayoutsRoute: SettingsPayoutsRoute,
+  SettingsProfileRoute: SettingsProfileRoute,
+  SettingsThemeRoute: SettingsThemeRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CRoute: CRouteWithChildren,
   CheckoutRoute: CheckoutRouteWithChildren,
   ContactRoute: ContactRoute,
   CoursesRoute: CoursesRoute,
@@ -376,12 +989,15 @@ const rootRouteChildren: RootRouteChildren = {
   ReachUsRoute: ReachUsRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ServicesRoute: ServicesRoute,
+  SettingsRoute: SettingsRouteWithChildren,
   SubscriptionsRoute: SubscriptionsRoute,
   TermsOfUseRoute: TermsOfUseRoute,
   AccountBillingRoute: AccountBillingRoute,
   ApiLeadRoute: ApiLeadRoute,
+  CourseSlugRoute: CourseSlugRoute,
   ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
+  ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
