@@ -37,7 +37,7 @@ export function CommunitySidebar() {
         <div className="p-4">
           <h2 className="text-xl font-bold">{name}</h2>
           <p className="text-sm text-muted-foreground">
-            {profile?.handleLabel || "skool.com/aivideobootcamp"}
+            {profile?.handleLabel && !profile.handleLabel.includes("skool.com") ? profile.handleLabel : "solverwebsite.com/courses"}
           </p>
           <p className="mt-3 text-[15px] leading-7">
             {profile?.description ||

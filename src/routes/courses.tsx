@@ -163,7 +163,7 @@ function CoursesPage() {
             <div className="p-4">
               <h2 className="font-semibold">{name}</h2>
               <p className="text-sm text-muted-foreground">
-                {profile?.handleLabel || "skool.com/aivideobootcamp"}
+                {profile?.handleLabel && !profile.handleLabel.includes("skool.com") ? profile.handleLabel : "solverwebsite.com/courses"}
               </p>
               <p className="mt-3 text-[15px] leading-6">
                 {profile?.description ||
@@ -203,7 +203,7 @@ function CoursesPage() {
                       className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-accent"
                     >
                       <CoverImage
-                        path={c.coverUrl}
+                        path={c.coverUrl || coverPath}
                         alt={c.title}
                         loading="lazy"
                         width={64}

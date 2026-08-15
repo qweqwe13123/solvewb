@@ -19,10 +19,12 @@ export function CourseSwitcher({
     c.title.toLowerCase().includes(query.trim().toLowerCase()),
   );
 
+  const defaultLogo = logo || "/assets/community-cover.jpg";
+
   return (
     <div className="flex items-center gap-3">
       <CoverImage
-        path={logo}
+        path={defaultLogo}
         alt={`${title} logo`}
         width={40}
         height={40}
@@ -36,7 +38,7 @@ export function CourseSwitcher({
         >
           <ChevronsUpDown className="size-4" />
         </PopoverTrigger>
-        <PopoverContent align="start" sideOffset={12} className="w-80 rounded-xl p-3">
+        <PopoverContent align="start" sideOffset={12} className="w-80 rounded-xl p-3 shadow-lg">
           <div className="flex items-center gap-2 rounded-full bg-accent px-4 py-2.5">
             <Search className="size-4 shrink-0 text-muted-foreground" />
             <input
@@ -69,7 +71,7 @@ export function CourseSwitcher({
                 className="flex w-full items-center gap-3 rounded-lg p-2 transition-colors hover:bg-accent"
               >
                 <CoverImage
-                  path={c.coverUrl}
+                  path={c.coverUrl || defaultLogo}
                   alt={c.title}
                   loading="lazy"
                   width={40}

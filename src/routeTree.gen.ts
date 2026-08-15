@@ -24,6 +24,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings.index'
+import { Route as CourseIndexRouteImport } from './routes/course.index'
 import { Route as CIndexRouteImport } from './routes/c.index'
 import { Route as SettingsThemeRouteImport } from './routes/settings.theme'
 import { Route as SettingsProfileRouteImport } from './routes/settings.profile'
@@ -127,6 +128,11 @@ const SettingsIndexRoute = SettingsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SettingsRoute,
+} as any)
+const CourseIndexRoute = CourseIndexRouteImport.update({
+  id: '/course/',
+  path: '/course/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CIndexRoute = CIndexRouteImport.update({
   id: '/',
@@ -312,6 +318,7 @@ export interface FileRoutesByFullPath {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/theme': typeof SettingsThemeRoute
   '/c/': typeof CIndexRoute
+  '/course/': typeof CourseIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/classroom': typeof AuthenticatedAdminClassroomRoute
@@ -354,6 +361,7 @@ export interface FileRoutesByTo {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/theme': typeof SettingsThemeRoute
   '/c': typeof CIndexRoute
+  '/course': typeof CourseIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/classroom': typeof AuthenticatedAdminClassroomRoute
@@ -401,6 +409,7 @@ export interface FileRoutesById {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/theme': typeof SettingsThemeRoute
   '/c/': typeof CIndexRoute
+  '/course/': typeof CourseIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/_authenticated/admin/classroom': typeof AuthenticatedAdminClassroomRoute
@@ -448,6 +457,7 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/theme'
     | '/c/'
+    | '/course/'
     | '/settings/'
     | '/admin/calendar'
     | '/admin/classroom'
@@ -490,6 +500,7 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/theme'
     | '/c'
+    | '/course'
     | '/settings'
     | '/admin/calendar'
     | '/admin/classroom'
@@ -536,6 +547,7 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/theme'
     | '/c/'
+    | '/course/'
     | '/settings/'
     | '/_authenticated/admin/calendar'
     | '/_authenticated/admin/classroom'
@@ -565,6 +577,7 @@ export interface RootRouteChildren {
   AccountBillingRoute: typeof AccountBillingRoute
   ApiLeadRoute: typeof ApiLeadRoute
   CourseSlugRoute: typeof CourseSlugRoute
+  CourseIndexRoute: typeof CourseIndexRoute
   ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
@@ -676,6 +689,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/'
       preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof SettingsRoute
+    }
+    '/course/': {
+      id: '/course/'
+      path: '/course'
+      fullPath: '/course/'
+      preLoaderRoute: typeof CourseIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/c/': {
       id: '/c/'
@@ -995,6 +1015,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountBillingRoute: AccountBillingRoute,
   ApiLeadRoute: ApiLeadRoute,
   CourseSlugRoute: CourseSlugRoute,
+  CourseIndexRoute: CourseIndexRoute,
   ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
