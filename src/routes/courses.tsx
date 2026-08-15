@@ -15,14 +15,12 @@ export const Route = createFileRoute("/courses")({
       { title: "AI Video Bootcamp — Courses & Community" },
       {
         name: "description",
-        content:
-          "Master AI Video & AI Image Creation. Join 26.4k creators, monetise AI influencers and UGC ads.",
+        content: "Master AI Video & AI Image Creation. Join 26.4k creators, monetise AI influencers and UGC ads.",
       },
       { property: "og:title", content: "AI Video Bootcamp — Courses" },
       {
         property: "og:description",
-        content:
-          "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn.",
+        content: "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn.",
       },
     ],
   }),
@@ -40,14 +38,14 @@ function CoursesPage() {
   const priceLabel = profile?.priceLabel || "$9/month";
   const membersLabel = profile?.membersLabel || "26.4k members";
   const privacyLabel = profile?.privacyLabel || "Private";
-  const coverPath = profile?.coverUrl ?? null;
-  const logoPath = courses[0]?.coverUrl ?? coverPath;
+  const coverPath = profile?.coverUrl || "/assets/community-cover.jpg";
+  const logoPath = courses[0]?.coverUrl || coverPath;
   const introVideo = profile?.videoUrl ? mediaUrl(profile.videoUrl) : null;
   const gallery = profile?.gallery ?? [];
-  const body = profile?.body ?? "";
+  const body = profile?.body || "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰\n\nWelcome to the AI Video Bootcamp! In this community and course library, you will learn step-by-step how to create photorealistic AI videos, monetizable AI influencers, viral UGC ads, and short films.\n\nWhat you get inside:\n• Full Access to All Current & Future Courses\n• Private Creator Community & Feedback\n• Weekly Live Q&A and Breakdown Sessions\n• Prompt Templates, Workflow Guides & Cheat Sheets";
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground font-sans">
       <header className="sticky top-0 z-20 border-b border-border bg-card">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <CourseSwitcher
@@ -63,7 +61,7 @@ function CoursesPage() {
             ) : (
               <Link
                 to="/auth"
-                search={{ redirect: "/courses" }}
+                search={{ redirect: "/c" }}
                 className="rounded-md border border-border px-5 py-2.5 text-sm font-medium tracking-wide uppercase transition-colors hover:bg-accent"
               >
                 Log in
@@ -80,9 +78,9 @@ function CoursesPage() {
           {introVideo ? (
             <video
               src={introVideo}
-              poster={coverPath ? mediaUrl(coverPath) : undefined}
+              poster={coverPath ? mediaUrl(coverPath) : "/assets/video-poster.jpg"}
               controls
-              className="mt-5 aspect-video w-full rounded-lg bg-black"
+              className="mt-5 aspect-video w-full rounded-lg bg-black object-cover"
             />
           ) : (
             <div className="relative mt-5 overflow-hidden rounded-lg bg-black">
@@ -113,7 +111,7 @@ function CoursesPage() {
                 <img
                   key={p}
                   src={mediaUrl(p)}
-                  alt="Community preview"
+                  alt={`${name} preview`}
                   loading="lazy"
                   width={160}
                   height={96}
@@ -142,8 +140,13 @@ function CoursesPage() {
             </span>
           </div>
 
-          <div className="mt-6 space-y-4 text-[15px] leading-7 whitespace-pre-line">
-            {body || "Master AI Video & AI Image Creation. Join 26.4k creators, monetise AI influencers and UGC ads."}
+          <div className="mt-6 space-y-4 text-[15px] leading-7 whitespace-pre-line text-foreground/90">
+            {body}
+            <div>
+              <Link to="/terms-of-use" className="text-sm text-muted-foreground underline">
+                Privacy and terms
+              </Link>
+            </div>
           </div>
         </article>
 
@@ -151,7 +154,7 @@ function CoursesPage() {
           <div className="overflow-hidden rounded-xl border border-border bg-card">
             <CoverImage
               path={coverPath}
-              alt="Community cover"
+              alt={`${name} community cover`}
               width={1088}
               height={608}
               className="aspect-video w-full object-cover"
@@ -178,9 +181,9 @@ function CoursesPage() {
                 ))}
               </div>
               <Link
-                to="/auth"
-                search={{ redirect: "/courses" }}
-                className="mt-4 block w-full rounded-lg bg-join py-3.5 text-center text-sm font-semibold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90"
+                to={user ? "/c" : "/auth"}
+                search={user ? undefined : { redirect: "/c" }}
+                className="mt-4 block w-full rounded-lg bg-join py-3.5 text-center text-sm font-semibold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 shadow-sm"
               >
                 Join {priceLabel}
               </Link>
@@ -220,6 +223,10 @@ function CoursesPage() {
               </ul>
             </div>
           ) : null}
+
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Powered by <span className="font-bold text-foreground">skool</span>
+          </p>
         </aside>
       </main>
     </div>
