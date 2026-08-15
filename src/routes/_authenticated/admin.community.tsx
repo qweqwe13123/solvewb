@@ -13,7 +13,7 @@ import {
   type Course,
 } from "@/lib/community.functions";
 import { mediaUrl, uploadMedia } from "@/lib/media";
-import { CoverImage } from "@/components/Media";
+import { CoverImage, Avatar } from "@/components/Media";
 
 export const Route = createFileRoute("/_authenticated/admin/community")({
   head: () => ({
@@ -21,12 +21,12 @@ export const Route = createFileRoute("/_authenticated/admin/community")({
       { title: "Community — Admin — AI Video Bootcamp" },
       {
         name: "description",
-        content: "Manage the community profile and create or edit courses.",
+        content: "Manage the community profile, owner information, and create or edit courses.",
       },
       { property: "og:title", content: "Community — Admin" },
       {
         property: "og:description",
-        content: "Manage the community profile and create or edit courses.",
+        content: "Manage the community profile, owner information, and create or edit courses.",
       },
     ],
   }),
@@ -69,7 +69,7 @@ function AdminCommunityPage() {
   const profileMutation = useMutation({
     mutationFn: (p: CommunityProfile) => saveProfileFn({ data: p }),
     onSuccess: () => {
-      toast.success("Профиль сообщества сохранён");
+      toast.success("Профиль сообщества и данные владельца сохранены!");
       qc.invalidateQueries({ queryKey: ["admin-community"] });
       qc.invalidateQueries({ queryKey: ["community"] });
     },
@@ -115,7 +115,7 @@ function AdminCommunityPage() {
   if (isLoading) return <p className="text-[15px] text-muted-foreground">Загрузка…</p>;
 
   return (
-    <>
+    <div className="space-y-8">
       {profile ? (
         <SidebarCardForm
           profile={profile}
@@ -125,11 +125,14 @@ function AdminCommunityPage() {
         />
       ) : null}
 
-
-
-      <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+      <section className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-xl font-bold">Курсы</h2>
+          <div>
+            <h2 className="text-xl font-bold">Курсы</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Список курсов, отображаемый на страницах сообщества и каталога.
+            </p>
+          </div>
           <button
             onClick={() => setEditing({ ...emptyCourse })}
             className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-bold transition-colors hover:bg-accent"
@@ -146,7 +149,7 @@ function AdminCommunityPage() {
                 alt={c.title}
                 width={72}
                 height={48}
-                className="h-12 w-18 shrink-0 rounded-md bg-muted object-cover"
+                className="h-12 w-[72px] shrink-0 rounded-md bg-muted object-cover"
               />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[15px] font-bold">{c.title}</p>
@@ -192,8 +195,7 @@ function AdminCommunityPage() {
           }}
         />
       ) : null}
-
-    </>
+    </div>
   );
 }
 
@@ -209,22 +211,42 @@ function SidebarCardForm({
   onSave: () => void;
 }) {
   return (
-    <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-      <h1 className="text-2xl font-bold">Карточка справа</h1>
+    <section className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm">
+      <h1 className="text-2xl font-bold">Настройки сообщества и владельца</h1>
       <p className="mt-2 text-[15px] text-muted-foreground">
-        Блок в правой колонке главной страницы: обложка, название, ссылка, описание, счётчики и
-        кнопка Join.
+        Здесь настраиваются имя автора/владельца, его фотография (Avatar), название сообщества, обложка и описание.
       </p>
       <form
-        className="mt-6 space-y-4"
+        className="mt-6 space-y-6"
         onSubmit={(e) => {
           e.preventDefault();
           onSave();
         }}
       >
+        <div className="rounded-xl border border-border p-5 bg-accent/20">
+          <h2 className="text-base font-bold text-foreground">Владелец / Автор курса</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Синхронизируется со строкой под видео на странице курсов (например: By Daniel Riley).
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <Text
+              label="Имя автора / подпись (например: By Daniel Riley)"
+              value={profile.ownerLabel}
+              onChange={(v) => onChange({ ...profile, ownerLabel: v })}
+            />
+            <MediaField
+              label="Фото / аватар владельца"
+              folder="avatars"
+              accept="image/*"
+              value={profile.ownerAvatar}
+              onChange={(v) => onChange({ ...profile, ownerAvatar: v })}
+            />
+          </div>
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <Text
-            label="Название"
+            label="Название сообщества"
             value={profile.name}
             onChange={(v) => onChange({ ...profile, name: v })}
           />
@@ -234,12 +256,14 @@ function SidebarCardForm({
             onChange={(v) => onChange({ ...profile, handleLabel: v })}
           />
         </div>
+
         <Area
-          label="Описание карточки"
+          label="Краткое описание"
           rows={3}
           value={profile.description}
           onChange={(v) => onChange({ ...profile, description: v })}
         />
+
         <div className="grid gap-4 sm:grid-cols-3">
           <Text
             label="Участники"
@@ -257,24 +281,60 @@ function SidebarCardForm({
             onChange={(v) => onChange({ ...profile, adminsLabel: v })}
           />
         </div>
-        <Text
-          label="Цена на кнопке Join"
-          value={profile.priceLabel}
-          onChange={(v) => onChange({ ...profile, priceLabel: v })}
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Text
+            label="Цена на кнопке Join"
+            value={profile.priceLabel}
+            onChange={(v) => onChange({ ...profile, priceLabel: v })}
+          />
+          <Text
+            label="Приватность (Private / Public)"
+            value={profile.privacyLabel}
+            onChange={(v) => onChange({ ...profile, privacyLabel: v })}
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <MediaField
+            label="Обложка карточки сообщества"
+            folder="community"
+            accept="image/*"
+            value={profile.coverUrl}
+            onChange={(v) => onChange({ ...profile, coverUrl: v })}
+          />
+          <MediaField
+            label="Видео сообщества"
+            folder="community"
+            accept="video/*"
+            isVideo
+            value={profile.videoUrl}
+            onChange={(v) => onChange({ ...profile, videoUrl: v })}
+          />
+        </div>
+
+        <Area
+          label="Полное описание страницы (текст под видео)"
+          rows={6}
+          value={profile.body}
+          onChange={(v) => onChange({ ...profile, body: v })}
         />
-        <MediaField
-          label="Обложка карточки"
-          folder="community"
-          accept="image/*"
-          value={profile.coverUrl}
-          onChange={(v) => onChange({ ...profile, coverUrl: v })}
-        />
+
+        <div>
+          <GalleryField
+            label="Фотогалерея сообщества"
+            folder="community"
+            value={profile.gallery}
+            onChange={(gallery) => onChange({ ...profile, gallery })}
+          />
+        </div>
+
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-join px-6 py-3 text-sm font-bold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="rounded-lg bg-join px-6 py-3 text-sm font-bold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
         >
-          {pending ? "Сохраняем…" : "Сохранить карточку"}
+          {pending ? "Сохраняем…" : "Сохранить изменения"}
         </button>
       </form>
     </section>
@@ -300,7 +360,7 @@ function CourseForm({
   useEffect(() => setMain(profile), [profile]);
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+    <section className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">{course.id ? "Редактировать курс" : "Новый курс"}</h2>
         <button aria-label="Закрыть" onClick={onCancel} className="rounded-lg p-2 hover:bg-accent">
@@ -326,72 +386,7 @@ function CourseForm({
           );
         }}
       >
-        {main ? (
-          <div className="rounded-xl border border-border p-4">
-            <h3 className="text-[15px] font-bold">Главный экран</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Эти поля меняют левую часть главной страницы.
-            </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Text
-                label="Приватность (Private)"
-                value={main.privacyLabel}
-                onChange={(v) => setMain({ ...main, privacyLabel: v })}
-              />
-              <Text
-                label="Число пользователей"
-                value={main.membersLabel}
-                onChange={(v) => setMain({ ...main, membersLabel: v })}
-              />
-              <Text
-                label="Цена"
-                value={main.priceLabel}
-                onChange={(v) => setMain({ ...main, priceLabel: v })}
-              />
-              <Text
-                label="Название канала"
-                value={main.handleLabel}
-                onChange={(v) => setMain({ ...main, handleLabel: v })}
-              />
-            </div>
-            <div className="mt-4">
-              <Area
-                label="Описание главной страницы"
-                rows={14}
-                value={main.body}
-                onChange={(v) => setMain({ ...main, body: v })}
-              />
-            </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <MediaField
-                label="Видео сообщества"
-                folder="community"
-                accept="video/*"
-                isVideo
-                value={main.videoUrl}
-                onChange={(v) => setMain({ ...main, videoUrl: v })}
-              />
-              <MediaField
-                label="Обложка / превью главного экрана"
-                folder="community"
-                accept="image/*"
-                value={main.coverUrl}
-                onChange={(v) => setMain({ ...main, coverUrl: v })}
-              />
-            </div>
-            <div className="mt-4">
-              <GalleryField
-                label="Фотографии сообщества"
-                folder="community"
-                value={main.gallery}
-                onChange={(gallery) => setMain({ ...main, gallery })}
-              />
-            </div>
-          </div>
-        ) : null}
-
         <div className="grid gap-4 sm:grid-cols-2">
-
           <Text
             label="Название"
             value={form.title}
@@ -421,7 +416,7 @@ function CourseForm({
         />
         <Area
           label="Полное описание"
-          rows={8}
+          rows={6}
           value={form.description}
           onChange={(v) => setForm({ ...form, description: v })}
         />
@@ -445,6 +440,7 @@ function CourseForm({
         </div>
 
         <GalleryField
+          label="Фотографии курса"
           value={form.gallery}
           onChange={(gallery) => setForm({ ...form, gallery })}
         />
@@ -546,7 +542,9 @@ function MediaField({
     if (!file) return;
     setBusy(true);
     try {
-      onChange(await uploadMedia(file, folder));
+      const url = await uploadMedia(file, folder);
+      onChange(url);
+      toast.success("Файл успешно загружен");
     } catch {
       toast.error("Не удалось загрузить файл");
     } finally {
@@ -562,11 +560,13 @@ function MediaField({
           isVideo ? (
             <video src={mediaUrl(value)} controls className="aspect-video w-full rounded bg-black" />
           ) : (
-            <img
-              src={mediaUrl(value)}
-              alt={label}
-              className="aspect-video w-full rounded object-cover"
-            />
+            <div className="relative aspect-video w-full overflow-hidden rounded bg-muted flex items-center justify-center">
+              <img
+                src={mediaUrl(value)}
+                alt={label}
+                className="h-full w-full object-cover"
+              />
+            </div>
           )
         ) : (
           <div className="grid aspect-video w-full place-items-center rounded bg-muted text-sm text-muted-foreground">
@@ -618,6 +618,7 @@ function GalleryField({
     try {
       const paths = await Promise.all(Array.from(files).map((f) => uploadMedia(f, folder)));
       onChange([...value, ...paths]);
+      toast.success("Фотографии добавлены");
     } catch {
       toast.error("Не удалось загрузить фото");
     } finally {
@@ -641,7 +642,7 @@ function GalleryField({
                 type="button"
                 aria-label="Удалить фото"
                 onClick={() => onChange(value.filter((x) => x !== p))}
-                className="absolute -top-2 -right-2 grid size-6 place-items-center rounded-full border border-border bg-card"
+                className="absolute -top-2 -right-2 grid size-6 place-items-center rounded-full border border-border bg-card shadow"
               >
                 <X className="size-3" />
               </button>

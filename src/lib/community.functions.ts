@@ -13,6 +13,7 @@ export type CommunityProfile = {
   membersLabel: string;
   privacyLabel: string;
   ownerLabel: string;
+  ownerAvatar: string | null;
   coverUrl: string | null;
   videoUrl: string | null;
   gallery: string[];
@@ -58,6 +59,7 @@ function mapProfile(row: ProfileRow): CommunityProfile {
     membersLabel: row.members_label,
     privacyLabel: row.privacy_label,
     ownerLabel: row.owner_label,
+    ownerAvatar: (row as any).owner_avatar ?? null,
     coverUrl: row.cover_url,
     videoUrl: row.video_url,
     gallery: Array.isArray(row.gallery) ? (row.gallery as string[]) : [],
@@ -89,10 +91,11 @@ const DEFAULT_PROFILE: CommunityProfile = {
   name: "AI Video Bootcamp",
   tagline: "How AI Content Creators Make Real Money",
   description: "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰",
-  priceLabel: "/month",
+  priceLabel: "$9/month",
   membersLabel: "26.4k members",
   privacyLabel: "Private",
   ownerLabel: "By Daniel Riley",
+  ownerAvatar: null,
   coverUrl: "/assets/community-cover.jpg",
   videoUrl: null,
   gallery: [],
@@ -188,13 +191,13 @@ export const adminGetCommunity = createServerFn({ method: "GET" })
         .order("created_at", { ascending: true }),
     ]);
     return {
-      profile: profileRes.data ? mapProfile(profileRes.data) : null,
+      profile: profileRes.data ? mapProfile(profileRes.data) : DEFAULT_PROFILE,
       courses: (coursesRes.data ?? []).map(mapCourse),
     };
   });
 
 const profileSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   name: z.string().min(1).max(120),
   tagline: z.string().max(300),
   description: z.string().max(5000),
@@ -202,9 +205,10 @@ const profileSchema = z.object({
   membersLabel: z.string().max(60),
   privacyLabel: z.string().max(60),
   ownerLabel: z.string().max(120),
-  coverUrl: z.string().max(500).nullable(),
-  videoUrl: z.string().max(500).nullable(),
-  gallery: z.array(z.string().max(500)).max(20),
+  ownerAvatar: z.string().nullable().optional(),
+  coverUrl: z.string().nullable(),
+  videoUrl: z.string().nullable(),
+  gallery: z.array(z.string()).max(20),
   body: z.string().max(20000),
   handleLabel: z.string().max(160),
   onlineLabel: z.string().max(40),
@@ -215,31 +219,58 @@ export const saveCommunityProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => profileSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase
+    const payload: Record<string, any> = {
+      name: data.name,
+      tagline: data.tagline,
+      description: data.description,
+      price_label: data.priceLabel,
+      members_label: data.membersLabel,
+      privacy_label: data.privacyLabel,
+      owner_label: data.ownerLabel,
+      owner_avatar: data.ownerAvatar ?? null,
+      cover_url: data.coverUrl,
+      video_url: data.videoUrl,
+      gallery: data.gallery,
+      body: data.body,
+      handle_label: data.handleLabel,
+      online_label: data.onlineLabel,
+      admins_label: data.adminsLabel,
+    };
+
+    if (data.id && data.id !== "default-id") {
+      const { error } = await context.supabase
+        .from("community_profile")
+        .update(payload)
+        .eq("id", data.id);
+      if (!error) return { ok: true };
+    }
+
+    // If update by ID didn't match or was default-id, try updating first row or insert
+    const { data: existing } = await context.supabase
       .from("community_profile")
-      .update({
-        name: data.name,
-        tagline: data.tagline,
-        description: data.description,
-        price_label: data.priceLabel,
-        members_label: data.membersLabel,
-        privacy_label: data.privacyLabel,
-        owner_label: data.ownerLabel,
-        cover_url: data.coverUrl,
-        video_url: data.videoUrl,
-        gallery: data.gallery,
-        body: data.body,
-        handle_label: data.handleLabel,
-        online_label: data.onlineLabel,
-        admins_label: data.adminsLabel,
-      })
-      .eq("id", data.id);
-    if (error) throw new Error("Не удалось сохранить профиль сообщества");
+      .select("id")
+      .limit(1)
+      .maybeSingle();
+
+    if (existing?.id) {
+      const { error } = await context.supabase
+        .from("community_profile")
+        .update(payload)
+        .eq("id", existing.id);
+      if (error) throw new Error("Не удалось обновить профиль сообщества");
+      return { ok: true };
+    }
+
+    const { error: insertError } = await context.supabase
+      .from("community_profile")
+      .insert(payload);
+    if (insertError) throw new Error("Не удалось сохранить профиль сообщества");
+
     return { ok: true };
   });
 
 const courseSchema = z.object({
-  id: z.string().uuid().nullable(),
+  id: z.string().uuid().nullable().optional(),
   slug: z
     .string()
     .min(1)
@@ -249,9 +280,9 @@ const courseSchema = z.object({
   summary: z.string().max(500),
   description: z.string().max(20000),
   priceLabel: z.string().max(60),
-  coverUrl: z.string().max(500).nullable(),
-  videoUrl: z.string().max(500).nullable(),
-  gallery: z.array(z.string().max(500)).max(20),
+  coverUrl: z.string().nullable(),
+  videoUrl: z.string().nullable(),
+  gallery: z.array(z.string()).max(20),
   isPublished: z.boolean(),
   sortOrder: z.number().int().min(0).max(9999),
 });
@@ -290,7 +321,7 @@ export const saveCourse = createServerFn({ method: "POST" })
 
 export const deleteCourse = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .inputValidator((data: unknown) => z.object({ id: z.string() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("courses").delete().eq("id", data.id);
     if (error) throw new Error("Не удалось удалить курс");

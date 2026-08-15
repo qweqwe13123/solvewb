@@ -133,7 +133,8 @@ function CoursesPage() {
             </span>
             <span className="flex items-center gap-2">
               <Avatar
-                name={profile?.ownerLabel || "Owner"}
+                name={profile?.ownerLabel || "Daniel Riley"}
+                path={profile?.ownerAvatar}
                 className="size-6 rounded-full text-[10px]"
               />
               {profile?.ownerLabel || "By Daniel Riley"}
