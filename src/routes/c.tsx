@@ -1,12 +1,15 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Bell, MessageSquare, Search, Send } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CourseSwitcher } from "@/components/CourseSwitcher";
 import { UserMenu } from "@/components/UserMenu";
 import { useSession } from "@/hooks/useSession";
-import { getCommunity } from "@/lib/community.functions";
+import { getCommunity, checkCommunityAccessFn } from "@/lib/community.functions";
+
+const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
+const COMMUNITY_REDIRECT = "/checkout?plan=starter&period=monthly";
 
 export const Route = createFileRoute("/c")({
   component: CommunityShell,
@@ -23,17 +26,61 @@ const TABS = [
 ] as const;
 
 function CommunityShell() {
-  const { user } = useSession();
+  const { user, loading: sessionLoading } = useSession();
+  const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
   const fetchCommunity = useServerFn(getCommunity);
+  const checkAccess = useServerFn(checkCommunityAccessFn);
   const { data } = useQuery({ queryKey: ["community"], queryFn: () => fetchCommunity() });
+  const accessQuery = useQuery({
+    queryKey: ["community-access-status", user?.id, user?.email],
+    queryFn: () => checkAccess({ data: { userId: user?.id, email: user?.email } }),
+    enabled: !!user,
+  });
   const profile = data?.profile ?? null;
   const courses = data?.courses ?? [];
   const name = courses[0]?.title || profile?.name || "AI Video Bootcamp";
   const logo = courses[0]?.coverUrl ?? profile?.coverUrl ?? null;
+  const isAdmin = (user?.email || "").toLowerCase().trim() === DESIGNATED_ADMIN_EMAIL;
+  const hasAccess = isAdmin || Boolean(accessQuery.data?.hasAccess);
+
+  useEffect(() => {
+    if (sessionLoading) return;
+    if (!user) {
+      navigate({
+        to: "/auth",
+        search: { redirect: COMMUNITY_REDIRECT },
+        replace: true,
+      });
+      return;
+    }
+    if (!isAdmin && accessQuery.isSuccess && !hasAccess) {
+      navigate({
+        to: "/checkout",
+        search: { plan: "starter", period: "monthly" },
+        replace: true,
+      });
+    }
+  }, [accessQuery.isSuccess, hasAccess, isAdmin, navigate, sessionLoading, user]);
+
+  if (sessionLoading || (!user && typeof window !== "undefined") || (user && !isAdmin && accessQuery.isLoading)) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">
+        Checking access…
+      </div>
+    );
+  }
+
+  if (user && !isAdmin && (accessQuery.isError || (accessQuery.isSuccess && !hasAccess))) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">
+        Redirecting to checkout…
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">

@@ -14,18 +14,23 @@ export const Route = createFileRoute("/api/stripe/checkout")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const url = new URL(request.url);
-        const search = checkoutSearchSchema.parse({
-          plan: url.searchParams.get("plan"),
-          period: url.searchParams.get("period"),
-        });
+        try {
+          const url = new URL(request.url);
+          const rawPlan = url.searchParams.get("plan");
+          const rawPeriod = url.searchParams.get("period");
+          const plan = (rawPlan && PLAN_IDS.includes(rawPlan as any) ? rawPlan : "starter") as (typeof PLAN_IDS)[number];
+          const period = rawPeriod === "annually" ? "annually" : "monthly";
 
-        const checkoutUrl = await createHostedCheckoutUrl({
-          plan: search.plan,
-          period: search.period,
-        });
+          const checkoutUrl = await createHostedCheckoutUrl({
+            plan,
+            period,
+          });
 
-        return Response.redirect(checkoutUrl, 302);
+          return Response.redirect(checkoutUrl, 303);
+        } catch (error) {
+          console.error("Error creating Stripe checkout session in API:", error);
+          return Response.redirect("https://www.solverwebsite.com/courses", 303);
+        }
       },
     },
   },

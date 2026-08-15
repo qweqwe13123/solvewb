@@ -226,7 +226,8 @@ function BillingPage() {
                     You can start a new subscription from the checkout page.
                   </p>
                   <Link
-                    to="/checkout"
+                    to="/api/stripe/checkout"
+                    search={{ plan: "starter", period: "monthly" }}
                     className="mt-6 inline-flex items-center justify-center rounded-full bg-[#2c2824] px-5 py-3 text-sm text-white transition-colors hover:bg-[#1f1b17]"
                   >
                     Go to checkout

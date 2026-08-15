@@ -44,6 +44,14 @@ const DEFAULT_SUPABASE_URL = "https://bwxiiqpuhgcvouuqvmbi.supabase.co";
 const DEFAULT_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3eGlpcXB1aGdjdm91dXF2bWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MzU0NDIsImV4cCI6MjEwMjIxMTQ0Mn0.OjMHVOCpkMYx4D1xmrk4u_G1TSmVNHD2SYyMsB_0ZM4";
 const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
 const BASE_MEMBER_COUNT = 100;
+const FIXED_PRICE_LABEL = "$49/month";
+
+function normalizePriceLabel(label: string | null | undefined) {
+  const value = (label || "").trim();
+  if (!value) return FIXED_PRICE_LABEL;
+  if (/\b9\b|\$9(?:\/|\b)/i.test(value)) return FIXED_PRICE_LABEL;
+  return value;
+}
 
 function publicClient() {
   const url = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || DEFAULT_SUPABASE_URL;
@@ -57,7 +65,7 @@ function mapProfile(row: ProfileRow): CommunityProfile {
     name: row.name,
     tagline: row.tagline,
     description: row.description,
-    priceLabel: row.price_label,
+    priceLabel: normalizePriceLabel(row.price_label),
     membersLabel: row.members_label,
     privacyLabel: row.privacy_label,
     ownerLabel: row.owner_label,
@@ -99,7 +107,7 @@ function mapCourse(row: CourseRow): Course {
     title: row.title,
     summary: row.summary,
     description: row.description,
-    priceLabel: row.price_label,
+    priceLabel: normalizePriceLabel(row.price_label),
     coverUrl: row.cover_url,
     videoUrl: row.video_url,
     gallery: Array.isArray(row.gallery) ? (row.gallery as string[]) : [],
@@ -113,7 +121,7 @@ let inMemoryProfile: CommunityProfile = {
   name: "AI Video Bootcamp",
   tagline: "How AI Content Creators Make Real Money",
   description: "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰",
-  priceLabel: "$49/month",
+  priceLabel: FIXED_PRICE_LABEL,
   membersLabel: "100 members",
   privacyLabel: "Private",
   ownerLabel: "By Daniel Riley",
@@ -134,7 +142,7 @@ let inMemoryCourses: Course[] = [
     title: "AI Video Bootcamp",
     summary: "Master AI Video & AI Image Creation with 100 creators.",
     description: "Complete guide to generating cinematic AI video clips, camera controls, and monetizing UGC ads.",
-    priceLabel: "$49/month",
+    priceLabel: FIXED_PRICE_LABEL,
     coverUrl: "/assets/community-cover.jpg",
     videoUrl: null,
     gallery: [],
@@ -201,6 +209,41 @@ export const getCourseBySlug = createServerFn({ method: "GET" })
     return { course: found ?? inMemoryCourses[0] ?? null };
   });
 
+export const checkCommunityAccessFn = createServerFn({ method: "POST" })
+  .validator((data: unknown) => {
+    const parsed = z.object({ userId: z.string().optional(), email: z.string().optional() }).safeParse(data || {});
+    return parsed.success ? parsed.data : {};
+  })
+  .handler(async ({ data }) => {
+    const email = (data.email || "").toLowerCase().trim();
+    if (email && email === DESIGNATED_ADMIN_EMAIL.toLowerCase()) {
+      return { hasAccess: true, isAdmin: true, status: "admin" };
+    }
+
+    if (!data.userId) {
+      return { hasAccess: false, isAdmin: false, status: "unauthenticated" };
+    }
+
+    try {
+      const supabase = publicClient();
+      const { data: sub, error } = await supabase
+        .from("subscriptions")
+        .select("status")
+        .eq("user_id", data.userId)
+        .in("status", ["active", "trialing", "past_due"])
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && sub && ["active", "trialing", "past_due"].includes(sub.status)) {
+        return { hasAccess: true, isAdmin: false, status: sub.status };
+      }
+    } catch (err) {
+      console.warn("Could not check subscription access:", err);
+    }
+
+    return { hasAccess: false, isAdmin: false, status: "no_subscription" };
+  });
+
 /* ---------------- admin ---------------- */
 
 export const adminGetCommunity = createServerFn({ method: "GET" })
@@ -265,7 +308,7 @@ export const saveCommunityProfile = createServerFn({ method: "POST" })
       name: data.name,
       tagline: data.tagline,
       description: data.description,
-      price_label: data.priceLabel,
+      price_label: normalizePriceLabel(data.priceLabel),
       members_label: data.membersLabel,
       privacy_label: data.privacyLabel,
       owner_label: data.ownerLabel,
@@ -361,7 +404,7 @@ export const saveCourse = createServerFn({ method: "POST" })
       title: data.title,
       summary: data.summary,
       description: data.description,
-      price_label: data.priceLabel,
+      price_label: normalizePriceLabel(data.priceLabel),
       cover_url: data.coverUrl || inMemoryProfile.coverUrl,
       video_url: data.videoUrl,
       gallery: data.gallery,

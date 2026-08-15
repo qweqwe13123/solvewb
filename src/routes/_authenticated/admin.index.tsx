@@ -40,7 +40,7 @@ function AdminMembersPage() {
             value={membersQuery.data ? String(membersQuery.data.total) : "…"}
           />
           <Stat label="Admins" value="1" />
-          <Stat label="Price" value="$9/mo" />
+          <Stat label="Price" value="$49/mo" />
         </div>
       </section>
 
