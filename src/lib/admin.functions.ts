@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+export const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
+
 export type AdminMember = {
   id: string;
   email: string;
@@ -13,34 +15,24 @@ export type AdminMember = {
 export const getIsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    try {
-      const { data: claimData, error: claimError } = await context.supabase.rpc("claim_admin_role");
-      if (!claimError && claimData === true) return { isAdmin: true };
-
-      const { data: roleData } = await context.supabase.rpc("has_role", {
-        _user_id: context.userId,
-        _role: "admin",
-      });
-      if (roleData === true) return { isAdmin: true };
-
-      const { data: userRole } = await context.supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", context.userId)
-        .eq("role", "admin")
-        .maybeSingle();
-      if (userRole) return { isAdmin: true };
-
-      // If user is authenticated in this private workspace, allow admin access
-      return { isAdmin: true };
-    } catch {
-      return { isAdmin: true };
+    const userEmail = (context.claims?.email || context.user?.email || "").toLowerCase().trim();
+    if (userEmail !== DESIGNATED_ADMIN_EMAIL.toLowerCase()) {
+      return { isAdmin: false };
     }
+
+    try {
+      await context.supabase.rpc("claim_admin_role");
+    } catch {}
+
+    return { isAdmin: true };
   });
 
 export const listMembers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ members: AdminMember[]; total: number }> => {
+    const userEmail = (context.claims?.email || context.user?.email || "").toLowerCase().trim();
+    if (userEmail !== DESIGNATED_ADMIN_EMAIL.toLowerCase()) throw new Error("Forbidden");
+
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data, error } = await supabaseAdmin.auth.admin.listUsers({
@@ -52,7 +44,7 @@ export const listMembers = createServerFn({ method: "GET" })
           members: [
             {
               id: context.userId,
-              email: context.claims?.email || "owner@solverwebsite.com",
+              email: context.claims?.email || DESIGNATED_ADMIN_EMAIL,
               name: "Admin Owner",
               avatarUrl: null,
               createdAt: new Date().toISOString(),
@@ -81,7 +73,7 @@ export const listMembers = createServerFn({ method: "GET" })
         members: [
           {
             id: context.userId,
-            email: context.claims?.email || "owner@solverwebsite.com",
+            email: context.claims?.email || DESIGNATED_ADMIN_EMAIL,
             name: "Admin Owner",
             avatarUrl: null,
             createdAt: new Date().toISOString(),

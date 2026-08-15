@@ -30,7 +30,7 @@ export const Route = createFileRoute("/c/")({
       { property: "og:title", content: "AI Video Bootcamp community feed" },
       {
         property: "og:description",
-        content: "Join the discussion, share your AI video wins and learn with 26.4k creators.",
+        content: "Join the discussion, share your AI video wins and learn with 100 creators.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -77,16 +77,16 @@ function CommunityFeed() {
             to="/admin/posts"
             className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-accent"
           >
-            <span className="text-[15px] font-bold">Написать новый пост</span>
+            <span className="text-[15px] font-bold">Create a new post</span>
             <span className="text-sm text-muted-foreground">Admin · Posts</span>
           </Link>
         ) : null}
 
         {postsQuery.isLoading ? (
-          <p className="text-[15px] text-muted-foreground">Загрузка…</p>
+          <p className="text-[15px] text-muted-foreground">Loading…</p>
         ) : posts.length === 0 ? (
           <p className="rounded-xl border border-border bg-card p-6 text-[15px] text-muted-foreground">
-            Пока нет постов.
+            No posts yet.
           </p>
         ) : (
           <ul className="mt-5 space-y-5">
@@ -135,7 +135,7 @@ function PostCard({
   const likeMutation = useMutation({
     mutationFn: () => likeFn({ data: { postId: post.id } }),
     onSuccess: invalidate,
-    onError: () => toast.error("Не удалось обновить лайк"),
+    onError: () => toast.error("Failed to update like"),
   });
 
   const commentMutation = useMutation({
@@ -144,13 +144,13 @@ function PostCard({
       setText("");
       invalidate();
     },
-    onError: () => toast.error("Не удалось отправить комментарий"),
+    onError: () => toast.error("Failed to submit comment"),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => removeFn({ data: { id } }),
     onSuccess: invalidate,
-    onError: () => toast.error("Не удалось удалить комментарий"),
+    onError: () => toast.error("Failed to delete comment"),
   });
 
   return (
@@ -198,7 +198,7 @@ function PostCard({
         <button
           onClick={() => {
             if (!userId) {
-              toast.error("Войдите, чтобы поставить лайк");
+              toast.error("Log in to like this post");
               return;
             }
             likeMutation.mutate();
@@ -236,7 +236,7 @@ function PostCard({
                         onClick={() => deleteMutation.mutate(c.id)}
                         className="ml-auto text-xs text-muted-foreground hover:text-destructive"
                       >
-                        Удалить
+                        Delete
                       </button>
                     ) : null}
                   </div>
@@ -245,9 +245,9 @@ function PostCard({
               </li>
             ))}
             {commentsQuery.isLoading ? (
-              <li className="text-sm text-muted-foreground">Загрузка…</li>
+              <li className="text-sm text-muted-foreground">Loading…</li>
             ) : (commentsQuery.data?.comments ?? []).length === 0 ? (
-              <li className="text-sm text-muted-foreground">Комментариев пока нет.</li>
+              <li className="text-sm text-muted-foreground">No comments yet.</li>
             ) : null}
           </ul>
 
@@ -263,14 +263,14 @@ function PostCard({
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Написать комментарий…"
-                aria-label="Комментарий"
+                placeholder="Write a comment…"
+                aria-label="Comment"
                 className="min-w-0 flex-1 rounded-lg border border-border bg-transparent px-3 py-2.5 text-[15px] outline-none focus:border-foreground"
               />
               <button
                 type="submit"
                 disabled={commentMutation.isPending || !text.trim()}
-                aria-label="Отправить комментарий"
+                aria-label="Send comment"
                 className="rounded-lg bg-join p-2.5 text-join-foreground disabled:opacity-50"
               >
                 <Send className="size-4" />
@@ -279,9 +279,9 @@ function PostCard({
           ) : (
             <p className="mt-4 text-sm text-muted-foreground">
               <Link to="/auth" className="font-bold text-brand">
-                Войдите
+                Log in
               </Link>
-              , чтобы комментировать и ставить лайки.
+               to comment and like posts.
             </p>
           )}
         </div>

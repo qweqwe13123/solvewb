@@ -18,20 +18,17 @@ export async function uploadMedia(file: File, folder: string): Promise<string> {
   try {
     const { error } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .upload(path, file, { cacheControl: "3600", upsert: true, contentType: file.type });
+      .upload(path, file, { cacheControl: "3600", upsert: true, contentType: file.type || "application/octet-stream" });
     if (!error) {
       return path;
     }
-    console.warn("[uploadMedia] Supabase storage upload warning:", error.message);
-  } catch (err) {
-    console.warn("[uploadMedia] Supabase storage upload exception:", err);
-  }
+  } catch {}
 
-  // Fallback to Data URL for instant preview & persistence even if bucket RLS/creation is pending
+  // Fallback to Data URL for any image/file format (png, jpg, webp, heic, gif, svg, avif, etc.)
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error("Не удалось прочитать файл"));
+    reader.onerror = () => reject(new Error("Unable to read file"));
     reader.readAsDataURL(file);
   });
 }

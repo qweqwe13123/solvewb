@@ -14,6 +14,7 @@ import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as RefundGuaranteeRouteImport } from './routes/refund-guarantee'
 import { Route as ReachUsRouteImport } from './routes/reach-us'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as CoursesRouteImport } from './routes/courses'
@@ -78,6 +79,11 @@ const ServicesRoute = ServicesRouteImport.update({
 const RefundPolicyRoute = RefundPolicyRouteImport.update({
   id: '/refund-policy',
   path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundGuaranteeRoute = RefundGuaranteeRouteImport.update({
+  id: '/refund-guarantee',
+  path: '/refund-guarantee',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReachUsRoute = ReachUsRouteImport.update({
@@ -292,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/courses': typeof CoursesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/reach-us': typeof ReachUsRoute
+  '/refund-guarantee': typeof RefundGuaranteeRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/services': typeof ServicesRoute
   '/settings': typeof SettingsRouteWithChildren
@@ -337,6 +344,7 @@ export interface FileRoutesByTo {
   '/courses': typeof CoursesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/reach-us': typeof ReachUsRoute
+  '/refund-guarantee': typeof RefundGuaranteeRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/services': typeof ServicesRoute
   '/subscriptions': typeof SubscriptionsRoute
@@ -383,6 +391,7 @@ export interface FileRoutesById {
   '/courses': typeof CoursesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/reach-us': typeof ReachUsRoute
+  '/refund-guarantee': typeof RefundGuaranteeRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/services': typeof ServicesRoute
   '/settings': typeof SettingsRouteWithChildren
@@ -431,6 +440,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/privacy-policy'
     | '/reach-us'
+    | '/refund-guarantee'
     | '/refund-policy'
     | '/services'
     | '/settings'
@@ -476,6 +486,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/privacy-policy'
     | '/reach-us'
+    | '/refund-guarantee'
     | '/refund-policy'
     | '/services'
     | '/subscriptions'
@@ -521,6 +532,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/privacy-policy'
     | '/reach-us'
+    | '/refund-guarantee'
     | '/refund-policy'
     | '/services'
     | '/settings'
@@ -569,6 +581,7 @@ export interface RootRouteChildren {
   CoursesRoute: typeof CoursesRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ReachUsRoute: typeof ReachUsRoute
+  RefundGuaranteeRoute: typeof RefundGuaranteeRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ServicesRoute: typeof ServicesRoute
   SettingsRoute: typeof SettingsRouteWithChildren
@@ -618,6 +631,13 @@ declare module '@tanstack/react-router' {
       path: '/refund-policy'
       fullPath: '/refund-policy'
       preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund-guarantee': {
+      id: '/refund-guarantee'
+      path: '/refund-guarantee'
+      fullPath: '/refund-guarantee'
+      preLoaderRoute: typeof RefundGuaranteeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reach-us': {
@@ -1007,6 +1027,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesRoute: CoursesRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ReachUsRoute: ReachUsRoute,
+  RefundGuaranteeRoute: RefundGuaranteeRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ServicesRoute: ServicesRoute,
   SettingsRoute: SettingsRouteWithChildren,

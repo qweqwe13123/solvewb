@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Globe, Lock, Users, Tag, Play } from "lucide-react";
+import { Globe, Lock, Users, Tag, Play, ShieldCheck } from "lucide-react";
 import { CourseSwitcher } from "@/components/CourseSwitcher";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/courses")({
       { title: "AI Video Bootcamp — Courses & Community" },
       {
         name: "description",
-        content: "Master AI Video & AI Image Creation. Join 26.4k creators, monetise AI influencers and UGC ads.",
+        content: "Master AI Video & AI Image Creation. Join 100 creators, monetise AI influencers and UGC ads.",
       },
       { property: "og:title", content: "AI Video Bootcamp — Courses" },
       {
@@ -35,8 +35,8 @@ function CoursesPage() {
   const profile = data?.profile ?? null;
   const courses = data?.courses ?? [];
   const name = profile?.name || "AI Video Bootcamp";
-  const priceLabel = profile?.priceLabel || "$9/month";
-  const membersLabel = profile?.membersLabel || "26.4k members";
+  const priceLabel = profile?.priceLabel || "$49/month";
+  const membersLabel = profile?.membersLabel || "100 members";
   const privacyLabel = profile?.privacyLabel || "Private";
   const coverPath = profile?.coverUrl || "/assets/community-cover.jpg";
   const logoPath = courses[0]?.coverUrl || coverPath;
@@ -59,9 +59,9 @@ function CoursesPage() {
             {user ? (
               <UserMenu user={user} />
             ) : (
-              <Link
-                to="/auth"
-                search={{ redirect: "/c" }}
+          <Link
+            to="/auth"
+            search={{ redirect: "/courses" }}
                 className="rounded-md border border-border px-5 py-2.5 text-sm font-medium tracking-wide uppercase transition-colors hover:bg-accent"
               >
                 Log in
@@ -182,11 +182,18 @@ function CoursesPage() {
                 ))}
               </div>
               <Link
-                to={user ? "/c" : "/auth"}
-                search={user ? undefined : { redirect: "/c" }}
+                to={user ? "/checkout" : "/auth"}
+                search={user ? { plan: "starter", period: "monthly" } : { redirect: "/checkout?plan=starter&period=monthly" }}
                 className="mt-4 block w-full rounded-lg bg-join py-3.5 text-center text-sm font-semibold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 shadow-sm"
               >
                 Join {priceLabel}
+              </Link>
+              <Link
+                to="/refund-guarantee"
+                className="mt-3 flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2.5 text-center text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <ShieldCheck className="size-4" />
+                100% Money-Back Guarantee
               </Link>
             </div>
           </div>
@@ -226,7 +233,7 @@ function CoursesPage() {
           ) : null}
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Powered by <span className="font-bold text-foreground">skool</span>
+            Powered by <span className="font-bold text-foreground">solverwebsite</span>
           </p>
         </aside>
       </main>

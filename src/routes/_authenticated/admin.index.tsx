@@ -32,7 +32,7 @@ function AdminMembersPage() {
       <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <h1 className="text-2xl font-bold">Admin panel</h1>
         <p className="mt-3 text-[15px] leading-6 text-muted-foreground">
-          Доступ есть только у {user?.email}.
+          Only accessible by {user?.email}.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <Stat
@@ -47,10 +47,10 @@ function AdminMembersPage() {
       <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <h2 className="text-xl font-bold">Members</h2>
         {membersQuery.isLoading ? (
-          <p className="mt-4 text-[15px] text-muted-foreground">Загрузка…</p>
+          <p className="mt-4 text-[15px] text-muted-foreground">Loading…</p>
         ) : membersQuery.isError ? (
           <p className="mt-4 text-[15px] text-destructive">
-            Не удалось загрузить список участников.
+            Failed to load members list.
           </p>
         ) : (
           <ul className="mt-4 divide-y divide-border">

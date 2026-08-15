@@ -42,6 +42,8 @@ type CourseRow = Database["public"]["Tables"]["courses"]["Row"];
 
 const DEFAULT_SUPABASE_URL = "https://bwxiiqpuhgcvouuqvmbi.supabase.co";
 const DEFAULT_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3eGlpcXB1aGdjdm91dXF2bWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MzU0NDIsImV4cCI6MjEwMjIxMTQ0Mn0.OjMHVOCpkMYx4D1xmrk4u_G1TSmVNHD2SYyMsB_0ZM4";
+const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
+const BASE_MEMBER_COUNT = 100;
 
 function publicClient() {
   const url = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || DEFAULT_SUPABASE_URL;
@@ -59,7 +61,7 @@ function mapProfile(row: ProfileRow): CommunityProfile {
     membersLabel: row.members_label,
     privacyLabel: row.privacy_label,
     ownerLabel: row.owner_label,
-    ownerAvatar: (row as any).owner_avatar || row.tagline || null,
+    ownerAvatar: (row as any).owner_avatar || null,
     coverUrl: row.cover_url,
     videoUrl: row.video_url,
     gallery: Array.isArray(row.gallery) ? (row.gallery as string[]) : [],
@@ -68,6 +70,26 @@ function mapProfile(row: ProfileRow): CommunityProfile {
     onlineLabel: row.online_label,
     adminsLabel: row.admins_label,
   };
+}
+
+async function getDisplayedMembersLabel(supabase: ReturnType<typeof publicClient>) {
+  try {
+    const { count, error } = await supabase
+      .from("profiles")
+      .select("id", { count: "exact", head: true });
+    if (!error && typeof count === "number") {
+      return `${BASE_MEMBER_COUNT + count} members`;
+    }
+  } catch {}
+
+  return `${BASE_MEMBER_COUNT} members`;
+}
+
+function assertDesignatedAdmin(context: { claims?: { email?: string | null }; user?: { email?: string | null } }) {
+  const email = (context.claims?.email || context.user?.email || "").toLowerCase().trim();
+  if (email !== DESIGNATED_ADMIN_EMAIL.toLowerCase()) {
+    throw new Error("Forbidden");
+  }
 }
 
 function mapCourse(row: CourseRow): Course {
@@ -91,15 +113,15 @@ let inMemoryProfile: CommunityProfile = {
   name: "AI Video Bootcamp",
   tagline: "How AI Content Creators Make Real Money",
   description: "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰",
-  priceLabel: "$9/month",
-  membersLabel: "26.4k members",
+  priceLabel: "$49/month",
+  membersLabel: "100 members",
   privacyLabel: "Private",
   ownerLabel: "By Daniel Riley",
   ownerAvatar: null,
   coverUrl: "/assets/community-cover.jpg",
   videoUrl: null,
   gallery: [],
-  body: "Master AI Video & AI Image Creation. Join 26.4k creators, monetise AI influencers and UGC ads.\n\nWelcome to the AI Video Bootcamp! In this community and course library, you will learn step-by-step how to create photorealistic AI videos, monetizable AI influencers, viral UGC ads, and short films.\n\nWhat you get inside:\n• Full Access to All Current & Future Courses\n• Private Creator Community & Feedback\n• Weekly Live Q&A and Breakdown Sessions\n• Prompt Templates, Workflow Guides & Cheat Sheets",
+  body: "Master AI Video & AI Image Creation. Join 100 creators, monetise AI influencers and UGC ads.\n\nWelcome to the AI Video Bootcamp! In this community and course library, you will learn step-by-step how to create photorealistic AI videos, monetizable AI influencers, viral UGC ads, and short films.\n\nWhat you get inside:\n• Full Access to All Current & Future Courses\n• Private Creator Community & Feedback\n• Weekly Live Q&A and Breakdown Sessions\n• Prompt Templates, Workflow Guides & Cheat Sheets",
   handleLabel: "solverwebsite.com/courses",
   onlineLabel: "414",
   adminsLabel: "8",
@@ -110,9 +132,9 @@ let inMemoryCourses: Course[] = [
     id: "c1",
     slug: "ai-video-mastery",
     title: "AI Video Bootcamp",
-    summary: "Master AI Video & AI Image Creation with 26.4k creators.",
+    summary: "Master AI Video & AI Image Creation with 100 creators.",
     description: "Complete guide to generating cinematic AI video clips, camera controls, and monetizing UGC ads.",
-    priceLabel: "$9/month",
+    priceLabel: "$49/month",
     coverUrl: "/assets/community-cover.jpg",
     videoUrl: null,
     gallery: [],
@@ -125,7 +147,7 @@ export const getCommunity = createServerFn({ method: "GET" }).handler(
   async (): Promise<{ profile: CommunityProfile; courses: Course[] }> => {
     try {
       const supabase = publicClient();
-      const [profileRes, coursesRes] = await Promise.all([
+      const [profileRes, coursesRes, membersLabel] = await Promise.all([
         supabase.from("community_profile").select("*").limit(1).maybeSingle(),
         supabase
           .from("courses")
@@ -133,9 +155,12 @@ export const getCommunity = createServerFn({ method: "GET" }).handler(
           .eq("is_published", true)
           .order("sort_order", { ascending: true })
           .order("created_at", { ascending: true }),
+        getDisplayedMembersLabel(supabase),
       ]);
 
-      const fetchedProfile = profileRes.data ? mapProfile(profileRes.data) : null;
+      const fetchedProfile = profileRes.data
+        ? { ...mapProfile(profileRes.data), membersLabel }
+        : { ...inMemoryProfile, membersLabel };
       const fetchedCourses = (coursesRes.data ?? []).map(mapCourse);
 
       if (fetchedProfile) {
@@ -146,7 +171,7 @@ export const getCommunity = createServerFn({ method: "GET" }).handler(
       }
 
       return {
-        profile: fetchedProfile ? { ...inMemoryProfile, ...fetchedProfile } : inMemoryProfile,
+        profile: { ...inMemoryProfile, ...fetchedProfile },
         courses: fetchedCourses.length > 0 ? fetchedCourses : inMemoryCourses,
       };
     } catch {
@@ -181,6 +206,8 @@ export const getCourseBySlug = createServerFn({ method: "GET" })
 export const adminGetCommunity = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ profile: CommunityProfile | null; courses: Course[] }> => {
+    assertDesignatedAdmin(context);
+    await context.supabase.rpc("claim_admin_role");
     try {
       const [profileRes, coursesRes] = await Promise.all([
         context.supabase.from("community_profile").select("*").limit(1).maybeSingle(),
@@ -231,28 +258,18 @@ export const saveCommunityProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => profileSchema.parse(data))
   .handler(async ({ data, context }) => {
-    // Update in-memory cache immediately
-    inMemoryProfile = {
-      ...inMemoryProfile,
-      ...data,
-      ownerAvatar: data.ownerAvatar ?? inMemoryProfile.ownerAvatar,
-    };
-
-    // Make sure user has admin role
-    try {
-      await context.supabase
-        .from("user_roles")
-        .upsert({ user_id: context.userId, role: "admin" }, { onConflict: "user_id, role" });
-    } catch {}
+    assertDesignatedAdmin(context);
+    await context.supabase.rpc("claim_admin_role");
 
     const payload: Record<string, any> = {
       name: data.name,
-      tagline: data.ownerAvatar || data.tagline || "",
+      tagline: data.tagline,
       description: data.description,
       price_label: data.priceLabel,
       members_label: data.membersLabel,
       privacy_label: data.privacyLabel,
       owner_label: data.ownerLabel,
+      owner_avatar: data.ownerAvatar,
       cover_url: data.coverUrl,
       video_url: data.videoUrl,
       gallery: data.gallery,
@@ -268,7 +285,13 @@ export const saveCommunityProfile = createServerFn({ method: "POST" })
           .from("community_profile")
           .update(payload)
           .eq("id", data.id);
-        if (!error) return { ok: true };
+        if (error) throw error;
+        inMemoryProfile = {
+          ...inMemoryProfile,
+          ...data,
+          ownerAvatar: data.ownerAvatar ?? inMemoryProfile.ownerAvatar,
+        };
+        return { ok: true };
       }
 
       const { data: existing } = await context.supabase
@@ -278,18 +301,31 @@ export const saveCommunityProfile = createServerFn({ method: "POST" })
         .maybeSingle();
 
       if (existing?.id) {
-        await context.supabase
+        const { error } = await context.supabase
           .from("community_profile")
           .update(payload)
           .eq("id", existing.id);
+        if (error) throw error;
+        inMemoryProfile = {
+          ...inMemoryProfile,
+          ...data,
+          ownerAvatar: data.ownerAvatar ?? inMemoryProfile.ownerAvatar,
+        };
         return { ok: true };
       }
 
-      await context.supabase
+      const { error } = await context.supabase
         .from("community_profile")
         .insert(payload);
+      if (error) throw error;
+      inMemoryProfile = {
+        ...inMemoryProfile,
+        ...data,
+        ownerAvatar: data.ownerAvatar ?? inMemoryProfile.ownerAvatar,
+      };
     } catch (err) {
-      console.warn("Could not persist community_profile to DB, updated in-memory profile:", err);
+      console.warn("Could not persist community_profile to DB:", err);
+      throw new Error("Community settings were not saved in Supabase");
     }
 
     return { ok: true };
@@ -317,6 +353,9 @@ export const saveCourse = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => courseSchema.parse(data))
   .handler(async ({ data, context }) => {
+    assertDesignatedAdmin(context);
+    await context.supabase.rpc("claim_admin_role");
+
     const payload = {
       slug: data.slug,
       title: data.title,
@@ -330,22 +369,22 @@ export const saveCourse = createServerFn({ method: "POST" })
       sort_order: data.sortOrder,
     };
 
-    // Update in-memory course list
-    const existingIndex = inMemoryCourses.findIndex((c) => (data.id && c.id === data.id) || c.slug === data.slug);
     const updatedCourse: Course = {
       id: data.id || `c-${Date.now()}`,
       ...payload,
     };
-    if (existingIndex >= 0) {
-      inMemoryCourses[existingIndex] = updatedCourse;
-    } else {
-      inMemoryCourses.push(updatedCourse);
-    }
 
     try {
       if (data.id) {
         const { error } = await context.supabase.from("courses").update(payload).eq("id", data.id);
-        if (!error) return { id: data.id };
+        if (error) throw error;
+        const existingIndex = inMemoryCourses.findIndex((c) => (data.id && c.id === data.id) || c.slug === data.slug);
+        if (existingIndex >= 0) {
+          inMemoryCourses[existingIndex] = updatedCourse;
+        } else {
+          inMemoryCourses.push(updatedCourse);
+        }
+        return { id: data.id };
       }
 
       const { data: row, error } = await context.supabase
@@ -353,8 +392,18 @@ export const saveCourse = createServerFn({ method: "POST" })
         .insert(payload)
         .select("id")
         .single();
-      if (!error && row) return { id: row.id };
-    } catch {}
+      if (error) throw error;
+      const existingIndex = inMemoryCourses.findIndex((c) => (data.id && c.id === data.id) || c.slug === data.slug);
+      if (existingIndex >= 0) {
+        inMemoryCourses[existingIndex] = updatedCourse;
+      } else {
+        inMemoryCourses.push(updatedCourse);
+      }
+      if (row) return { id: row.id };
+    } catch (err) {
+      console.warn("Could not persist course to DB:", err);
+      throw new Error("Course was not saved in Supabase");
+    }
 
     return { id: updatedCourse.id };
   });
@@ -363,9 +412,15 @@ export const deleteCourse = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: z.string() }).parse(data))
   .handler(async ({ data, context }) => {
-    inMemoryCourses = inMemoryCourses.filter((c) => c.id !== data.id);
+    assertDesignatedAdmin(context);
+    await context.supabase.rpc("claim_admin_role");
     try {
-      await context.supabase.from("courses").delete().eq("id", data.id);
-    } catch {}
+      const { error } = await context.supabase.from("courses").delete().eq("id", data.id);
+      if (error) throw error;
+      inMemoryCourses = inMemoryCourses.filter((c) => c.id !== data.id);
+    } catch (err) {
+      console.warn("Could not delete course from DB:", err);
+      throw new Error("Course was not deleted in Supabase");
+    }
     return { ok: true };
   });

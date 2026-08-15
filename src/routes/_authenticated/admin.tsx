@@ -73,9 +73,9 @@ function AdminLayout() {
 
         <main className="min-w-0 space-y-6">
           {!adminQuery.isSuccess ? (
-            <p className="text-[15px] text-muted-foreground">Проверяем доступ…</p>
+            <p className="text-[15px] text-muted-foreground">Verifying access…</p>
           ) : !isAdmin ? (
-            <p className="text-[15px] text-muted-foreground">Доступ запрещён.</p>
+            <p className="text-[15px] text-muted-foreground">Access denied.</p>
           ) : (
             <Outlet />
           )}

@@ -39,7 +39,7 @@ const emptyCourse: Course = {
   title: "",
   summary: "",
   description: "",
-  priceLabel: "$9/month",
+  priceLabel: "$49/month",
   coverUrl: null,
   videoUrl: null,
   gallery: [],
@@ -69,11 +69,11 @@ function AdminCommunityPage() {
   const profileMutation = useMutation({
     mutationFn: (p: CommunityProfile) => saveProfileFn({ data: p }),
     onSuccess: () => {
-      toast.success("Профиль сообщества и данные владельца сохранены!");
+      toast.success("Community profile and owner info saved!");
       qc.invalidateQueries({ queryKey: ["admin-community"] });
       qc.invalidateQueries({ queryKey: ["community"] });
     },
-    onError: () => toast.error("Не удалось сохранить профиль"),
+    onError: () => toast.error("Failed to save profile"),
   });
 
   const courseMutation = useMutation({
@@ -94,25 +94,25 @@ function AdminCommunityPage() {
         },
       }),
     onSuccess: () => {
-      toast.success("Курс сохранён");
+      toast.success("Course saved");
       setEditing(null);
       qc.invalidateQueries({ queryKey: ["admin-community"] });
       qc.invalidateQueries({ queryKey: ["community"] });
     },
-    onError: (e: Error) => toast.error(e.message || "Не удалось сохранить курс"),
+    onError: (e: Error) => toast.error(e.message || "Failed to save course"),
   });
 
   const removeMutation = useMutation({
     mutationFn: (id: string) => deleteCourseFn({ data: { id } }),
     onSuccess: () => {
-      toast.success("Курс удалён");
+      toast.success("Course deleted");
       qc.invalidateQueries({ queryKey: ["admin-community"] });
       qc.invalidateQueries({ queryKey: ["community"] });
     },
-    onError: () => toast.error("Не удалось удалить курс"),
+    onError: () => toast.error("Failed to delete course"),
   });
 
-  if (isLoading) return <p className="text-[15px] text-muted-foreground">Загрузка…</p>;
+  if (isLoading) return <p className="text-[15px] text-muted-foreground">Loading…</p>;
 
   return (
     <div className="space-y-8">
@@ -128,16 +128,16 @@ function AdminCommunityPage() {
       <section className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold">Курсы</h2>
+            <h2 className="text-xl font-bold">Courses</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Список курсов, отображаемый на страницах сообщества и каталога.
+              List of courses displayed on community and catalog pages.
             </p>
           </div>
           <button
             onClick={() => setEditing({ ...emptyCourse })}
             className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-bold transition-colors hover:bg-accent"
           >
-            <Plus className="size-4" /> Новый курс
+            <Plus className="size-4" /> New course
           </button>
         </div>
 
@@ -154,14 +154,14 @@ function AdminCommunityPage() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[15px] font-bold">{c.title}</p>
                 <p className="truncate text-sm text-muted-foreground">
-                  /course/{c.slug} · {c.priceLabel} · {c.isPublished ? "опубликован" : "черновик"}
+                  /course/{c.slug} · {c.priceLabel} · {c.isPublished ? "published" : "draft"}
                 </p>
               </div>
               <button
                 onClick={() => setEditing(c)}
                 className="rounded-lg border border-border px-3 py-2 text-sm font-bold transition-colors hover:bg-accent"
               >
-                Изменить
+                Edit
               </button>
               <button
                 aria-label={`Удалить ${c.title}`}
@@ -175,7 +175,7 @@ function AdminCommunityPage() {
             </li>
           ))}
           {(data?.courses ?? []).length === 0 ? (
-            <li className="py-6 text-[15px] text-muted-foreground">Пока нет курсов.</li>
+            <li className="py-6 text-[15px] text-muted-foreground">No courses yet.</li>
           ) : null}
         </ul>
       </section>
@@ -212,9 +212,9 @@ function SidebarCardForm({
 }) {
   return (
     <section className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm">
-      <h1 className="text-2xl font-bold">Настройки сообщества и владельца</h1>
+      <h1 className="text-2xl font-bold">Community & Owner Settings</h1>
       <p className="mt-2 text-[15px] text-muted-foreground">
-        Здесь настраиваются имя автора/владельца, его фотография (Avatar), название сообщества, обложка и описание.
+        Customize author name, owner profile avatar, community title, cover image, and description.
       </p>
       <form
         className="mt-6 space-y-6"
@@ -224,18 +224,18 @@ function SidebarCardForm({
         }}
       >
         <div className="rounded-xl border border-border p-5 bg-accent/20">
-          <h2 className="text-base font-bold text-foreground">Владелец / Автор курса</h2>
+          <h2 className="text-base font-bold text-foreground">Course Creator / Owner</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Синхронизируется со строкой под видео на странице курсов (например: By Daniel Riley).
+            Syncs with the creator line under the course video (e.g. By Daniel Riley).
           </p>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Text
-              label="Имя автора / подпись (например: By Daniel Riley)"
+              label="Creator name / signature (e.g. By Daniel Riley)"
               value={profile.ownerLabel}
               onChange={(v) => onChange({ ...profile, ownerLabel: v })}
             />
             <MediaField
-              label="Фото / аватар владельца"
+              label="Creator photo / avatar"
               folder="avatars"
               accept="image/*"
               value={profile.ownerAvatar}
@@ -246,19 +246,19 @@ function SidebarCardForm({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Text
-            label="Название сообщества"
+            label="Community name"
             value={profile.name}
             onChange={(v) => onChange({ ...profile, name: v })}
           />
           <Text
-            label="Ссылка / адрес канала"
+            label="Channel address / handle"
             value={profile.handleLabel}
             onChange={(v) => onChange({ ...profile, handleLabel: v })}
           />
         </div>
 
         <Area
-          label="Краткое описание"
+          label="Short description"
           rows={3}
           value={profile.description}
           onChange={(v) => onChange({ ...profile, description: v })}
@@ -266,17 +266,17 @@ function SidebarCardForm({
 
         <div className="grid gap-4 sm:grid-cols-3">
           <Text
-            label="Участники"
+            label="Members label"
             value={profile.membersLabel}
             onChange={(v) => onChange({ ...profile, membersLabel: v })}
           />
           <Text
-            label="Онлайн"
+            label="Online label"
             value={profile.onlineLabel}
             onChange={(v) => onChange({ ...profile, onlineLabel: v })}
           />
           <Text
-            label="Админов"
+            label="Admins label"
             value={profile.adminsLabel}
             onChange={(v) => onChange({ ...profile, adminsLabel: v })}
           />
@@ -284,12 +284,12 @@ function SidebarCardForm({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Text
-            label="Цена на кнопке Join"
+            label="Price on Join button"
             value={profile.priceLabel}
             onChange={(v) => onChange({ ...profile, priceLabel: v })}
           />
           <Text
-            label="Приватность (Private / Public)"
+            label="Privacy (Private / Public)"
             value={profile.privacyLabel}
             onChange={(v) => onChange({ ...profile, privacyLabel: v })}
           />
@@ -297,14 +297,14 @@ function SidebarCardForm({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <MediaField
-            label="Обложка карточки сообщества"
+            label="Community card cover"
             folder="community"
             accept="image/*"
             value={profile.coverUrl}
             onChange={(v) => onChange({ ...profile, coverUrl: v })}
           />
           <MediaField
-            label="Видео сообщества"
+            label="Community video"
             folder="community"
             accept="video/*"
             isVideo
@@ -314,7 +314,7 @@ function SidebarCardForm({
         </div>
 
         <Area
-          label="Полное описание страницы (текст под видео)"
+          label="Full page description (text below video)"
           rows={6}
           value={profile.body}
           onChange={(v) => onChange({ ...profile, body: v })}
@@ -322,7 +322,7 @@ function SidebarCardForm({
 
         <div>
           <GalleryField
-            label="Фотогалерея сообщества"
+            label="Community photo gallery"
             folder="community"
             value={profile.gallery}
             onChange={(gallery) => onChange({ ...profile, gallery })}
@@ -334,7 +334,7 @@ function SidebarCardForm({
           disabled={pending}
           className="rounded-lg bg-join px-6 py-3 text-sm font-bold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
         >
-          {pending ? "Сохраняем…" : "Сохранить изменения"}
+          {pending ? "Saving…" : "Save changes"}
         </button>
       </form>
     </section>
@@ -362,8 +362,8 @@ function CourseForm({
   return (
     <section className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">{course.id ? "Редактировать курс" : "Новый курс"}</h2>
-        <button aria-label="Закрыть" onClick={onCancel} className="rounded-lg p-2 hover:bg-accent">
+        <h2 className="text-xl font-bold">{course.id ? "Edit course" : "New course"}</h2>
+        <button aria-label="Close" onClick={onCancel} className="rounded-lg p-2 hover:bg-accent">
           <X className="size-4" />
         </button>
       </div>
@@ -388,34 +388,34 @@ function CourseForm({
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <Text
-            label="Название"
+            label="Title"
             value={form.title}
             onChange={(v) => setForm({ ...form, title: v })}
           />
           <Text
-            label="Адрес (slug)"
+            label="Address (slug)"
             value={form.slug}
             onChange={(v) => setForm({ ...form, slug: v })}
           />
           <Text
-            label="Цена"
+            label="Price"
             value={form.priceLabel}
             onChange={(v) => setForm({ ...form, priceLabel: v })}
           />
           <Text
-            label="Порядок"
+            label="Order"
             value={String(form.sortOrder)}
             onChange={(v) => setForm({ ...form, sortOrder: Number(v) || 0 })}
           />
         </div>
         <Area
-          label="Краткое описание"
+          label="Short description"
           rows={2}
           value={form.summary}
           onChange={(v) => setForm({ ...form, summary: v })}
         />
         <Area
-          label="Полное описание"
+          label="Full description"
           rows={6}
           value={form.description}
           onChange={(v) => setForm({ ...form, description: v })}
@@ -423,14 +423,14 @@ function CourseForm({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <MediaField
-            label="Обложка курса"
+            label="Course cover"
             folder="courses"
             accept="image/*"
             value={form.coverUrl}
             onChange={(v) => setForm({ ...form, coverUrl: v })}
           />
           <MediaField
-            label="Видео курса"
+            label="Course video"
             folder="courses"
             accept="video/*"
             isVideo
@@ -440,7 +440,7 @@ function CourseForm({
         </div>
 
         <GalleryField
-          label="Фотографии курса"
+          label="Course photos"
           value={form.gallery}
           onChange={(gallery) => setForm({ ...form, gallery })}
         />
@@ -452,7 +452,7 @@ function CourseForm({
             onChange={(e) => setForm({ ...form, isPublished: e.target.checked })}
             className="size-4"
           />
-          Опубликован
+          Published
         </label>
 
         <div className="flex gap-3">
@@ -461,14 +461,14 @@ function CourseForm({
             disabled={pending}
             className="rounded-lg bg-join px-6 py-3 text-sm font-bold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 disabled:opacity-60"
           >
-            {pending ? "Сохраняем…" : "Сохранить курс"}
+            {pending ? "Saving…" : "Save course"}
           </button>
           <button
             type="button"
             onClick={onCancel}
             className="rounded-lg border border-border px-6 py-3 text-sm font-bold transition-colors hover:bg-accent"
           >
-            Отмена
+            Cancel
           </button>
         </div>
       </form>
@@ -544,9 +544,9 @@ function MediaField({
     try {
       const url = await uploadMedia(file, folder);
       onChange(url);
-      toast.success("Файл успешно загружен");
+      toast.success("File uploaded successfully");
     } catch {
-      toast.error("Не удалось загрузить файл");
+      toast.error("Failed to upload file");
     } finally {
       setBusy(false);
     }
@@ -570,13 +570,13 @@ function MediaField({
           )
         ) : (
           <div className="grid aspect-video w-full place-items-center rounded bg-muted text-sm text-muted-foreground">
-            Нет файла
+            No file uploaded
           </div>
         )}
         <div className="mt-3 flex items-center gap-3">
           <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-bold transition-colors hover:bg-accent">
             <Upload className="size-4" />
-            {busy ? "Загрузка…" : "Загрузить"}
+            {busy ? "Loading…" : "Upload"}
             <input
               type="file"
               accept={accept}
@@ -590,7 +590,7 @@ function MediaField({
               onClick={() => onChange(null)}
               className="text-sm font-bold text-muted-foreground hover:text-destructive"
             >
-              Убрать
+              Remove
             </button>
           ) : null}
         </div>
@@ -618,9 +618,9 @@ function GalleryField({
     try {
       const paths = await Promise.all(Array.from(files).map((f) => uploadMedia(f, folder)));
       onChange([...value, ...paths]);
-      toast.success("Фотографии добавлены");
+      toast.success("Photos added successfully");
     } catch {
-      toast.error("Не удалось загрузить фото");
+      toast.error("Failed to upload photos");
     } finally {
       setBusy(false);
     }
@@ -635,7 +635,7 @@ function GalleryField({
             <div key={p} className="relative">
               <img
                 src={mediaUrl(p)}
-                alt="Фото курса"
+                alt="Course photo"
                 className="h-20 w-32 rounded object-cover"
               />
               <button
@@ -649,12 +649,12 @@ function GalleryField({
             </div>
           ))}
           {value.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Пока нет фотографий.</p>
+            <p className="text-sm text-muted-foreground">No photos yet.</p>
           ) : null}
         </div>
         <label className="mt-3 flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-bold transition-colors hover:bg-accent">
           <Upload className="size-4" />
-          {busy ? "Загрузка…" : "Добавить фото"}
+          {busy ? "Loading…" : "Add photos"}
           <input
             type="file"
             accept="image/*"

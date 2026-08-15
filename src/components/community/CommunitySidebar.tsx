@@ -1,4 +1,5 @@
-import { Link as LinkIcon } from "lucide-react";
+import { Link as RouterLink } from "@tanstack/react-router";
+import { Link as LinkIcon, ShieldCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCommunity } from "@/lib/community.functions";
@@ -22,7 +23,7 @@ export function CommunitySidebar() {
 
   const name = courses[0]?.title || profile?.name || "AI Video Bootcamp";
   const coverPath = courses[0]?.coverUrl ?? profile?.coverUrl ?? null;
-  const membersLabel = (profile?.membersLabel || "26.4k members").replace(" members", "");
+  const membersLabel = (profile?.membersLabel || "100 members").replace(" members", "");
 
   return (
     <aside className="space-y-6 lg:sticky lg:top-32 lg:self-start">
@@ -70,6 +71,13 @@ export function CommunitySidebar() {
           <button className="mt-4 w-full rounded-lg border border-border py-3 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:bg-accent">
             Settings
           </button>
+          <RouterLink
+            to="/refund-guarantee"
+            className="mt-3 flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <ShieldCheck className="size-4" />
+            100% Money-Back Guarantee
+          </RouterLink>
         </div>
       </div>
 

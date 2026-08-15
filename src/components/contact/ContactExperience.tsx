@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, MessageCircle, Send } from "lucide-react";
+import { ArrowLeft, Paperclip, Send } from "lucide-react";
 import { LeadConversationPanel } from "@/components/contact/LeadConversationPanel";
 import { LeadInputCard } from "@/components/contact/LeadInputCard";
 import { useLeadFlow, useScrollToBottom } from "@/hooks/use-lead-flow";
-import {
-  CTA_WHATSAPP_DISPLAY,
-  CTA_WHATSAPP_URL,
-  TELEGRAM_DISPLAY,
-  TELEGRAM_URL,
-} from "@/lib/contact";
+import { TELEGRAM_DISPLAY, TELEGRAM_URL } from "@/lib/contact";
 
 type Step = "choose" | "request";
 
 export function ContactExperience() {
   const [step, setStep] = useState<Step>("choose");
+  const [chatText, setChatText] = useState("");
+  const [chatFiles, setChatFiles] = useState<string[]>([]);
+  const [quickMessages, setQuickMessages] = useState<string[]>([
+    "Hello, hello",
+    "We're glad you're here. Send us a message and we'll help you from here.",
+  ]);
   const flow = useLeadFlow();
   const scrollRef = useScrollToBottom(flow.messages, flow.step, flow.status);
 
@@ -26,6 +27,19 @@ export function ContactExperience() {
   const backToChoose = () => {
     flow.resetFlow();
     setStep("choose");
+  };
+
+  const sendQuickMessage = () => {
+    const trimmed = chatText.trim();
+    if (!trimmed && chatFiles.length === 0) return;
+    setQuickMessages((messages) => [
+      ...messages,
+      trimmed || "Uploaded files",
+      ...(chatFiles.length ? [`Attached ${chatFiles.length} file${chatFiles.length > 1 ? "s" : ""}`] : []),
+    ]);
+    setChatText("");
+    setChatFiles([]);
+    startRequest();
   };
 
   return (
@@ -61,13 +75,78 @@ export function ContactExperience() {
           ref={scrollRef}
           className={`min-w-0 flex-1 ${step === "request" ? "max-h-[min(85vh,720px)] overflow-y-auto pr-2" : ""}`}
         >
-          <p className="text-sm text-[#a39a90]">Solver Team</p>
-          <div className="mt-4 flex flex-col gap-3">
-            <div className="w-fit max-w-[280px] rounded-2xl rounded-bl-md bg-[#ebe6df] px-4 py-3 text-[15px] leading-snug text-[#4a4540]">
-              Hello, hello <span aria-hidden>😊</span>
+          <div className="rounded-3xl border border-[#e8e2d9] bg-white/90 p-4 shadow-[0_24px_80px_-36px_rgba(61,56,50,0.25)] backdrop-blur sm:p-5">
+            <div className="flex items-center gap-3 border-b border-[#ece7e0] pb-4">
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-[#2c2824] text-sm font-semibold text-white">
+                S
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-[#2c2824]">Solver Support</p>
+                <p className="text-xs text-[#8a8178]">Online now</p>
+              </div>
             </div>
-            <div className="w-fit max-w-[300px] rounded-2xl rounded-bl-md bg-[#ebe6df] px-4 py-3 text-[15px] leading-snug text-[#4a4540]">
-              We&apos;re glad you&apos;re here <span aria-hidden>👋</span>
+
+            <div className="mt-4 flex max-h-72 flex-col gap-3 overflow-y-auto pr-1">
+              {quickMessages.map((message, index) => (
+                <div
+                  key={`${message}-${index}`}
+                  className={`w-fit max-w-[85%] rounded-2xl px-4 py-3 text-[15px] leading-snug ${
+                    index > 1
+                      ? "ml-auto rounded-br-md bg-[#2c2824] text-white"
+                      : "rounded-bl-md bg-[#ebe6df] text-[#4a4540]"
+                  }`}
+                >
+                  {message}
+                </div>
+              ))}
+            </div>
+
+            {chatFiles.length ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {chatFiles.map((file) => (
+                  <span
+                    key={file}
+                    className="rounded-full bg-[#f4efe8] px-3 py-1 text-xs text-[#6d6258]"
+                  >
+                    {file}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
+            <div className="mt-4 flex items-center gap-2 rounded-full border border-[#e8e2d9] bg-[#faf8f5] px-3 py-2">
+              <label className="grid size-9 cursor-pointer place-items-center rounded-full text-[#8a8178] transition-colors hover:bg-white hover:text-[#2c2824]">
+                <Paperclip className="size-4" />
+                <input
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={(event) => {
+                    const names = Array.from(event.target.files ?? []).map((file) => file.name);
+                    setChatFiles(names);
+                  }}
+                />
+              </label>
+              <input
+                value={chatText}
+                onChange={(event) => setChatText(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    sendQuickMessage();
+                  }
+                }}
+                placeholder="Write a message..."
+                className="min-w-0 flex-1 bg-transparent text-[15px] text-[#2c2824] outline-none placeholder:text-[#b9b0a6]"
+              />
+              <button
+                type="button"
+                onClick={sendQuickMessage}
+                className="grid size-9 place-items-center rounded-full bg-[#2c2824] text-white transition-opacity hover:opacity-90"
+                aria-label="Send message"
+              >
+                <Send className="size-4" />
+              </button>
             </div>
           </div>
 
@@ -81,13 +160,7 @@ export function ContactExperience() {
               ) : null}
             </>
           ) : (
-            <div
-              className="mt-5 flex h-11 w-11 items-center justify-center rounded-full text-lg font-semibold text-white"
-              style={{ background: "linear-gradient(135deg, #e67e5f 0%, #d45a3a 100%)" }}
-              aria-hidden
-            >
-              S
-            </div>
+            null
           )}
         </div>
 
@@ -100,22 +173,6 @@ export function ContactExperience() {
               </h1>
 
               <ul className="mt-8 flex flex-col gap-3">
-                <li>
-                  <a
-                    href={CTA_WHATSAPP_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-4 rounded-xl border border-[#ece7e0] bg-[#faf8f5] px-4 py-4 transition-colors hover:border-[#25D366]/40 hover:bg-[#f0fdf4]"
-                  >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#25D366]/15 text-[#25D366]">
-                      <MessageCircle className="h-5 w-5" />
-                    </span>
-                    <span className="flex flex-col text-left">
-                      <span className="text-sm font-semibold text-[#2c2824]">WhatsApp</span>
-                      <span className="text-sm text-[#8a8178]">{CTA_WHATSAPP_DISPLAY}</span>
-                    </span>
-                  </a>
-                </li>
                 <li>
                   <a
                     href={TELEGRAM_URL}

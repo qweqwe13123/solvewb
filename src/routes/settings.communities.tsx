@@ -26,7 +26,7 @@ function CommunitiesPage() {
         />
         <div>
           <div className="font-bold">AI Video Bootcamp</div>
-          <div className="text-sm text-muted-foreground">26.4k members · $9/month</div>
+          <div className="text-sm text-muted-foreground">100 members · $49/month</div>
         </div>
       </Link>
     </SettingsCard>

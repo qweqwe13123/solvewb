@@ -236,6 +236,7 @@ calendar_events: {
           members_label: string
           name: string
           online_label: string
+          owner_avatar: string | null
           owner_label: string
           price_label: string
           privacy_label: string
@@ -255,6 +256,7 @@ calendar_events: {
           members_label?: string
           name?: string
           online_label?: string
+          owner_avatar?: string | null
           owner_label?: string
           price_label?: string
           privacy_label?: string
@@ -274,6 +276,7 @@ calendar_events: {
           members_label?: string
           name?: string
           online_label?: string
+          owner_avatar?: string | null
           owner_label?: string
           price_label?: string
           privacy_label?: string

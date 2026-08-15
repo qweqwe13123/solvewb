@@ -186,13 +186,13 @@ export function LeadInputCard({
         <>
           <p className="text-sm text-[#a39a90]">You can also reach me on</p>
           <p className="mt-1 text-xs leading-relaxed text-[#b5aea4]">
-            WhatsApp or Telegram — phone number, @username, or link
+            Telegram @username or t.me link
           </p>
           <input
             type="text"
             value={textInput}
             onChange={(e) => onTextChange(e.target.value)}
-            placeholder="+1 205… or @username or t.me/…"
+            placeholder="@username or t.me/username"
             disabled={disabled}
             autoFocus
             autoComplete="tel"

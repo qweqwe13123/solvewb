@@ -64,9 +64,9 @@ function ProfilePage() {
     try {
       const url = await uploadMedia(file, "avatars");
       setAvatar(url);
-      toast.success("Фотография профиля выбрана");
+      toast.success("Profile photo selected");
     } catch {
-      toast.error("Не удалось загрузить фотографию");
+      toast.error("Failed to upload profile photo");
     } finally {
       setUploading(false);
     }
@@ -101,9 +101,9 @@ function ProfilePage() {
         qc.invalidateQueries({ queryKey: ["admin-community"] });
       }
 
-      toast.success("Профиль успешно сохранён и синхронизирован!");
+      toast.success("Profile saved and synced successfully!");
     } catch (err: any) {
-      toast.error(err?.message || "Не удалось сохранить профиль");
+      toast.error(err?.message || "Failed to save profile");
     } finally {
       setSaving(false);
     }
@@ -128,7 +128,7 @@ function ProfilePage() {
           </div>
           <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:bg-accent">
             <Upload className="size-4" />
-            {uploading ? "Загрузка…" : "Change profile photo"}
+            {uploading ? "Uploading…" : "Change profile photo"}
             <input
               type="file"
               accept="image/*"
@@ -160,7 +160,7 @@ function ProfilePage() {
           hint="Your community handle on the platform."
         >
           <TextInput
-            defaultValue={`skool.com/@${(user?.email ?? "member").split("@")[0]}`}
+            defaultValue={`solverwebsite.com/@${(user?.email ?? "member").split("@")[0]}`}
             disabled
           />
         </Field>
@@ -187,7 +187,7 @@ function ProfilePage() {
           disabled={saving || uploading}
           className="rounded-lg bg-join px-6 py-3 text-sm font-bold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
         >
-          {saving ? "Сохраняем…" : "Save changes"}
+          {saving ? "Saving…" : "Save changes"}
         </button>
       </div>
     </SettingsCard>

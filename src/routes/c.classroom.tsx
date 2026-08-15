@@ -75,7 +75,7 @@ function Classroom() {
           </div>
         ) : classes.length === 0 ? (
           <p className="mt-6 rounded-2xl border border-dashed border-border p-10 text-center text-[15px] text-muted-foreground">
-            Классы скоро появятся.
+            Classes coming soon.
           </p>
         ) : (
           <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

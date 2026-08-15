@@ -51,10 +51,10 @@ function AboutTab() {
             <Lock className="size-4 text-muted-foreground" /> {profile?.privacyLabel || "Private"}
           </span>
           <span className="flex items-center gap-2">
-            <Users className="size-4 text-muted-foreground" /> {profile?.membersLabel || "26.4k members"}
+            <Users className="size-4 text-muted-foreground" /> {profile?.membersLabel || "100 members"}
           </span>
           <span className="flex items-center gap-2">
-            <Tag className="size-4 text-muted-foreground" /> {profile?.priceLabel || "$9/month"}
+            <Tag className="size-4 text-muted-foreground" /> {profile?.priceLabel || "$49/month"}
           </span>
         </div>
 

@@ -101,7 +101,7 @@ export function useLeadFlow() {
           break;
         }
         case "email":
-          pushBot("bot-dark", "How can we also reach you on WhatsApp or Telegram?");
+          pushBot("bot-dark", "How can we also reach you on Telegram?");
           setStep("messenger");
           break;
         case "messenger":

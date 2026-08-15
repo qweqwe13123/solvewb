@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { Bell, MessageSquare, Search } from "lucide-react";
+import { useState } from "react";
+import { Bell, MessageSquare, Search, Send } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CourseSwitcher } from "@/components/CourseSwitcher";
@@ -23,6 +24,10 @@ const TABS = [
 
 function CommunityShell() {
   const { user } = useSession();
+  const [chatOpen, setChatOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<string[]>([]);
   const fetchCommunity = useServerFn(getCommunity);
   const { data } = useQuery({ queryKey: ["community"], queryFn: () => fetchCommunity() });
   const profile = data?.profile ?? null;
@@ -47,14 +52,32 @@ function CommunityShell() {
             />
           </div>
 
-          <div className="flex shrink-0 items-center gap-4">
-            <MessageSquare className="size-5 text-muted-foreground" />
-            <span className="relative">
-              <Bell className="size-5 text-muted-foreground" />
+          <div className="relative flex shrink-0 items-center gap-4">
+            <button
+              type="button"
+              aria-label="Open chat"
+              onClick={() => {
+                setChatOpen((value) => !value);
+                setNotificationsOpen(false);
+              }}
+              className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <MessageSquare className="size-5" />
+            </button>
+            <button
+              type="button"
+              aria-label="Open notifications"
+              onClick={() => {
+                setNotificationsOpen((value) => !value);
+                setChatOpen(false);
+              }}
+              className="relative rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <Bell className="size-5" />
               <span className="absolute -top-1.5 -right-1.5 grid size-4 place-items-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
                 1
               </span>
-            </span>
+            </button>
             {user ? (
               <UserMenu user={user} />
             ) : (
@@ -62,6 +85,69 @@ function CommunityShell() {
                 Log in
               </Link>
             )}
+
+            {chatOpen ? (
+              <div className="absolute right-0 top-11 z-30 w-[min(92vw,360px)] rounded-xl border border-border bg-card p-4 shadow-lg">
+                <div className="flex items-center justify-between border-b border-border pb-3">
+                  <div>
+                    <p className="text-sm font-bold">Community chat</p>
+                    <p className="text-xs text-muted-foreground">Send a message to support</p>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">
+                    Online
+                  </span>
+                </div>
+                <div className="mt-3 max-h-52 space-y-2 overflow-y-auto">
+                  <div className="w-fit max-w-[85%] rounded-xl rounded-bl-sm bg-accent px-3 py-2 text-sm">
+                    Hi, how can we help?
+                  </div>
+                  {messages.map((item, index) => (
+                    <div
+                      key={`${item}-${index}`}
+                      className="ml-auto w-fit max-w-[85%] rounded-xl rounded-br-sm bg-join px-3 py-2 text-sm font-medium text-join-foreground"
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+                <form
+                  className="mt-3 flex items-center gap-2 rounded-lg border border-border px-3 py-2"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const trimmed = message.trim();
+                    if (!trimmed) return;
+                    setMessages((items) => [...items, trimmed]);
+                    setMessage("");
+                  }}
+                >
+                  <input
+                    value={message}
+                    onChange={(event) => setMessage(event.target.value)}
+                    placeholder="Write a message..."
+                    className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  />
+                  <button
+                    type="submit"
+                    aria-label="Send message"
+                    className="rounded-md bg-join p-2 text-join-foreground"
+                  >
+                    <Send className="size-4" />
+                  </button>
+                </form>
+              </div>
+            ) : null}
+
+            {notificationsOpen ? (
+              <div className="absolute right-0 top-11 z-30 w-[min(92vw,340px)] rounded-xl border border-border bg-card p-4 shadow-lg">
+                <p className="text-sm font-bold">Notifications</p>
+                <div className="mt-3 rounded-lg bg-accent p-3">
+                  <p className="text-sm font-semibold">Welcome to AI Video Bootcamp</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    New course updates and community replies will appear here.
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
 

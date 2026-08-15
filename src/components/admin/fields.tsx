@@ -70,7 +70,7 @@ export function ImageField({
     try {
       onChange(await uploadMedia(file, folder));
     } catch {
-      toast.error("Не удалось загрузить файл");
+      toast.error("Failed to upload file");
     } finally {
       setBusy(false);
     }
@@ -88,13 +88,13 @@ export function ImageField({
           />
         ) : (
           <div className="grid aspect-video w-full place-items-center rounded bg-muted text-sm text-muted-foreground">
-            Нет обложки
+            No cover uploaded
           </div>
         )}
         <div className="mt-3 flex items-center gap-2">
           <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-bold transition-colors hover:bg-accent">
             <Upload className="size-4" />
-            {busy ? "Загрузка…" : "Загрузить"}
+            {busy ? "Uploading…" : "Upload"}
             <input
               type="file"
               accept="image/*"
@@ -105,7 +105,7 @@ export function ImageField({
           {value ? (
             <button
               type="button"
-              aria-label="Убрать обложку"
+              aria-label="Remove cover"
               onClick={() => onChange(null)}
               className="rounded-lg border border-border p-2 transition-colors hover:bg-accent"
             >

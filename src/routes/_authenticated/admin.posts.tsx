@@ -78,20 +78,20 @@ function AdminPostsPage() {
         },
       }),
     onSuccess: () => {
-      toast.success("Пост опубликован");
+      toast.success("Post published");
       setEditing(null);
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message || "Не удалось сохранить пост"),
+    onError: (e: Error) => toast.error(e.message || "Failed to save post"),
   });
 
   const removeMutation = useMutation({
     mutationFn: (id: string) => removeFn({ data: { id } }),
     onSuccess: () => {
-      toast.success("Пост удалён");
+      toast.success("Post deleted");
       invalidate();
     },
-    onError: () => toast.error("Не удалось удалить пост"),
+    onError: () => toast.error("Failed to delete post"),
   });
 
   return (
@@ -108,14 +108,14 @@ function AdminPostsPage() {
           onClick={() => setEditing({ ...emptyPost })}
           className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-[15px] font-bold transition-colors hover:bg-accent"
         >
-          <Plus className="size-4" /> Новый пост
+          <Plus className="size-4" /> New post
         </button>
       )}
 
       <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-        <h2 className="text-xl font-bold">Посты</h2>
+        <h2 className="text-xl font-bold">Posts</h2>
         {isLoading ? (
-          <p className="mt-4 text-[15px] text-muted-foreground">Загрузка…</p>
+          <p className="mt-4 text-[15px] text-muted-foreground">Loading…</p>
         ) : (
           <ul className="mt-4 divide-y divide-border">
             {(data?.posts ?? []).map((p) => (
@@ -133,20 +133,20 @@ function AdminPostsPage() {
                     {p.title}
                   </p>
                   <p className="truncate text-sm text-muted-foreground">
-                    {p.category} · {p.isPublished ? "опубликован" : "черновик"} · {p.likeCount}{" "}
-                    лайков · {p.commentCount} комм.
+                    {p.category} · {p.isPublished ? "published" : "draft"} · {p.likeCount}{" "}
+                    likes · {p.commentCount} comments
                   </p>
                 </div>
                 <button
                   onClick={() => setEditing(p)}
                   className="rounded-lg border border-border px-3 py-2 text-sm font-bold transition-colors hover:bg-accent"
                 >
-                  Изменить
+                  Edit
                 </button>
                 <button
-                  aria-label={`Удалить ${p.title}`}
+                  aria-label={`Delete ${p.title}`}
                   onClick={() => {
-                    if (confirm(`Удалить пост «${p.title}»?`)) removeMutation.mutate(p.id);
+                    if (confirm(`Delete пост «${p.title}»?`)) removeMutation.mutate(p.id);
                   }}
                   className="rounded-lg border border-border p-2 text-destructive transition-colors hover:bg-accent"
                 >
@@ -155,7 +155,7 @@ function AdminPostsPage() {
               </li>
             ))}
             {(data?.posts ?? []).length === 0 ? (
-              <li className="py-6 text-[15px] text-muted-foreground">Пока нет постов.</li>
+              <li className="py-6 text-[15px] text-muted-foreground">No posts yet.</li>
             ) : null}
           </ul>
         )}
@@ -208,7 +208,7 @@ function PostComposer({
       const path = await uploadMedia(file, "posts");
       setForm((f) => ({ ...f, coverUrl: path }));
     } catch {
-      toast.error("Не удалось загрузить файл");
+      toast.error("Failed to upload file");
     } finally {
       setUploading(false);
     }
@@ -234,7 +234,7 @@ function PostComposer({
         onSubmit={(e) => {
           e.preventDefault();
           if (!form.title.trim()) {
-            toast.error("Добавьте заголовок");
+            toast.error("Please add a title");
             return;
           }
           onSave(form);
@@ -244,7 +244,7 @@ function PostComposer({
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
           placeholder="Title"
-          aria-label="Заголовок поста"
+          aria-label="Post title"
           className="w-full bg-transparent text-3xl font-extrabold tracking-tight outline-none placeholder:text-muted-foreground/60"
         />
         <textarea
@@ -253,7 +253,7 @@ function PostComposer({
           onChange={(e) => setForm({ ...form, body: e.target.value })}
           placeholder="Write something..."
           rows={6}
-          aria-label="Текст поста"
+          aria-label="Post content"
           className="mt-3 w-full resize-y bg-transparent text-[17px] leading-7 outline-none placeholder:text-muted-foreground/60"
         />
 
@@ -261,12 +261,12 @@ function PostComposer({
           <div className="relative mt-3 w-full max-w-md">
             <CoverImage
               path={form.coverUrl}
-              alt="Обложка поста"
+              alt="Post cover"
               className="aspect-video w-full rounded-xl object-cover"
             />
             <button
               type="button"
-              aria-label="Убрать вложение"
+              aria-label="Remove attachment"
               onClick={() => setForm({ ...form, coverUrl: null })}
               className="absolute top-2 right-2 rounded-full bg-background/90 p-1.5"
             >
@@ -276,17 +276,17 @@ function PostComposer({
         ) : null}
         {uploading ? (
           <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-            <Upload className="size-4" /> Загрузка…
+            <Upload className="size-4" /> Loading…
           </p>
         ) : null}
 
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-border pt-4">
           <label
-            title="Прикрепить изображение"
+            title="Attach image"
             className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
           >
             <Paperclip className="size-5" />
-            <span className="sr-only">Прикрепить изображение</span>
+            <span className="sr-only">Attach image</span>
             <input
               type="file"
               accept="image/*"
@@ -297,39 +297,39 @@ function PostComposer({
 
           <button
             type="button"
-            title="Вставить ссылку"
+            title="Insert link"
             onClick={() => {
-              const url = prompt("Ссылка (https://…)");
+              const url = prompt("Link URL (https://…)");
               if (url) append(url);
             }}
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
             <Link2 className="size-5" />
-            <span className="sr-only">Вставить ссылку</span>
+            <span className="sr-only">Insert link</span>
           </button>
 
           <button
             type="button"
-            title="Вставить видео YouTube"
+            title="Insert YouTube video"
             onClick={() => {
-              const url = prompt("Ссылка на YouTube");
+              const url = prompt("YouTube URL");
               if (url) append(url);
             }}
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
             <Youtube className="size-5" />
-            <span className="sr-only">Вставить видео</span>
+            <span className="sr-only">Insert video</span>
           </button>
 
           <div className="relative">
             <button
               type="button"
-              title="Эмодзи"
+              title="Emoji"
               onClick={() => setEmojiOpen((v) => !v)}
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
               <Smile className="size-5" />
-              <span className="sr-only">Эмодзи</span>
+              <span className="sr-only">Emoji</span>
             </button>
             {emojiOpen ? (
               <div className="absolute bottom-9 left-0 z-10 flex w-56 flex-wrap gap-1 rounded-xl border border-border bg-card p-2 shadow-lg">
@@ -353,7 +353,7 @@ function PostComposer({
           <select
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
-            aria-label="Категория"
+            aria-label="Category"
             className="rounded-lg border border-border bg-transparent px-3 py-2 text-sm font-bold outline-none"
           >
             {CATEGORIES.map((c) => (
@@ -380,7 +380,7 @@ function PostComposer({
             onClick={() => setForm({ ...form, isPublished: !form.isPublished })}
             className="rounded-lg border border-border px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-accent"
           >
-            {form.isPublished ? "Опубликован" : "Черновик"}
+            {form.isPublished ? "Published" : "Draft"}
           </button>
 
           <div className="ml-auto flex items-center gap-3">

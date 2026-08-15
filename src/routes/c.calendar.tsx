@@ -150,7 +150,7 @@ function CalendarPage() {
         </div>
       ) : upcoming.length === 0 ? (
         <p className="border-t border-border p-10 text-center text-[15px] text-muted-foreground">
-          Пока нет запланированных событий.
+          No scheduled events yet.
         </p>
       ) : (
         <ul className="divide-y divide-border border-t border-border">

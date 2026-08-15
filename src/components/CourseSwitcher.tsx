@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronsUpDown, Search, Compass, Plus } from "lucide-react";
+import { ChevronsUpDown, Search } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CoverImage } from "@/components/Media";
 import type { Course } from "@/lib/community.functions";
@@ -50,19 +50,6 @@ export function CourseSwitcher({
           </div>
 
           <div className="mt-2 space-y-1">
-            <button className="flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-accent">
-              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-accent">
-                <Plus className="size-5 text-muted-foreground" />
-              </span>
-              <span className="text-[15px] font-semibold">Create a community</span>
-            </button>
-            <button className="flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-accent">
-              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-accent">
-                <Compass className="size-5 text-muted-foreground" />
-              </span>
-              <span className="text-[15px] font-semibold">Discover communities</span>
-            </button>
-
             {filtered.map((c) => (
               <Link
                 key={c.id}
@@ -83,7 +70,7 @@ export function CourseSwitcher({
             ))}
 
             {filtered.length === 0 ? (
-              <p className="px-2 py-3 text-sm text-muted-foreground">Ничего не найдено</p>
+              <p className="px-2 py-3 text-sm text-muted-foreground">No results found</p>
             ) : null}
           </div>
         </PopoverContent>

@@ -82,12 +82,6 @@ export function UserMenu({ user }: { user: User }) {
             <Globe className="size-4" /> Language
           </DropdownMenuItem>
           <DropdownMenuItem className="px-4 py-2.5 text-[15px]">Help center</DropdownMenuItem>
-          <DropdownMenuItem className="px-4 py-2.5 text-[15px]">
-            Create a community
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="px-4 py-2.5 text-[15px]">
-            <Link to="/settings/communities">Discover communities</Link>
-          </DropdownMenuItem>
           <DropdownMenuItem onClick={signOut} className="px-4 py-2.5 text-[15px]">
             Log out
           </DropdownMenuItem>

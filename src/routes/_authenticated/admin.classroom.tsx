@@ -65,39 +65,39 @@ function AdminClassroomPage() {
         },
       }),
     onSuccess: () => {
-      toast.success("Класс сохранён");
+      toast.success("Class saved");
       setEditing(null);
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message || "Не удалось сохранить класс"),
+    onError: (e: Error) => toast.error(e.message || "Failed to save class"),
   });
 
   const removeMutation = useMutation({
     mutationFn: (id: string) => removeFn({ data: { id } }),
     onSuccess: () => {
-      toast.success("Класс удалён");
+      toast.success("Class deleted");
       invalidate();
     },
-    onError: () => toast.error("Не удалось удалить класс"),
+    onError: () => toast.error("Failed to delete class"),
   });
 
-  if (isLoading) return <p className="text-[15px] text-muted-foreground">Загрузка…</p>;
+  if (isLoading) return <p className="text-[15px] text-muted-foreground">Loading…</p>;
 
   return (
     <>
       <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Классы</h1>
+            <h1 className="text-2xl font-bold">Classes</h1>
             <p className="mt-1 text-[15px] text-muted-foreground">
-              Обложка, название и описание для каждой карточки в Classroom.
+              Cover, title, and description for each Classroom card.
             </p>
           </div>
           <button
             onClick={() => setEditing({ ...emptyClass })}
             className="flex shrink-0 items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-bold transition-colors hover:bg-accent"
           >
-            <Plus className="size-4" /> Новый класс
+            <Plus className="size-4" /> New class
           </button>
         </div>
 
@@ -114,14 +114,14 @@ function AdminClassroomPage() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[15px] font-bold">{c.title}</p>
                 <p className="truncate text-sm text-muted-foreground">
-                  #{c.sortOrder} · {c.isPublished ? "опубликован" : "черновик"}
+                  #{c.sortOrder} · {c.isPublished ? "published" : "draft"}
                 </p>
               </div>
               <button
                 onClick={() => setEditing(c)}
                 className="rounded-lg border border-border px-3 py-2 text-sm font-bold transition-colors hover:bg-accent"
               >
-                Изменить
+                Edit
               </button>
               <button
                 aria-label={`Удалить ${c.title}`}
@@ -135,7 +135,7 @@ function AdminClassroomPage() {
             </li>
           ))}
           {(data?.classes ?? []).length === 0 ? (
-            <li className="py-6 text-[15px] text-muted-foreground">Пока нет классов.</li>
+            <li className="py-6 text-[15px] text-muted-foreground">No classes yet.</li>
           ) : null}
         </ul>
       </section>
@@ -169,8 +169,8 @@ function ClassForm({
   return (
     <section className="mt-6 rounded-2xl border border-border bg-card p-6 sm:p-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">{value.id ? "Редактировать класс" : "Новый класс"}</h2>
-        <button aria-label="Закрыть" onClick={onCancel} className="rounded-lg p-2 hover:bg-accent">
+        <h2 className="text-xl font-bold">{value.id ? "Edit class" : "New class"}</h2>
+        <button aria-label="Close" onClick={onCancel} className="rounded-lg p-2 hover:bg-accent">
           <X className="size-4" />
         </button>
       </div>
@@ -184,24 +184,24 @@ function ClassForm({
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <Text
-            label="Название класса"
+            label="Class title"
             value={form.title}
             onChange={(v) => setForm({ ...form, title: v })}
           />
           <Text
-            label="Порядок"
+            label="Sort order"
             value={String(form.sortOrder)}
             onChange={(v) => setForm({ ...form, sortOrder: Number(v) || 0 })}
           />
         </div>
         <Area
-          label="Описание"
+          label="Description"
           rows={4}
           value={form.description}
           onChange={(v) => setForm({ ...form, description: v })}
         />
         <ImageField
-          label="Обложка класса"
+          label="Class cover"
           folder="classroom"
           value={form.coverUrl}
           onChange={(v) => setForm({ ...form, coverUrl: v })}
@@ -213,7 +213,7 @@ function ClassForm({
             onChange={(e) => setForm({ ...form, isPublished: e.target.checked })}
             className="size-4"
           />
-          Опубликован
+          Published
         </label>
         <div className="flex gap-3">
           <button
@@ -221,14 +221,14 @@ function ClassForm({
             disabled={pending}
             className="rounded-lg bg-join px-6 py-3 text-sm font-bold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 disabled:opacity-60"
           >
-            {pending ? "Сохраняем…" : "Сохранить класс"}
+            {pending ? "Saving…" : "Save class"}
           </button>
           <button
             type="button"
             onClick={onCancel}
             className="rounded-lg border border-border px-6 py-3 text-sm font-bold transition-colors hover:bg-accent"
           >
-            Отмена
+            Cancel
           </button>
         </div>
       </form>

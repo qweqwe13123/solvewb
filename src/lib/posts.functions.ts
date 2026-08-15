@@ -152,7 +152,7 @@ export const addComment = createServerFn({ method: "POST" })
     const name =
       (meta?.["full_name"] as string | undefined) ??
       (meta?.["name"] as string | undefined) ??
-      ((context.claims as { email?: string } | null)?.email ?? "Участник");
+      ((context.claims as { email?: string } | null)?.email ?? "Member");
     const avatar = (meta?.["avatar_url"] as string | undefined) ?? null;
 
     const { error } = await context.supabase.from("post_comments").insert({
@@ -162,7 +162,7 @@ export const addComment = createServerFn({ method: "POST" })
       author_name: name,
       author_avatar: avatar,
     });
-    if (error) throw new Error("Не удалось отправить комментарий");
+    if (error) throw new Error("Failed to submit comment");
     return { ok: true };
   });
 
@@ -171,7 +171,7 @@ export const deleteComment = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("post_comments").delete().eq("id", data.id);
-    if (error) throw new Error("Не удалось удалить комментарий");
+    if (error) throw new Error("Failed to delete comment");
     return { ok: true };
   });
 

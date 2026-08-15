@@ -11,7 +11,7 @@ export const Route = createFileRoute("/c/members")({
       { title: "Members — AI Video Bootcamp" },
       { name: "description", content: "Browse the AI Video Bootcamp member directory and connect with other creators." },
       { property: "og:title", content: "AI Video Bootcamp members" },
-      { property: "og:description", content: "26.4k AI creators building videos, ads and brands together." },
+      { property: "og:description", content: "100 AI creators building videos, ads and brands together." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
