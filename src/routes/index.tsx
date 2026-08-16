@@ -12,6 +12,7 @@ import { siteMetaTags } from "@/lib/site-meta";
 
 const HERO_VIDEO =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4";
+const HERO_POSTER = "/video-poster.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,8 +35,16 @@ function Index() {
   });
 
   useEffect(() => {
-    if (!ready) return;
-    setHeroVideoSrc(HERO_VIDEO);
+    if (!ready || typeof window === "undefined") return;
+
+    // Keep the first paint light: the hero video is large and should never compete
+    // with the initial page render or mobile network traffic.
+    if (window.matchMedia("(max-width: 1023px), (prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setHeroVideoSrc(HERO_VIDEO), 900);
+    return () => window.clearTimeout(timer);
   }, [ready]);
 
   useEffect(() => {
@@ -60,7 +69,8 @@ function Index() {
               loop
               muted
               playsInline
-              preload="auto"
+              preload="metadata"
+              poster={HERO_POSTER}
               src={heroVideoSrc}
               onLoadedData={() => {
                 if (typeof window !== "undefined" && window.innerWidth < 1024) tryPlay();
