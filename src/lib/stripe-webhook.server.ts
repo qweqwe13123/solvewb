@@ -6,7 +6,6 @@ import {
   sendPaymentConfirmationEmail,
   sendPaymentFailedEmail,
   sendRenewalEmail,
-  sendPurchaseThankYouEmail,
 } from "@/lib/email.server";
 import { PLANS, priceIdToPlanId, type BillingPeriod, type PlanId } from "@/lib/stripe-config";
 import { getStripe, getStripeWebhookSecret } from "@/lib/stripe.server";
@@ -271,12 +270,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   });
   const synced = await upsertSubscriptionRow(subscription);
 
-  const email =
-    profile.email ?? synced.profile?.email ?? (await getStripeCustomerEmail(synced.customerId));
-
-  if (email) {
-    await sendPurchaseThankYouEmail(email, PLANS[synced.plan].name);
-  }
+  // The invoice.payment_succeeded webhook sends the canonical receipt email.
+  // Keeping checkout.session.completed focused on entitlement activation avoids duplicate emails.
 }
 
 async function handleInvoiceSucceeded(invoice: Stripe.Invoice) {
@@ -424,7 +419,7 @@ export async function checkCustomerActiveSubscription(email: string): Promise<bo
     const cleanEmail = email.toLowerCase().trim();
     const customers = await stripe.customers.list({ email: cleanEmail, limit: 10 });
     for (const customer of customers.data) {
-      const subs = await stripe.subscriptions.list({ customer: customer.id, status: "active", limit: 5 });
+      const subs = await stripe.subscriptions.list({ customer: customer.id, status: "all", limit: 20 });
       for (const sub of subs.data) {
         if (sub.status === "active" || sub.status === "trialing") {
           try {
