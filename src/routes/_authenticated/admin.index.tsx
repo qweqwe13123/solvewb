@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   cancelProUserSubscription,
+  cancelProUsers,
   listMembers,
   listProUsers,
 } from "@/lib/admin.functions";
@@ -35,9 +37,21 @@ function AdminMembersPage() {
   const proUsersQuery = useQuery({ queryKey: ["admin-pro-users"], queryFn: () => fetchProUsers() });
   const queryClient = useQueryClient();
   const cancelSubscription = useServerFn(cancelProUserSubscription);
+  const [selectedSubscriptions, setSelectedSubscriptions] = useState<string[]>([]);
   const cancelMutation = useMutation({
     mutationFn: (subscriptionId: string) => cancelSubscription({ data: { subscriptionId } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-pro-users"] }),
+    onSuccess: () => {
+      setSelectedSubscriptions([]);
+      queryClient.invalidateQueries({ queryKey: ["admin-pro-users"] });
+    },
+  });
+  const bulkCancelSubscription = useServerFn(cancelProUsers);
+  const bulkCancelMutation = useMutation({
+    mutationFn: (subscriptionIds: string[]) => bulkCancelSubscription({ data: { subscriptionIds } }),
+    onSuccess: () => {
+      setSelectedSubscriptions([]);
+      queryClient.invalidateQueries({ queryKey: ["admin-pro-users"] });
+    },
   });
 
   return (
@@ -65,17 +79,31 @@ function AdminMembersPage() {
               <span className="text-sm text-muted-foreground">{proUsersQuery.data?.total ?? "…"} active subscriptions</span>
             </div>
             <h2 className="mt-3 text-xl font-bold">Pro Users</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Manage paid users and schedule subscription cancellations without removing access before the paid period ends.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Select one or more paid users and immediately remove their Pro access by canceling their subscriptions.</p>
           </div>
-          <button
-            type="button"
-            onClick={() => proUsersQuery.refetch()}
-            disabled={proUsersQuery.isFetching}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <RefreshCw className={`size-4 ${proUsersQuery.isFetching ? "animate-spin" : ""}`} />
-            Refresh
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => proUsersQuery.refetch()}
+              disabled={proUsersQuery.isFetching}
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <RefreshCw className={`size-4 ${proUsersQuery.isFetching ? "animate-spin" : ""}`} />
+              Refresh
+            </button>
+            <button
+              type="button"
+              disabled={!selectedSubscriptions.length || bulkCancelMutation.isPending}
+              onClick={() => {
+                if (window.confirm(`Immediately cancel ${selectedSubscriptions.length} selected subscription(s) and remove Pro access?`)) {
+                  bulkCancelMutation.mutate(selectedSubscriptions);
+                }
+              }}
+              className="rounded-lg bg-destructive px-3 py-2 text-sm font-semibold text-destructive-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {bulkCancelMutation.isPending ? "Cancelling…" : `Cancel selected${selectedSubscriptions.length ? ` (${selectedSubscriptions.length})` : ""}`}
+            </button>
+          </div>
         </div>
         {proUsersQuery.isLoading ? (
           <p className="mt-5 text-sm text-muted-foreground">Loading Pro users…</p>
@@ -86,8 +114,24 @@ function AdminMembersPage() {
           </div>
         ) : proUsersQuery.data?.users.length ? (
           <div className="mt-5 space-y-3">
+            <label className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-3 text-sm font-semibold">
+              <input
+                type="checkbox"
+                checked={selectedSubscriptions.length === proUsersQuery.data.users.length}
+                onChange={(event) => setSelectedSubscriptions(event.target.checked ? proUsersQuery.data.users.map((user) => user.subscriptionId) : [])}
+                className="size-4 accent-current"
+              />
+              Select all active Pro users for immediate cancellation
+            </label>
             {proUsersQuery.data.users.map((proUser) => (
               <div key={proUser.subscriptionId} className="flex flex-col gap-4 rounded-xl border border-border bg-card/80 p-4 sm:flex-row sm:items-center">
+                <input
+                  type="checkbox"
+                  aria-label={`Select ${proUser.email}`}
+                  checked={selectedSubscriptions.includes(proUser.subscriptionId)}
+                  onChange={(event) => setSelectedSubscriptions((current) => event.target.checked ? [...new Set([...current, proUser.subscriptionId])] : current.filter((id) => id !== proUser.subscriptionId))}
+                  className="size-4 shrink-0 accent-current"
+                />
                 <div className="grid size-10 shrink-0 place-items-center rounded-full bg-amber-500/15 text-sm font-bold text-amber-700 dark:text-amber-300">
                   {proUser.name.slice(0, 1).toUpperCase()}
                 </div>
@@ -103,13 +147,13 @@ function AdminMembersPage() {
                     type="button"
                     disabled={cancelMutation.isPending}
                     onClick={() => {
-                      if (window.confirm(`Cancel ${proUser.email}'s subscription at the end of the paid period?`)) {
+                      if (window.confirm(`Immediately cancel ${proUser.email}'s subscription and remove Pro access?`)) {
                         cancelMutation.mutate(proUser.subscriptionId);
                       }
                     }}
                     className="rounded-lg border border-destructive/30 px-3 py-2 text-sm font-semibold text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {cancelMutation.isPending ? "Cancelling…" : "Cancel subscription"}
+                    {cancelMutation.isPending ? "Cancelling…" : "Cancel immediately"}
                   </button>
                 )}
               </div>
@@ -119,6 +163,7 @@ function AdminMembersPage() {
           <p className="mt-5 rounded-xl bg-card/70 p-4 text-sm text-muted-foreground">No active Pro subscriptions yet.</p>
         )}
         {cancelMutation.isError ? <p className="mt-4 text-sm text-destructive">{cancelMutation.error instanceof Error ? cancelMutation.error.message : "Could not cancel subscription."}</p> : null}
+        {bulkCancelMutation.isError ? <p className="mt-4 text-sm text-destructive">{bulkCancelMutation.error instanceof Error ? bulkCancelMutation.error.message : "Could not cancel selected subscriptions."}</p> : null}
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
