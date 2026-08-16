@@ -39,10 +39,11 @@ function CommunityShell() {
     queryKey: ["community-access-status", user?.id, user?.email],
     queryFn: () => checkAccess({ data: { userId: user?.id, email: user?.email } }),
     enabled: !!user,
-    staleTime: 0,
-    refetchOnMount: "always",
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+    refetchOnMount: false,
+    retry: 1,
+    retryDelay: 600,
   });
   const profile = data?.profile ?? null;
   const courses = data?.courses ?? [];
@@ -78,7 +79,7 @@ function CommunityShell() {
       <div className="grid min-h-screen place-items-center bg-background text-sm font-medium text-muted-foreground">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="size-6 animate-spin text-foreground" />
-          <span>Verifying Pro access...</span>
+          <span>Loading your account...</span>
         </div>
       </div>
     );
@@ -88,7 +89,7 @@ function CommunityShell() {
     return (
       <div className="grid min-h-screen place-items-center bg-background px-4 text-center text-sm text-muted-foreground">
         <div>
-          <p>We are still verifying your Pro access.</p>
+          <p>We couldn&apos;t verify your account right now.</p>
           <button type="button" className="mt-4 rounded-lg bg-join px-4 py-2 font-semibold text-join-foreground" onClick={() => accessQuery.refetch()}>
             Check access again
           </button>
