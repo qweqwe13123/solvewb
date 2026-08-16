@@ -243,16 +243,41 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
 
     try {
       const supabase = publicClient();
-      const { data: sub, error } = await supabase
-        .from("subscriptions")
-        .select("status")
-        .eq("user_id", data.userId)
-        .in("status", ["active", "trialing", "past_due"])
-        .limit(1)
-        .maybeSingle();
+      if (data.userId) {
+        const { data: sub, error } = await supabase
+          .from("subscriptions")
+          .select("status")
+          .eq("user_id", data.userId)
+          .in("status", ["active", "trialing", "past_due"])
+          .limit(1)
+          .maybeSingle();
 
-      if (!error && sub && ["active", "trialing", "past_due"].includes(sub.status)) {
-        return { hasAccess: true, isAdmin: false, status: sub.status };
+        if (!error && sub && ["active", "trialing", "past_due"].includes(sub.status)) {
+          return { hasAccess: true, isAdmin: false, status: sub.status };
+        }
+      }
+
+      if (email) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("email", email)
+          .limit(1)
+          .maybeSingle();
+
+        if (profile?.id) {
+          const { data: subByProfile } = await supabase
+            .from("subscriptions")
+            .select("status")
+            .eq("user_id", profile.id)
+            .in("status", ["active", "trialing", "past_due"])
+            .limit(1)
+            .maybeSingle();
+
+          if (subByProfile && ["active", "trialing", "past_due"].includes(subByProfile.status)) {
+            return { hasAccess: true, isAdmin: false, status: subByProfile.status };
+          }
+        }
       }
     } catch (err) {
       console.warn("Could not check subscription access:", err);
