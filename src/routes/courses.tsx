@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Bell,
   Globe,
@@ -14,10 +14,10 @@ import {
 import { CourseSwitcher } from "@/components/CourseSwitcher";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "@/hooks/useSession";
 import { UserMenu } from "@/components/UserMenu";
-import { getCommunity, type Course } from "@/lib/community.functions";
+import { getCommunity, checkCommunityAccessFn, type Course } from "@/lib/community.functions";
 import { mediaUrl } from "@/lib/media";
 import { Avatar, CoverImage } from "@/components/Media";
 
@@ -44,10 +44,25 @@ export const Route = createFileRoute("/courses")({
 });
 
 function CoursesPage() {
-  const { user } = useSession();
+  const { user, loading: sessionLoading } = useSession();
+  const navigate = useNavigate();
   const isAdmin = (user?.email || "").toLowerCase().trim() === DESIGNATED_ADMIN_EMAIL;
   const fetchCommunity = useServerFn(getCommunity);
+  const checkAccess = useServerFn(checkCommunityAccessFn);
   const { data } = useQuery({ queryKey: ["community"], queryFn: () => fetchCommunity() });
+  const accessQuery = useQuery({
+    queryKey: ["community-access-status", user?.id, user?.email],
+    queryFn: () => checkAccess({ data: { userId: user?.id, email: user?.email } }),
+    enabled: !!user,
+  });
+  const hasAccess = isAdmin || Boolean(accessQuery.data?.hasAccess);
+
+  useEffect(() => {
+    if (sessionLoading) return;
+    if (user && hasAccess) {
+      navigate({ to: "/c", replace: true });
+    }
+  }, [hasAccess, navigate, sessionLoading, user]);
   const [chatOpen, setChatOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -67,6 +82,14 @@ function CoursesPage() {
     profile?.body ||
     "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰\n\nWelcome to the AI Video Bootcamp! In this community and course library, you will learn step-by-step how to create photorealistic AI videos, monetizable AI influencers, viral UGC ads, and short films.\n\nWhat you get inside:\n• Full Access to All Current & Future Courses\n• Private Creator Community & Feedback\n• Weekly Live Q&A and Breakdown Sessions\n• Prompt Templates, Workflow Guides & Cheat Sheets";
   const checkoutPath = "/checkout?plan=starter&period=monthly";
+
+  if (user && hasAccess) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">
+        Opening community…
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">

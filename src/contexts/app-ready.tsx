@@ -16,9 +16,16 @@ const MAX_WAIT_MS = 5000;
 
 export function AppReadyProvider({ children }: { children: ReactNode }) {
   const [exiting, setExiting] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.location.pathname !== "/";
+  });
 
   useEffect(() => {
+    if (typeof window !== "undefined" && window.location.pathname !== "/") {
+      setReady(true);
+      return;
+    }
     let exitTimer: number | undefined;
     let readyTimer: number | undefined;
     let safetyTimer: number | undefined;
