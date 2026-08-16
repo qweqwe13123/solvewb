@@ -130,14 +130,14 @@ export function PricingSection() {
                   ) : null}
 
                   <a
-                    href={`/api/stripe/checkout?plan=${plan.id}&period=${billing}`}
+                    href={`/checkout?plan=${plan.id}&period=${billing}`}
                     className={`mt-6 flex w-full items-center justify-center rounded-xl py-3 text-sm font-semibold transition-colors ${
                       plan.recommended
                         ? "bg-[#2563eb] text-white hover:bg-[#1d4ed8]"
                         : "border border-[#d1d5db] bg-white text-[#111] hover:bg-[#fafafa]"
                     }`}
                   >
-                    Get Started
+                    Continue to secure checkout
                   </a>
 
                   <div className="my-6 h-px bg-[#e5e7eb]" />
