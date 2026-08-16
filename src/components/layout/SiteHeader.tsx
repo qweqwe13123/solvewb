@@ -17,7 +17,10 @@ export function SiteHeader({
   desktopCta,
   backLink,
 }: SiteHeaderProps) {
-  const textMuted = variant === "dark" ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground";
+  const textMuted =
+    variant === "dark"
+      ? "text-white/60 hover:text-white"
+      : "text-muted-foreground hover:text-foreground";
   const textMain = variant === "dark" ? "text-white" : "text-foreground";
 
   return (

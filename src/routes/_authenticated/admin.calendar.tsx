@@ -181,9 +181,7 @@ function EventForm({
   return (
     <section className="mt-6 rounded-2xl border border-border bg-card p-6 sm:p-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">
-          {value.id ? "Edit event" : "New event"}
-        </h2>
+        <h2 className="text-xl font-bold">{value.id ? "Edit event" : "New event"}</h2>
         <button aria-label="Close" onClick={onCancel} className="rounded-lg p-2 hover:bg-accent">
           <X className="size-4" />
         </button>

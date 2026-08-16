@@ -18,7 +18,10 @@ export const Route = createFileRoute("/_authenticated/admin/classroom")({
   head: () => ({
     meta: [
       { title: "Classroom — Admin — AI Video Bootcamp" },
-      { name: "description", content: "Create and manage classroom classes, covers and descriptions." },
+      {
+        name: "description",
+        content: "Create and manage classroom classes, covers and descriptions.",
+      },
       { property: "og:title", content: "Classroom — Admin" },
       { property: "og:description", content: "Create and manage classroom classes." },
     ],

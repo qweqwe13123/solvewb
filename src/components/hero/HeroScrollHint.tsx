@@ -1,9 +1,6 @@
 export function HeroScrollHint() {
   return (
-    <div
-      className="flex flex-col items-center"
-      aria-hidden
-    >
+    <div className="flex flex-col items-center" aria-hidden>
       <span className="relative flex h-11 w-[26px] items-center justify-center rounded-full border border-white/35 bg-black/20 backdrop-blur-sm">
         <svg
           viewBox="0 0 24 24"

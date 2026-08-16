@@ -41,7 +41,8 @@ type ProfileRow = Database["public"]["Tables"]["community_profile"]["Row"];
 type CourseRow = Database["public"]["Tables"]["courses"]["Row"];
 
 const DEFAULT_SUPABASE_URL = "https://bwxiiqpuhgcvouuqvmbi.supabase.co";
-const DEFAULT_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3eGlpcXB1aGdjdm91dXF2bWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MzU0NDIsImV4cCI6MjEwMjIxMTQ0Mn0.OjMHVOCpkMYx4D1xmrk4u_G1TSmVNHD2SYyMsB_0ZM4";
+const DEFAULT_SUPABASE_PUBLISHABLE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3eGlpcXB1aGdjdm91dXF2bWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MzU0NDIsImV4cCI6MjEwMjIxMTQ0Mn0.OjMHVOCpkMYx4D1xmrk4u_G1TSmVNHD2SYyMsB_0ZM4";
 const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
 const BASE_MEMBER_COUNT = 100;
 const FIXED_PRICE_LABEL = "$49/month";
@@ -54,9 +55,15 @@ function normalizePriceLabel(label: string | null | undefined) {
 }
 
 function publicClient() {
-  const url = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || DEFAULT_SUPABASE_URL;
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"] || process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || DEFAULT_SUPABASE_PUBLISHABLE_KEY;
-  return createClient<Database>(url, key, { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } });
+  const url =
+    process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || DEFAULT_SUPABASE_URL;
+  const key =
+    process.env["SUPABASE_PUBLISHABLE_KEY"] ||
+    process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
+    DEFAULT_SUPABASE_PUBLISHABLE_KEY;
+  return createClient<Database>(url, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
 }
 
 function mapProfile(row: ProfileRow): CommunityProfile {
@@ -74,7 +81,10 @@ function mapProfile(row: ProfileRow): CommunityProfile {
     videoUrl: row.video_url,
     gallery: Array.isArray(row.gallery) ? (row.gallery as string[]) : [],
     body: row.body,
-    handleLabel: row.handle_label && !row.handle_label.includes("skool.com") ? row.handle_label : "solverwebsite.com/courses",
+    handleLabel:
+      row.handle_label && !row.handle_label.includes("skool.com")
+        ? row.handle_label
+        : "solverwebsite.com/courses",
     onlineLabel: row.online_label,
     adminsLabel: row.admins_label,
   };
@@ -93,7 +103,10 @@ async function getDisplayedMembersLabel(supabase: ReturnType<typeof publicClient
   return `${BASE_MEMBER_COUNT} members`;
 }
 
-function assertDesignatedAdmin(context: { claims?: { email?: string | null }; user?: { email?: string | null } }) {
+function assertDesignatedAdmin(context: {
+  claims?: { email?: string | null };
+  user?: { email?: string | null };
+}) {
   const email = (context.claims?.email || context.user?.email || "").toLowerCase().trim();
   if (email !== DESIGNATED_ADMIN_EMAIL.toLowerCase()) {
     throw new Error("Forbidden");
@@ -120,7 +133,8 @@ let inMemoryProfile: CommunityProfile = {
   id: "default-id",
   name: "AI Video Bootcamp",
   tagline: "How AI Content Creators Make Real Money",
-  description: "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰",
+  description:
+    "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰",
   priceLabel: FIXED_PRICE_LABEL,
   membersLabel: "100 members",
   privacyLabel: "Private",
@@ -141,7 +155,8 @@ let inMemoryCourses: Course[] = [
     slug: "ai-video-mastery",
     title: "AI Video Bootcamp",
     summary: "Master AI Video & AI Image Creation with 100 creators.",
-    description: "Complete guide to generating cinematic AI video clips, camera controls, and monetizing UGC ads.",
+    description:
+      "Complete guide to generating cinematic AI video clips, camera controls, and monetizing UGC ads.",
     priceLabel: FIXED_PRICE_LABEL,
     coverUrl: "/assets/community-cover.jpg",
     videoUrl: null,
@@ -210,8 +225,10 @@ export const getCourseBySlug = createServerFn({ method: "GET" })
   });
 
 export const checkCommunityAccessFn = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    const parsed = z.object({ userId: z.string().optional(), email: z.string().optional() }).safeParse(data || {});
+  .inputValidator((data: unknown) => {
+    const parsed = z
+      .object({ userId: z.string().optional(), email: z.string().optional() })
+      .safeParse(data || {});
     return parsed.success ? parsed.data : {};
   })
   .handler(async ({ data }) => {
@@ -248,35 +265,37 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
 
 export const adminGetCommunity = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ profile: CommunityProfile | null; courses: Course[] }> => {
-    assertDesignatedAdmin(context);
-    await context.supabase.rpc("claim_admin_role");
-    try {
-      const [profileRes, coursesRes] = await Promise.all([
-        context.supabase.from("community_profile").select("*").limit(1).maybeSingle(),
-        context.supabase
-          .from("courses")
-          .select("*")
-          .order("sort_order", { ascending: true })
-          .order("created_at", { ascending: true }),
-      ]);
-      const fetchedProfile = profileRes.data ? mapProfile(profileRes.data) : null;
-      const fetchedCourses = (coursesRes.data ?? []).map(mapCourse);
+  .handler(
+    async ({ context }): Promise<{ profile: CommunityProfile | null; courses: Course[] }> => {
+      assertDesignatedAdmin(context);
+      await context.supabase.rpc("claim_admin_role");
+      try {
+        const [profileRes, coursesRes] = await Promise.all([
+          context.supabase.from("community_profile").select("*").limit(1).maybeSingle(),
+          context.supabase
+            .from("courses")
+            .select("*")
+            .order("sort_order", { ascending: true })
+            .order("created_at", { ascending: true }),
+        ]);
+        const fetchedProfile = profileRes.data ? mapProfile(profileRes.data) : null;
+        const fetchedCourses = (coursesRes.data ?? []).map(mapCourse);
 
-      if (fetchedProfile) inMemoryProfile = { ...inMemoryProfile, ...fetchedProfile };
-      if (fetchedCourses.length > 0) inMemoryCourses = fetchedCourses;
+        if (fetchedProfile) inMemoryProfile = { ...inMemoryProfile, ...fetchedProfile };
+        if (fetchedCourses.length > 0) inMemoryCourses = fetchedCourses;
 
-      return {
-        profile: fetchedProfile ? { ...inMemoryProfile, ...fetchedProfile } : inMemoryProfile,
-        courses: fetchedCourses.length > 0 ? fetchedCourses : inMemoryCourses,
-      };
-    } catch {
-      return {
-        profile: inMemoryProfile,
-        courses: inMemoryCourses,
-      };
-    }
-  });
+        return {
+          profile: fetchedProfile ? { ...inMemoryProfile, ...fetchedProfile } : inMemoryProfile,
+          courses: fetchedCourses.length > 0 ? fetchedCourses : inMemoryCourses,
+        };
+      } catch {
+        return {
+          profile: inMemoryProfile,
+          courses: inMemoryCourses,
+        };
+      }
+    },
+  );
 
 const profileSchema = z.object({
   id: z.string(),
@@ -326,7 +345,7 @@ export const saveCommunityProfile = createServerFn({ method: "POST" })
       if (data.id && data.id !== "default-id") {
         const { error } = await context.supabase
           .from("community_profile")
-          .update(payload)
+          .update(payload as any)
           .eq("id", data.id);
         if (error) throw error;
         inMemoryProfile = {
@@ -346,7 +365,7 @@ export const saveCommunityProfile = createServerFn({ method: "POST" })
       if (existing?.id) {
         const { error } = await context.supabase
           .from("community_profile")
-          .update(payload)
+          .update(payload as any)
           .eq("id", existing.id);
         if (error) throw error;
         inMemoryProfile = {
@@ -357,9 +376,7 @@ export const saveCommunityProfile = createServerFn({ method: "POST" })
         return { ok: true };
       }
 
-      const { error } = await context.supabase
-        .from("community_profile")
-        .insert(payload);
+      const { error } = await context.supabase.from("community_profile").insert(payload as any);
       if (error) throw error;
       inMemoryProfile = {
         ...inMemoryProfile,
@@ -414,14 +431,25 @@ export const saveCourse = createServerFn({ method: "POST" })
 
     const updatedCourse: Course = {
       id: data.id || `c-${Date.now()}`,
-      ...payload,
+      slug: data.slug,
+      title: data.title,
+      summary: data.summary,
+      description: data.description,
+      priceLabel: normalizePriceLabel(data.priceLabel),
+      coverUrl: data.coverUrl || inMemoryProfile.coverUrl,
+      videoUrl: data.videoUrl,
+      gallery: data.gallery,
+      isPublished: data.isPublished,
+      sortOrder: data.sortOrder,
     };
 
     try {
       if (data.id) {
-        const { error } = await context.supabase.from("courses").update(payload).eq("id", data.id);
+        const { error } = await context.supabase.from("courses").update(payload as any).eq("id", data.id);
         if (error) throw error;
-        const existingIndex = inMemoryCourses.findIndex((c) => (data.id && c.id === data.id) || c.slug === data.slug);
+        const existingIndex = inMemoryCourses.findIndex(
+          (c) => (data.id && c.id === data.id) || c.slug === data.slug,
+        );
         if (existingIndex >= 0) {
           inMemoryCourses[existingIndex] = updatedCourse;
         } else {
@@ -432,11 +460,13 @@ export const saveCourse = createServerFn({ method: "POST" })
 
       const { data: row, error } = await context.supabase
         .from("courses")
-        .insert(payload)
+        .insert(payload as any)
         .select("id")
         .single();
       if (error) throw error;
-      const existingIndex = inMemoryCourses.findIndex((c) => (data.id && c.id === data.id) || c.slug === data.slug);
+      const existingIndex = inMemoryCourses.findIndex(
+        (c) => (data.id && c.id === data.id) || c.slug === data.slug,
+      );
       if (existingIndex >= 0) {
         inMemoryCourses[existingIndex] = updatedCourse;
       } else {

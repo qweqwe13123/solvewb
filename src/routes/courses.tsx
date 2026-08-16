@@ -1,5 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bell, Globe, Lock, MessageSquare, Play, Search, Send, ShieldCheck, Tag, Users } from "lucide-react";
+import {
+  Bell,
+  Globe,
+  Lock,
+  MessageSquare,
+  Play,
+  Search,
+  Send,
+  ShieldCheck,
+  Tag,
+  Users,
+} from "lucide-react";
 import { CourseSwitcher } from "@/components/CourseSwitcher";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -18,12 +29,14 @@ export const Route = createFileRoute("/courses")({
       { title: "AI Video Bootcamp — Courses & Community" },
       {
         name: "description",
-        content: "Master AI Video & AI Image Creation. Join 100 creators, monetise AI influencers and UGC ads.",
+        content:
+          "Master AI Video & AI Image Creation. Join 100 creators, monetise AI influencers and UGC ads.",
       },
       { property: "og:title", content: "AI Video Bootcamp — Courses" },
       {
         property: "og:description",
-        content: "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn.",
+        content:
+          "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn.",
       },
     ],
   }),
@@ -50,18 +63,16 @@ function CoursesPage() {
   const logoPath = courses[0]?.coverUrl || coverPath;
   const introVideo = profile?.videoUrl ? mediaUrl(profile.videoUrl) : null;
   const gallery = profile?.gallery ?? [];
-  const body = profile?.body || "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰\n\nWelcome to the AI Video Bootcamp! In this community and course library, you will learn step-by-step how to create photorealistic AI videos, monetizable AI influencers, viral UGC ads, and short films.\n\nWhat you get inside:\n• Full Access to All Current & Future Courses\n• Private Creator Community & Feedback\n• Weekly Live Q&A and Breakdown Sessions\n• Prompt Templates, Workflow Guides & Cheat Sheets";
+  const body =
+    profile?.body ||
+    "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰\n\nWelcome to the AI Video Bootcamp! In this community and course library, you will learn step-by-step how to create photorealistic AI videos, monetizable AI influencers, viral UGC ads, and short films.\n\nWhat you get inside:\n• Full Access to All Current & Future Courses\n• Private Creator Community & Feedback\n• Weekly Live Q&A and Breakdown Sessions\n• Prompt Templates, Workflow Guides & Cheat Sheets";
   const checkoutPath = "/checkout?plan=starter&period=monthly";
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <header className="sticky top-0 z-20 border-b border-border bg-card">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <CourseSwitcher
-            title={courses[0]?.title || name}
-            logo={logoPath}
-            courses={courses}
-          />
+          <CourseSwitcher title={courses[0]?.title || name} logo={logoPath} courses={courses} />
 
           <div className="relative flex items-center gap-2 sm:gap-3">
             <button
@@ -154,9 +165,9 @@ function CoursesPage() {
             {user ? (
               <UserMenu user={user} />
             ) : (
-          <Link
-            to="/auth"
-            search={{ redirect: "/courses" }}
+              <Link
+                to="/auth"
+                search={{ redirect: "/courses" }}
                 className="rounded-md border border-border px-5 py-2.5 text-sm font-medium tracking-wide uppercase transition-colors hover:bg-accent"
               >
                 Log in
@@ -258,7 +269,9 @@ function CoursesPage() {
             <div className="p-4">
               <h2 className="font-semibold">{name}</h2>
               <p className="text-sm text-muted-foreground">
-                {profile?.handleLabel && !profile.handleLabel.includes("skool.com") ? profile.handleLabel : "solverwebsite.com/courses"}
+                {profile?.handleLabel && !profile.handleLabel.includes("skool.com")
+                  ? profile.handleLabel
+                  : "solverwebsite.com/courses"}
               </p>
               <p className="mt-3 text-[15px] leading-6">
                 {profile?.description ||
@@ -330,9 +343,7 @@ function CoursesPage() {
                         className="h-11 w-16 shrink-0 rounded-md object-cover"
                       />
                       <span className="min-w-0">
-                        <span className="block truncate text-[15px] font-semibold">
-                          {c.title}
-                        </span>
+                        <span className="block truncate text-[15px] font-semibold">{c.title}</span>
                         <span className="block truncate text-xs text-muted-foreground">
                           {c.summary || c.priceLabel}
                         </span>

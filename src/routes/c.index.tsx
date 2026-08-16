@@ -102,15 +102,7 @@ function CommunityFeed() {
   );
 }
 
-function PostCard({
-  post,
-  liked,
-  userId,
-}: {
-  post: Post;
-  liked: boolean;
-  userId: string | null;
-}) {
+function PostCard({ post, liked, userId }: { post: Post; liked: boolean; userId: string | null }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
@@ -154,7 +146,9 @@ function PostCard({
   });
 
   return (
-    <li className={`rounded-xl border bg-card p-5 ${post.isPinned ? "border-join" : "border-border"}`}>
+    <li
+      className={`rounded-xl border bg-card p-5 ${post.isPinned ? "border-join" : "border-border"}`}
+    >
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <Avatar
@@ -281,7 +275,7 @@ function PostCard({
               <Link to="/auth" className="font-bold text-brand">
                 Log in
               </Link>
-               to comment and like posts.
+              to comment and like posts.
             </p>
           )}
         </div>

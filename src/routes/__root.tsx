@@ -113,10 +113,7 @@ function RootLayout() {
   return (
     <>
       {!ready && <SiteLoader exiting={exiting} />}
-      <div
-        className="transition-opacity duration-500"
-        style={{ opacity: ready ? 1 : 0 }}
-      >
+      <div className="transition-opacity duration-500" style={{ opacity: ready ? 1 : 0 }}>
         <Outlet />
       </div>
     </>

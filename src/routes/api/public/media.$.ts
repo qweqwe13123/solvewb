@@ -8,9 +8,7 @@ export const Route = createFileRoute("/api/public/media/$")({
         if (!path || path.includes("..")) return new Response("Not found", { status: 404 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data, error } = await supabaseAdmin.storage
-          .from("community-media")
-          .download(path);
+        const { data, error } = await supabaseAdmin.storage.from("community-media").download(path);
         if (error || !data) return new Response("Not found", { status: 404 });
 
         return new Response(data, {

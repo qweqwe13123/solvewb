@@ -14,11 +14,7 @@ function Char({
   return (
     <span style={{ position: "relative" }}>
       <span style={{ opacity: 0 }}>{char}</span>
-      <motion.span
-        style={{ position: "absolute", left: 0, top: 0, opacity }}
-      >
-        {char}
-      </motion.span>
+      <motion.span style={{ position: "absolute", left: 0, top: 0, opacity }}>{char}</motion.span>
     </span>
   );
 }

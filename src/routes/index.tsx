@@ -84,8 +84,8 @@ function Index() {
             <em className="not-italic text-muted-foreground">through the silence.</em>
           </h1>
           <p className="animate-fade-rise-delay mt-6 max-w-2xl text-[15px] leading-relaxed text-muted-foreground sm:mt-8 sm:text-base lg:mt-8 lg:text-lg">
-            We're designing tools for deep thinkers, bold creators, and quiet rebels. Amid the chaos, we
-            build digital spaces for sharp focus and inspired work.
+            We're designing tools for deep thinkers, bold creators, and quiet rebels. Amid the
+            chaos, we build digital spaces for sharp focus and inspired work.
           </p>
           <HeroSocialProof />
           <Link

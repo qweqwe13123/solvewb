@@ -387,11 +387,7 @@ function CourseForm({
         }}
       >
         <div className="grid gap-4 sm:grid-cols-2">
-          <Text
-            label="Title"
-            value={form.title}
-            onChange={(v) => setForm({ ...form, title: v })}
-          />
+          <Text label="Title" value={form.title} onChange={(v) => setForm({ ...form, title: v })} />
           <Text
             label="Address (slug)"
             value={form.slug}
@@ -558,14 +554,14 @@ function MediaField({
       <div className="mt-1.5 rounded-md border border-border p-3">
         {value ? (
           isVideo ? (
-            <video src={mediaUrl(value)} controls className="aspect-video w-full rounded bg-black" />
+            <video
+              src={mediaUrl(value)}
+              controls
+              className="aspect-video w-full rounded bg-black"
+            />
           ) : (
             <div className="relative aspect-video w-full overflow-hidden rounded bg-muted flex items-center justify-center">
-              <img
-                src={mediaUrl(value)}
-                alt={label}
-                className="h-full w-full object-cover"
-              />
+              <img src={mediaUrl(value)} alt={label} className="h-full w-full object-cover" />
             </div>
           )
         ) : (

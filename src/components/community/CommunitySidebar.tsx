@@ -38,7 +38,9 @@ export function CommunitySidebar() {
         <div className="p-4">
           <h2 className="text-xl font-bold">{name}</h2>
           <p className="text-sm text-muted-foreground">
-            {profile?.handleLabel && !profile.handleLabel.includes("skool.com") ? profile.handleLabel : "solverwebsite.com/courses"}
+            {profile?.handleLabel && !profile.handleLabel.includes("skool.com")
+              ? profile.handleLabel
+              : "solverwebsite.com/courses"}
           </p>
           <p className="mt-3 text-[15px] leading-7">
             {profile?.description ||
@@ -66,7 +68,6 @@ export function CommunitySidebar() {
               </div>
             ))}
           </div>
-
 
           <button className="mt-4 w-full rounded-lg border border-border py-3 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:bg-accent">
             Settings

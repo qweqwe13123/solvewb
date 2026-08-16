@@ -18,7 +18,9 @@ export const Route = createFileRoute("/api/stripe/checkout")({
           const url = new URL(request.url);
           const rawPlan = url.searchParams.get("plan");
           const rawPeriod = url.searchParams.get("period");
-          const plan = (rawPlan && PLAN_IDS.includes(rawPlan as any) ? rawPlan : "starter") as (typeof PLAN_IDS)[number];
+          const plan = (
+            rawPlan && PLAN_IDS.includes(rawPlan as any) ? rawPlan : "starter"
+          ) as (typeof PLAN_IDS)[number];
           const period = rawPeriod === "annually" ? "annually" : "monthly";
 
           const checkoutUrl = await createHostedCheckoutUrl({

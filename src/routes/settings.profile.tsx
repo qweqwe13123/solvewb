@@ -42,11 +42,12 @@ function ProfilePage() {
 
   useEffect(() => {
     if (user?.user_metadata) {
-      const metaName = (user.user_metadata["full_name"] as string) || (user.user_metadata["name"] as string) || "";
+      const metaName =
+        (user.user_metadata["full_name"] as string) || (user.user_metadata["name"] as string) || "";
       const parts = metaName.split(" ");
       setFirstName(parts[0] ?? "");
       setLastName(parts.slice(1).join(" "));
-      setAvatar(user.user_metadata["avatar_url"] as string ?? null);
+      setAvatar((user.user_metadata["avatar_url"] as string) ?? null);
     } else if (communityData?.profile?.ownerLabel) {
       const clean = communityData.profile.ownerLabel.replace(/^By\s+/i, "");
       const parts = clean.split(" ");
@@ -115,11 +116,7 @@ function ProfilePage() {
         <div className="flex items-center gap-5">
           <div className="relative size-16 overflow-hidden rounded-full border border-border bg-muted flex items-center justify-center">
             {avatar ? (
-              <img
-                src={avatar}
-                alt="Profile photo"
-                className="size-full object-cover"
-              />
+              <img src={avatar} alt="Profile photo" className="size-full object-cover" />
             ) : (
               <span className="text-xl font-bold text-muted-foreground">
                 {(firstName[0] || user?.email?.[0] || "U").toUpperCase()}
@@ -155,10 +152,7 @@ function ProfilePage() {
           </Field>
         </div>
 
-        <Field
-          label="URL"
-          hint="Your community handle on the platform."
-        >
+        <Field label="URL" hint="Your community handle on the platform.">
           <TextInput
             defaultValue={`solverwebsite.com/@${(user?.email ?? "member").split("@")[0]}`}
             disabled

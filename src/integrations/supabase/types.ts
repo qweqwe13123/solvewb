@@ -470,10 +470,15 @@ calendar_events: {
         }
         Relationships: []
       }
-      }
+    }
     Views: {
-[_ in never]: never
-claim_admin_role: { Args: never; Returns: boolean }
+      [_ in never]: never
+    }
+    Functions: {
+      claim_admin_role: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -481,12 +486,10 @@ claim_admin_role: { Args: never; Returns: boolean }
         }
         Returns: boolean
       }
-      }
-    Functions: {
-      [_ in never]: never
     }
     Enums: {
-billing_period: "monthly" | "annually"
+      app_role: "admin" | "member"
+      billing_period: "monthly" | "annually"
       payment_status: "succeeded" | "failed" | "pending" | "refunded"
       subscription_plan: "starter" | "pro" | "ultra"
       subscription_status:
@@ -498,10 +501,8 @@ billing_period: "monthly" | "annually"
         | "incomplete_expired"
         | "unpaid"
         | "paused"
-app_role: "admin" | "member"
-      }
+    }
     CompositeTypes: {
-      [_ in never]: never
     }
   }
 }

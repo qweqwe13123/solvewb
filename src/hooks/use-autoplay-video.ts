@@ -13,13 +13,21 @@ type Options = {
 export function useAutoplayVideo(
   containerRef: RefObject<HTMLElement | null>,
   videoRef: RefObject<HTMLVideoElement | null>,
-  { enabled = true, rootMargin = "80px 0px", amount = 0.2, playImmediatelyOnMobile = false }: Options = {},
+  {
+    enabled = true,
+    rootMargin = "80px 0px",
+    amount = 0.2,
+    playImmediatelyOnMobile = false,
+  }: Options = {},
 ) {
   const isMobile = useMobileViewport();
   const mobileImmediate = playImmediatelyOnMobile && isMobile;
 
   const isInView = useInView(containerRef, {
-    margin: rootMargin as `${number}${"px" | "%"}` | `${number}${"px" | "%"} ${number}${"px" | "%"}` | `${number}${"px" | "%"} ${number}${"px" | "%"} ${number}${"px" | "%"} ${number}${"px" | "%"}`,
+    margin: rootMargin as
+      | `${number}${"px" | "%"}`
+      | `${number}${"px" | "%"} ${number}${"px" | "%"}`
+      | `${number}${"px" | "%"} ${number}${"px" | "%"} ${number}${"px" | "%"} ${number}${"px" | "%"}`,
     amount,
   });
 

@@ -54,8 +54,8 @@ export function CoursesSection() {
           COURSES
         </h2>
         <p className="mx-auto mt-6 max-w-2xl font-light leading-relaxed text-[#D7E2EA]/70 max-lg:text-[15px] lg:text-lg">
-          Practical, project-based training built from real client work — so you can
-          master the same systems we use to grow businesses.
+          Practical, project-based training built from real client work — so you can master the same
+          systems we use to grow businesses.
         </p>
       </motion.div>
 

@@ -11,7 +11,8 @@ export const Route = createFileRoute("/subscriptions")({
       { title: "Subscriptions — Solver" },
       {
         name: "description",
-        content: "Solver plans — Starter, Pro, and Ultra. Choose the membership that fits your growth.",
+        content:
+          "Solver plans — Starter, Pro, and Ultra. Choose the membership that fits your growth.",
       },
     ],
   }),

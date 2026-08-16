@@ -6,7 +6,10 @@ export async function createHostedCheckoutUrl(input: { plan: PlanId; period: Bil
   const stripe = getStripe();
   const origin = getSiteEnv().SITE_URL || "https://www.solverwebsite.com";
   const planConfig = PLANS[input.plan] || PLANS.starter;
-  const amount = input.period === "annually" ? Math.round(planConfig.monthlyPrice * 0.8 * 12 * 100) : planConfig.monthlyPrice * 100;
+  const amount =
+    input.period === "annually"
+      ? Math.round(planConfig.monthlyPrice * 0.8 * 12 * 100)
+      : planConfig.monthlyPrice * 100;
   const interval = input.period === "annually" ? "year" : "month";
 
   const session = await stripe.checkout.sessions.create({

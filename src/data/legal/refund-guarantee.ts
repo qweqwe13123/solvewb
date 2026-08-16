@@ -11,12 +11,7 @@ export const REFUND_GUARANTEE = {
     {
       heading: "How to request your refund",
       paragraphs: [],
-      list: [
-        "Go to Settings",
-        "Open Support",
-        "Contact our Support team",
-        "Request a 100% refund",
-      ],
+      list: ["Go to Settings", "Open Support", "Contact our Support team", "Request a 100% refund"],
     },
     {
       heading: "Review",

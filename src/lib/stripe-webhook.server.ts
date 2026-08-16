@@ -165,8 +165,8 @@ async function upsertSubscriptionRow(subscription: Stripe.Subscription) {
     plan,
     billing_period: billingPeriod,
     status: subscription.status,
-    current_period_start: toIso(subscription.current_period_start),
-    current_period_end: toIso(subscription.current_period_end),
+    current_period_start: toIso((subscription as any).current_period_start),
+    current_period_end: toIso((subscription as any).current_period_end),
     cancel_at_period_end: subscription.cancel_at_period_end,
     canceled_at: toIso(subscription.canceled_at ?? undefined),
     trial_end: toIso(subscription.trial_end ?? undefined),
@@ -200,9 +200,9 @@ async function upsertPaymentHistory(args: {
 }) {
   const { invoice, subscriptionRowId, userId, status } = args;
   const paymentIntentId =
-    typeof invoice.payment_intent === "string"
-      ? invoice.payment_intent
-      : (invoice.payment_intent?.id ?? null);
+    typeof (invoice as any).payment_intent === "string"
+      ? (invoice as any).payment_intent
+      : ((invoice as any).payment_intent?.id ?? null);
   const payload = {
     user_id: userId,
     subscription_id: subscriptionRowId,
@@ -280,10 +280,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 }
 
 async function handleInvoiceSucceeded(invoice: Stripe.Invoice) {
-  if (!invoice.subscription) return;
+  if (!(invoice as any).subscription) return;
   const stripe = getStripe();
   const subscriptionId =
-    typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription.id;
+    typeof (invoice as any).subscription === "string" ? (invoice as any).subscription : (invoice as any).subscription.id;
   const synced = await upsertSubscriptionRow(await stripe.subscriptions.retrieve(subscriptionId));
   await upsertPaymentHistory({
     invoice,
@@ -325,10 +325,10 @@ async function handleInvoiceSucceeded(invoice: Stripe.Invoice) {
 }
 
 async function handleInvoiceFailed(invoice: Stripe.Invoice) {
-  if (!invoice.subscription) return;
+  if (!(invoice as any).subscription) return;
   const stripe = getStripe();
   const subscriptionId =
-    typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription.id;
+    typeof (invoice as any).subscription === "string" ? (invoice as any).subscription : (invoice as any).subscription.id;
   const synced = await upsertSubscriptionRow(await stripe.subscriptions.retrieve(subscriptionId));
   await upsertPaymentHistory({
     invoice,

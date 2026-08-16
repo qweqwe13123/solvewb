@@ -6,17 +6,20 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { supabase } from "@/integrations/supabase/client";
 import { useGlobalVideoUnlock } from "@/hooks/use-global-video-unlock";
 
+export type AuthSearchParams = {
+  redirect?: string;
+  provider?: string;
+  code?: string;
+  error?: string;
+};
+
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => {
-    const redirect =
-      typeof search.redirect === "string" && search.redirect.startsWith("/")
-        ? search.redirect
-        : "/c";
-    const provider = typeof search.provider === "string" ? search.provider : undefined;
-    const code = typeof search.code === "string" ? search.code : undefined;
-    const error = typeof search.error === "string" ? search.error : undefined;
-    return { redirect, provider, code, error };
-  },
+  validateSearch: (search: Record<string, unknown>): AuthSearchParams => ({
+    redirect: typeof search.redirect === "string" && search.redirect.startsWith("/") ? search.redirect : undefined,
+    provider: typeof search.provider === "string" ? search.provider : undefined,
+    code: typeof search.code === "string" ? search.code : undefined,
+    error: typeof search.error === "string" ? search.error : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Auth — Solver" },
@@ -28,7 +31,8 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   useGlobalVideoUnlock();
-  const { redirect: redirectTarget, provider, code, error: authError } = Route.useSearch();
+  const { redirect, provider, code, error: authError } = Route.useSearch();
+  const redirectTarget = redirect || "/c";
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [message, setMessage] = useState<string | null>(authError || null);
@@ -251,7 +255,8 @@ function AuthPage() {
 
           <div className="mt-6 flex items-start gap-3 rounded-2xl bg-[#f7f3ee] p-4 text-sm text-[#6f665c]">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#2c2824]" />
-            We use Supabase magic links and Google sign-in so you can get into your account securely without a password.
+            We use Supabase magic links and Google sign-in so you can get into your account securely
+            without a password.
           </div>
         </form>
       </div>

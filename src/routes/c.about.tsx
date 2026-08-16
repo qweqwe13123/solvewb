@@ -11,9 +11,15 @@ export const Route = createFileRoute("/c/about")({
   head: () => ({
     meta: [
       { title: "About — AI Video Bootcamp" },
-      { name: "description", content: "What AI Video Bootcamp is, who it is for and what is inside the membership." },
+      {
+        name: "description",
+        content: "What AI Video Bootcamp is, who it is for and what is inside the membership.",
+      },
       { property: "og:title", content: "About AI Video Bootcamp" },
-      { property: "og:description", content: "Master AI video and AI image creation, then monetise the skill." },
+      {
+        property: "og:description",
+        content: "Master AI video and AI image creation, then monetise the skill.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -35,7 +41,12 @@ function AboutTab() {
       <article className="min-w-0 rounded-xl border border-border bg-card p-5 sm:p-8">
         <h1 className="text-2xl font-bold sm:text-3xl">{name}</h1>
         {video ? (
-          <video src={video} poster={imagePath ? mediaUrl(imagePath) : undefined} controls className="mt-5 aspect-video w-full rounded-lg bg-black" />
+          <video
+            src={video}
+            poster={imagePath ? mediaUrl(imagePath) : undefined}
+            controls
+            className="mt-5 aspect-video w-full rounded-lg bg-black"
+          />
         ) : (
           <CoverImage
             path={imagePath}
@@ -51,7 +62,8 @@ function AboutTab() {
             <Lock className="size-4 text-muted-foreground" /> {profile?.privacyLabel || "Private"}
           </span>
           <span className="flex items-center gap-2">
-            <Users className="size-4 text-muted-foreground" /> {profile?.membersLabel || "100 members"}
+            <Users className="size-4 text-muted-foreground" />{" "}
+            {profile?.membersLabel || "100 members"}
           </span>
           <span className="flex items-center gap-2">
             <Tag className="size-4 text-muted-foreground" /> {profile?.priceLabel || "$49/month"}

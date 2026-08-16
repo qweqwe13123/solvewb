@@ -8,7 +8,12 @@ export function HeroSection() {
       className="relative h-screen flex flex-col"
       style={{ overflowX: "clip", fontFamily: "'Kanit', sans-serif" }}
     >
-      <FadeIn as="nav" delay={0} y={-20} className="flex justify-between px-6 md:px-10 pt-6 md:pt-8">
+      <FadeIn
+        as="nav"
+        delay={0}
+        y={-20}
+        className="flex justify-between px-6 md:px-10 pt-6 md:pt-8"
+      >
         {["About", "Price", "Projects", "Contact"].map((l) => (
           <a
             key={l}
@@ -21,8 +26,12 @@ export function HeroSection() {
       </FadeIn>
 
       <div className="overflow-hidden w-full mt-6 sm:mt-4 md:-mt-5">
-        <FadeIn as="h1" delay={0.15} y={40}
-          className="hero-heading font-black uppercase tracking-tight leading-none whitespace-nowrap w-full text-[14vw] sm:text-[15vw] md:text-[16vw] lg:text-[17.5vw]">
+        <FadeIn
+          as="h1"
+          delay={0.15}
+          y={40}
+          className="hero-heading font-black uppercase tracking-tight leading-none whitespace-nowrap w-full text-[14vw] sm:text-[15vw] md:text-[16vw] lg:text-[17.5vw]"
+        >
           Hi, i&apos;m jack
         </FadeIn>
       </div>

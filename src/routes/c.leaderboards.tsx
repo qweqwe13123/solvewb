@@ -9,9 +9,15 @@ export const Route = createFileRoute("/c/leaderboards")({
   head: () => ({
     meta: [
       { title: "Leaderboards — AI Video Bootcamp" },
-      { name: "description", content: "Weekly, monthly and all-time points leaderboards for AI Video Bootcamp members." },
+      {
+        name: "description",
+        content: "Weekly, monthly and all-time points leaderboards for AI Video Bootcamp members.",
+      },
       { property: "og:title", content: "AI Video Bootcamp leaderboards" },
-      { property: "og:description", content: "Earn points by posting, commenting and shipping AI videos." },
+      {
+        property: "og:description",
+        content: "Earn points by posting, commenting and shipping AI videos.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

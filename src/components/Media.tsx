@@ -21,12 +21,7 @@ export function CoverImage({
 }) {
   const src = mediaUrl(path);
   if (!src) {
-    return (
-      <div
-        aria-hidden
-        className={`bg-gradient-to-br from-muted to-accent ${className}`}
-      />
-    );
+    return <div aria-hidden className={`bg-gradient-to-br from-muted to-accent ${className}`} />;
   }
   return (
     <img
@@ -62,9 +57,7 @@ export function Avatar({
 }) {
   const src = mediaUrl(path);
   if (src) {
-    return (
-      <img src={src} alt={name} loading="lazy" className={`object-cover ${className}`} />
-    );
+    return <img src={src} alt={name} loading="lazy" className={`object-cover ${className}`} />;
   }
   return (
     <span

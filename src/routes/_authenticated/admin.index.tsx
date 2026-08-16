@@ -49,9 +49,7 @@ function AdminMembersPage() {
         {membersQuery.isLoading ? (
           <p className="mt-4 text-[15px] text-muted-foreground">Loading…</p>
         ) : membersQuery.isError ? (
-          <p className="mt-4 text-[15px] text-destructive">
-            Failed to load members list.
-          </p>
+          <p className="mt-4 text-[15px] text-destructive">Failed to load members list.</p>
         ) : (
           <ul className="mt-4 divide-y divide-border">
             {membersQuery.data?.members.map((m) => (

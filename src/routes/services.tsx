@@ -8,9 +8,17 @@ export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
       { title: "Services — Solver" },
-      { name: "description", content: "All 14 services we provide — from web & app development to maintenance & support." },
+      {
+        name: "description",
+        content:
+          "All 14 services we provide — from web & app development to maintenance & support.",
+      },
       { property: "og:title", content: "Services — Solver" },
-      { property: "og:description", content: "All 14 services we provide — from web & app development to maintenance & support." },
+      {
+        property: "og:description",
+        content:
+          "All 14 services we provide — from web & app development to maintenance & support.",
+      },
     ],
   }),
   component: ServicesPage,
@@ -21,7 +29,10 @@ function ServicesPage() {
   useGlobalVideoUnlock();
 
   return (
-    <div className="min-h-screen overflow-x-clip" style={{ background: "#0C0C0C", fontFamily: "'Kanit', sans-serif" }}>
+    <div
+      className="min-h-screen overflow-x-clip"
+      style={{ background: "#0C0C0C", fontFamily: "'Kanit', sans-serif" }}
+    >
       <SiteHeader
         logoStyle={display}
         variant="dark"

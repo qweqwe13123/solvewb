@@ -133,8 +133,8 @@ function AdminPostsPage() {
                     {p.title}
                   </p>
                   <p className="truncate text-sm text-muted-foreground">
-                    {p.category} · {p.isPublished ? "published" : "draft"} · {p.likeCount}{" "}
-                    likes · {p.commentCount} comments
+                    {p.category} · {p.isPublished ? "published" : "draft"} · {p.likeCount} likes ·{" "}
+                    {p.commentCount} comments
                   </p>
                 </div>
                 <button

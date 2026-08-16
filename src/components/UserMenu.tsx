@@ -30,7 +30,6 @@ export function UserMenu({ user }: { user: User }) {
     navigate({ to: "/auth", replace: true });
   }
 
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">

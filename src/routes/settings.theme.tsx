@@ -53,9 +53,7 @@ function ThemePage() {
             Theme
           </span>
           <span className="text-[17px]">{current.label}</span>
-          <ChevronUp
-            className={`size-5 transition-transform ${open ? "" : "rotate-180"}`}
-          />
+          <ChevronUp className={`size-5 transition-transform ${open ? "" : "rotate-180"}`} />
         </button>
 
         {open ? (

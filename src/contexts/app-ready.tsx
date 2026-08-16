@@ -55,11 +55,7 @@ export function AppReadyProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  return (
-    <AppReadyContext.Provider value={{ ready, exiting }}>
-      {children}
-    </AppReadyContext.Provider>
-  );
+  return <AppReadyContext.Provider value={{ ready, exiting }}>{children}</AppReadyContext.Provider>;
 }
 
 export function useAppReady() {

@@ -1,4 +1,9 @@
-import { BUDGET_OPTIONS, SERVICE_OPTIONS, TIMELINE_OPTIONS, type LeadFlowStep } from "@/lib/lead-schema";
+import {
+  BUDGET_OPTIONS,
+  SERVICE_OPTIONS,
+  TIMELINE_OPTIONS,
+  type LeadFlowStep,
+} from "@/lib/lead-schema";
 
 type LeadInputCardProps = {
   step: LeadFlowStep;
@@ -107,7 +112,11 @@ export function LeadInputCard({
   return (
     <div
       className="rounded-2xl border border-[#e8e2d9] bg-white p-6 shadow-[0_24px_80px_-32px_rgba(61,56,50,0.22)] sm:p-8"
-      onKeyDown={step === "service" || step === "budget" || step === "timeline" ? onChoiceKeyDown : onTextKeyDown}
+      onKeyDown={
+        step === "service" || step === "budget" || step === "timeline"
+          ? onChoiceKeyDown
+          : onTextKeyDown
+      }
     >
       {step === "name" ? (
         <>
@@ -231,9 +240,7 @@ export function LeadInputCard({
             <OkButton
               onClick={onSubmitChoice}
               disabled={
-                disabled ||
-                !selectedOption ||
-                (selectedOption === "Other" && !otherText.trim())
+                disabled || !selectedOption || (selectedOption === "Other" && !otherText.trim())
               }
             />
           </div>
@@ -255,9 +262,7 @@ export function LeadInputCard({
             <OkButton
               onClick={onSubmitChoice}
               disabled={
-                disabled ||
-                !selectedOption ||
-                (selectedOption === "Other" && !otherText.trim())
+                disabled || !selectedOption || (selectedOption === "Other" && !otherText.trim())
               }
             />
           </div>

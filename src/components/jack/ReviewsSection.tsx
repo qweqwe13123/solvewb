@@ -131,7 +131,10 @@ export function ReviewsSection() {
       ref={sectionRef}
       id="reviews"
       className="relative z-10 overflow-hidden rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] px-5 sm:px-8 md:px-10 py-20 sm:py-28 md:py-32"
-      style={{ background: "#F5F5F7", fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif" }}
+      style={{
+        background: "#F5F5F7",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif",
+      }}
     >
       <motion.div
         initial={{ opacity: 0, y: 28 }}
@@ -141,12 +144,17 @@ export function ReviewsSection() {
       >
         <div className="mb-3 flex items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-gradient-to-br from-[#1D1D1F] to-[#3A3A3C] shadow-md">
-            <span className="text-lg font-semibold text-white" style={{ fontFamily: "'Instrument Serif', serif" }}>
+            <span
+              className="text-lg font-semibold text-white"
+              style={{ fontFamily: "'Instrument Serif', serif" }}
+            >
               S
             </span>
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#86868B]">Solver</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#86868B]">
+              Solver
+            </p>
             <p className="text-[13px] text-[#636366]">Client Experience</p>
           </div>
         </div>
@@ -177,9 +185,7 @@ export function ReviewsSection() {
             </div>
             <div>
               <StarRating rating={5} />
-              <p className="mt-2 text-[13px] text-[#86868B]">
-                {REVIEW_STATS.total} Ratings
-              </p>
+              <p className="mt-2 text-[13px] text-[#86868B]">{REVIEW_STATS.total} Ratings</p>
             </div>
           </div>
           <RatingHistogram />

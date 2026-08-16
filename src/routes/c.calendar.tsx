@@ -9,9 +9,15 @@ export const Route = createFileRoute("/c/calendar")({
   head: () => ({
     meta: [
       { title: "Calendar — AI Video Bootcamp" },
-      { name: "description", content: "Live calls, Q&A sessions and community events for AI Video Bootcamp members." },
+      {
+        name: "description",
+        content: "Live calls, Q&A sessions and community events for AI Video Bootcamp members.",
+      },
       { property: "og:title", content: "AI Video Bootcamp calendar" },
-      { property: "og:description", content: "See every upcoming live Q&A and workshop at a glance." },
+      {
+        property: "og:description",
+        content: "See every upcoming live Q&A and workshop at a glance.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -80,7 +86,11 @@ function CalendarPage() {
         </button>
 
         <div className="flex min-w-0 items-center justify-center gap-6">
-          <button aria-label="Previous month" onClick={() => shift(-1)} className="text-muted-foreground">
+          <button
+            aria-label="Previous month"
+            onClick={() => shift(-1)}
+            className="text-muted-foreground"
+          >
             <ChevronLeft className="size-6" />
           </button>
           <div className="min-w-0 text-center">
@@ -89,7 +99,11 @@ function CalendarPage() {
               {events.length} {events.length === 1 ? "event" : "events"} scheduled
             </p>
           </div>
-          <button aria-label="Next month" onClick={() => shift(1)} className="text-muted-foreground">
+          <button
+            aria-label="Next month"
+            onClick={() => shift(1)}
+            className="text-muted-foreground"
+          >
             <ChevronRight className="size-6" />
           </button>
         </div>
@@ -114,7 +128,10 @@ function CalendarPage() {
         <div>
           <div className="grid grid-cols-7 border-y border-border">
             {DAYS.map((d) => (
-              <div key={d} className="border-r border-border py-4 text-center text-sm font-bold last:border-r-0">
+              <div
+                key={d}
+                className="border-r border-border py-4 text-center text-sm font-bold last:border-r-0"
+              >
                 {d}
               </div>
             ))}
@@ -124,7 +141,10 @@ function CalendarPage() {
               const isToday = c.current && isThisMonth && c.day === today.getDate();
               const dayEvents = c.current ? eventsForDay(c.day) : [];
               return (
-                <div key={i} className="min-h-32 border-r border-b border-border p-3 last:border-r-0">
+                <div
+                  key={i}
+                  className="min-h-32 border-r border-b border-border p-3 last:border-r-0"
+                >
                   <div
                     className={`grid size-7 place-items-center rounded-full text-sm ${
                       isToday

@@ -10,9 +10,15 @@ export const Route = createFileRoute("/c/classroom")({
   head: () => ({
     meta: [
       { title: "Classroom — AI Video Bootcamp" },
-      { name: "description", content: "All AI video and AI image courses, modules and lessons in one classroom." },
+      {
+        name: "description",
+        content: "All AI video and AI image courses, modules and lessons in one classroom.",
+      },
       { property: "og:title", content: "AI Video Bootcamp classroom" },
-      { property: "og:description", content: "Step-by-step AI video courses, unlocked as you level up." },
+      {
+        property: "og:description",
+        content: "Step-by-step AI video courses, unlocked as you level up.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

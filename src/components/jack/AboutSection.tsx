@@ -29,7 +29,13 @@ const GlassPrism = () => (
         <stop offset="100%" stopColor="#1a2230" stopOpacity="0.9" />
       </linearGradient>
     </defs>
-    <polygon points="100,20 175,150 25,150" fill="url(#prism)" stroke="#ffffff" strokeOpacity="0.3" strokeWidth="1" />
+    <polygon
+      points="100,20 175,150 25,150"
+      fill="url(#prism)"
+      stroke="#ffffff"
+      strokeOpacity="0.3"
+      strokeWidth="1"
+    />
     <polygon points="100,20 175,150 100,110" fill="#ffffff" fillOpacity="0.08" />
   </svg>
 );
@@ -62,26 +68,50 @@ export function AboutSection() {
       className="relative flex min-h-0 flex-col items-center justify-center overflow-hidden px-5 py-16 max-lg:px-4 sm:px-8 sm:py-20 lg:min-h-screen lg:px-10 lg:py-20"
       style={{ background: "#070B26", fontFamily: "'Kanit', sans-serif" }}
     >
-      <FadeIn delay={0.1} x={-80} y={0} duration={0.9}
-        className="absolute top-[4%] left-[1%] hidden w-[120px] lg:block sm:left-[2%] sm:w-[160px] md:left-[4%] md:w-[210px]">
+      <FadeIn
+        delay={0.1}
+        x={-80}
+        y={0}
+        duration={0.9}
+        className="absolute top-[4%] left-[1%] hidden w-[120px] lg:block sm:left-[2%] sm:w-[160px] md:left-[4%] md:w-[210px]"
+      >
         <OrbSphere from="#5b8def" to="#11224a" />
       </FadeIn>
-      <FadeIn delay={0.25} x={-80} y={0} duration={0.9}
-        className="absolute bottom-[8%] left-[3%] hidden w-[100px] lg:block sm:left-[6%] sm:w-[140px] md:left-[10%] md:w-[180px]">
+      <FadeIn
+        delay={0.25}
+        x={-80}
+        y={0}
+        duration={0.9}
+        className="absolute bottom-[8%] left-[3%] hidden w-[100px] lg:block sm:left-[6%] sm:w-[140px] md:left-[10%] md:w-[180px]"
+      >
         <GlassPrism />
       </FadeIn>
-      <FadeIn delay={0.15} x={80} y={0} duration={0.9}
-        className="absolute top-[4%] right-[1%] hidden w-[120px] lg:block sm:right-[2%] sm:w-[160px] md:right-[4%] md:w-[210px]">
+      <FadeIn
+        delay={0.15}
+        x={80}
+        y={0}
+        duration={0.9}
+        className="absolute top-[4%] right-[1%] hidden w-[120px] lg:block sm:right-[2%] sm:w-[160px] md:right-[4%] md:w-[210px]"
+      >
         <OrbSphere from="#a8c5e0" to="#2b3a55" />
       </FadeIn>
-      <FadeIn delay={0.3} x={80} y={0} duration={0.9}
-        className="absolute bottom-[8%] right-[3%] hidden w-[130px] lg:block sm:right-[6%] sm:w-[170px] md:right-[10%] md:w-[220px]">
+      <FadeIn
+        delay={0.3}
+        x={80}
+        y={0}
+        duration={0.9}
+        className="absolute bottom-[8%] right-[3%] hidden w-[130px] lg:block sm:right-[6%] sm:w-[170px] md:right-[10%] md:w-[220px]"
+      >
         <NetworkNodes />
       </FadeIn>
 
       <div className="relative z-10 flex flex-col items-center gap-10 sm:gap-14 md:gap-16">
-        <FadeIn as="h2" delay={0} y={40}
-          className="hero-heading text-center text-5xl font-black uppercase leading-none tracking-tight max-lg:sm:text-6xl lg:text-[clamp(3rem,12vw,160px)]">
+        <FadeIn
+          as="h2"
+          delay={0}
+          y={40}
+          className="hero-heading text-center text-5xl font-black uppercase leading-none tracking-tight max-lg:sm:text-6xl lg:text-[clamp(3rem,12vw,160px)]"
+        >
           Who We Are
         </FadeIn>
         <AnimatedText

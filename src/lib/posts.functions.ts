@@ -32,12 +32,19 @@ export type PostComment = {
 type Row = Database["public"]["Tables"]["posts"]["Row"];
 
 const DEFAULT_SUPABASE_URL = "https://bwxiiqpuhgcvouuqvmbi.supabase.co";
-const DEFAULT_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3eGlpcXB1aGdjdm91dXF2bWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MzU0NDIsImV4cCI6MjEwMjIxMTQ0Mn0.OjMHVOCpkMYx4D1xmrk4u_G1TSmVNHD2SYyMsB_0ZM4";
+const DEFAULT_SUPABASE_PUBLISHABLE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3eGlpcXB1aGdjdm91dXF2bWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MzU0NDIsImV4cCI6MjEwMjIxMTQ0Mn0.OjMHVOCpkMYx4D1xmrk4u_G1TSmVNHD2SYyMsB_0ZM4";
 
 function publicClient() {
-  const url = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || DEFAULT_SUPABASE_URL;
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"] || process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || DEFAULT_SUPABASE_PUBLISHABLE_KEY;
-  return createClient<Database>(url, key, { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } });
+  const url =
+    process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || DEFAULT_SUPABASE_URL;
+  const key =
+    process.env["SUPABASE_PUBLISHABLE_KEY"] ||
+    process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
+    DEFAULT_SUPABASE_PUBLISHABLE_KEY;
+  return createClient<Database>(url, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
 }
 
 function map(row: Row, likes = 0, comments = 0): Post {
@@ -142,9 +149,7 @@ export const toggleLike = createServerFn({ method: "POST" })
 export const addComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z
-      .object({ postId: z.string().uuid(), body: z.string().trim().min(1).max(4000) })
-      .parse(data),
+    z.object({ postId: z.string().uuid(), body: z.string().trim().min(1).max(4000) }).parse(data),
   )
   .handler(async ({ data, context }) => {
     const meta = (context.claims as { user_metadata?: Record<string, unknown> } | null)
@@ -152,7 +157,8 @@ export const addComment = createServerFn({ method: "POST" })
     const name =
       (meta?.["full_name"] as string | undefined) ??
       (meta?.["name"] as string | undefined) ??
-      ((context.claims as { email?: string } | null)?.email ?? "Member");
+      (context.claims as { email?: string } | null)?.email ??
+      "Member";
     const avatar = (meta?.["avatar_url"] as string | undefined) ?? null;
 
     const { error } = await context.supabase.from("post_comments").insert({
@@ -232,7 +238,8 @@ export const savePost = createServerFn({ method: "POST" })
     const name =
       (meta?.["full_name"] as string | undefined) ??
       (meta?.["name"] as string | undefined) ??
-      ((context.claims as { email?: string } | null)?.email ?? "Admin");
+      (context.claims as { email?: string } | null)?.email ??
+      "Admin";
 
     const { data: row, error } = await context.supabase
       .from("posts")

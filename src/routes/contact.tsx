@@ -6,7 +6,10 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact — Solver" },
-      { name: "description", content: "Choose how to connect with Solver — Telegram or leave a request." },
+      {
+        name: "description",
+        content: "Choose how to connect with Solver — Telegram or leave a request.",
+      },
     ],
   }),
   component: ContactPage,

@@ -8,8 +8,12 @@ import { CONTACT_EMAIL, TELEGRAM_URL, WHATSAPP_URL } from "@/lib/contact";
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/90">{title}</h3>
-      <div className="flex flex-col gap-3 text-[13px] leading-relaxed text-white/55">{children}</div>
+      <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/90">
+        {title}
+      </h3>
+      <div className="flex flex-col gap-3 text-[13px] leading-relaxed text-white/55">
+        {children}
+      </div>
     </div>
   );
 }

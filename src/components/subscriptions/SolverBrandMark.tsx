@@ -30,7 +30,10 @@ function BrandLetter({ char, index }: { char: string; index: number }) {
   }
 
   return (
-    <span className="text-white" style={{ textShadow: index === 0 ? "0 0 40px rgba(255,255,255,0.08)" : undefined }}>
+    <span
+      className="text-white"
+      style={{ textShadow: index === 0 ? "0 0 40px rgba(255,255,255,0.08)" : undefined }}
+    >
       {char}
     </span>
   );

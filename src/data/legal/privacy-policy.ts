@@ -12,7 +12,13 @@ export const PRIVACY_POLICY = {
     {
       heading: "2. Information We Collect",
       paragraphs: ["We may collect the following information:"],
-      list: ["Full name;", "Email address;", "Phone number;", "Company name;", "Messages submitted through contact forms."],
+      list: [
+        "Full name;",
+        "Email address;",
+        "Phone number;",
+        "Company name;",
+        "Messages submitted through contact forms.",
+      ],
     },
     {
       heading: "3. How We Use Information",
@@ -62,7 +68,9 @@ export const PRIVACY_POLICY = {
     },
     {
       heading: "9. Contact Information",
-      paragraphs: ["If you have any questions regarding this Privacy Policy, you may contact us at:"],
+      paragraphs: [
+        "If you have any questions regarding this Privacy Policy, you may contact us at:",
+      ],
       email: "solvershq@gmail.com",
     },
     {

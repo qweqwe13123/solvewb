@@ -9,9 +9,15 @@ export const Route = createFileRoute("/c/members")({
   head: () => ({
     meta: [
       { title: "Members — AI Video Bootcamp" },
-      { name: "description", content: "Browse the AI Video Bootcamp member directory and connect with other creators." },
+      {
+        name: "description",
+        content: "Browse the AI Video Bootcamp member directory and connect with other creators.",
+      },
       { property: "og:title", content: "AI Video Bootcamp members" },
-      { property: "og:description", content: "100 AI creators building videos, ads and brands together." },
+      {
+        property: "og:description",
+        content: "100 AI creators building videos, ads and brands together.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -20,8 +26,16 @@ export const Route = createFileRoute("/c/members")({
 });
 
 const MEMBERS = [
-  { name: "Daniel Riley", role: "Owner", bio: "Building AI video systems for brands. Teaching what works." },
-  { name: "Nitya Nakum", role: "Admin", bio: "Prompt engineer. Turning storyboards into finished AI films." },
+  {
+    name: "Daniel Riley",
+    role: "Owner",
+    bio: "Building AI video systems for brands. Teaching what works.",
+  },
+  {
+    name: "Nitya Nakum",
+    role: "Admin",
+    bio: "Prompt engineer. Turning storyboards into finished AI films.",
+  },
   { name: "Marcus Doyle", role: "Level 4", bio: "UGC ads with AI actors for DTC brands." },
   { name: "Elena Ruiz", role: "Level 3", bio: "Short-form creator, 1.2M views last month." },
   { name: "Ahmed Karim", role: "Level 3", bio: "Motion design + AI image pipelines." },

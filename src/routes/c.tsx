@@ -20,7 +20,7 @@ const TABS = [
   { to: "/c/classroom", label: "Classroom" },
   { to: "/c/calendar", label: "Calendar" },
   { to: "/c/members", label: "Members" },
-  
+
   { to: "/c/leaderboards", label: "Leaderboards" },
   { to: "/c/about", label: "About" },
 ] as const;
@@ -66,7 +66,11 @@ function CommunityShell() {
     }
   }, [accessQuery.isSuccess, hasAccess, isAdmin, navigate, sessionLoading, user]);
 
-  if (sessionLoading || (!user && typeof window !== "undefined") || (user && !isAdmin && accessQuery.isLoading)) {
+  if (
+    sessionLoading ||
+    (!user && typeof window !== "undefined") ||
+    (user && !isAdmin && accessQuery.isLoading)
+  ) {
     return (
       <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">
         Checking access…

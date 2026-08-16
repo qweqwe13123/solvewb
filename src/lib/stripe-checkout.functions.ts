@@ -9,7 +9,7 @@ const checkoutInputSchema = z.object({
 });
 
 export const getCheckoutUrlFn = createServerFn({ method: "POST" })
-  .validator((data: unknown) => checkoutInputSchema.parse(data || {}))
+  .inputValidator((data: unknown) => checkoutInputSchema.parse(data || {}))
   .handler(async ({ data }) => {
     const url = await createHostedCheckoutUrl({
       plan: data.plan as PlanId,

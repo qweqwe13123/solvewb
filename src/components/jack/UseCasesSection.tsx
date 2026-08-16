@@ -23,7 +23,12 @@ const USE_CASES: UseCase[] = [
   },
 ];
 
-const STAGGER_PT_DESKTOP = ["pt-0", "pt-5 md:pt-6", "pt-10 md:pt-12", "pt-[3.25rem] md:pt-16"] as const;
+const STAGGER_PT_DESKTOP = [
+  "pt-0",
+  "pt-5 md:pt-6",
+  "pt-10 md:pt-12",
+  "pt-[3.25rem] md:pt-16",
+] as const;
 
 function StaggeredRow({ className = "" }: { className?: string }) {
   return (

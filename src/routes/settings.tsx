@@ -57,9 +57,7 @@ function SettingsLayout() {
                   <Link
                     to={item.to}
                     className={`block shrink-0 rounded-xl px-4 py-3 text-[15px] font-bold whitespace-nowrap transition-colors ${
-                      active
-                        ? "bg-join text-join-foreground"
-                        : "text-foreground hover:bg-accent"
+                      active ? "bg-join text-join-foreground" : "text-foreground hover:bg-accent"
                     }`}
                   >
                     {item.label}

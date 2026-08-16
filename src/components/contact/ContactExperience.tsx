@@ -35,7 +35,9 @@ export function ContactExperience() {
     setQuickMessages((messages) => [
       ...messages,
       trimmed || "Uploaded files",
-      ...(chatFiles.length ? [`Attached ${chatFiles.length} file${chatFiles.length > 1 ? "s" : ""}`] : []),
+      ...(chatFiles.length
+        ? [`Attached ${chatFiles.length} file${chatFiles.length > 1 ? "s" : ""}`]
+        : []),
     ]);
     setChatText("");
     setChatFiles([]);
@@ -159,9 +161,7 @@ export function ContactExperience() {
                 </div>
               ) : null}
             </>
-          ) : (
-            null
-          )}
+          ) : null}
         </div>
 
         <div className="w-full shrink-0 lg:mt-4 lg:w-[min(100%,400px)]">
