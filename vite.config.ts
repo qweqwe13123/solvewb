@@ -44,7 +44,16 @@ export default defineConfig(({ command, mode }) => {
         server: { entry: "server" },
       }),
       react(),
-      ...(command === "build" ? [nitro({ preset: "vercel" })] : []),
+      ...(command === "build"
+        ? [
+            nitro({
+              preset: "vercel",
+              vercel: {
+                entryFormat: "node",
+              },
+            }),
+          ]
+        : []),
     ],
     server: {
       host: "::",
