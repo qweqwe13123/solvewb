@@ -84,7 +84,20 @@ function CommunityShell() {
     );
   }
 
-  if (user && !isAdmin && (accessQuery.isError || (accessQuery.isSuccess && !hasAccess))) {
+  if (user && !isAdmin && accessQuery.isError) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-4 text-center text-sm text-muted-foreground">
+        <div>
+          <p>We are still verifying your Pro access.</p>
+          <button type="button" className="mt-4 rounded-lg bg-join px-4 py-2 font-semibold text-join-foreground" onClick={() => accessQuery.refetch()}>
+            Check access again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (user && !isAdmin && accessQuery.isSuccess && !hasAccess) {
     return (
       <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">
         Redirecting to courses…
