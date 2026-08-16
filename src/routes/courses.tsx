@@ -16,16 +16,21 @@ import {
 import { CourseSwitcher } from "@/components/CourseSwitcher";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSession } from "@/hooks/useSession";
 import { UserMenu } from "@/components/UserMenu";
 import { getCommunity, checkCommunityAccessFn, type Course } from "@/lib/community.functions";
+import { syncCheckoutSessionFn } from "@/lib/stripe-checkout.functions";
 import { mediaUrl } from "@/lib/media";
 import { Avatar, CoverImage } from "@/components/Media";
 
 const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
 
 export const Route = createFileRoute("/courses")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    checkout: search.checkout === "success" || search.checkout === "canceled" ? search.checkout : undefined,
+    session_id: typeof search.session_id === "string" ? search.session_id : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "AI Video Bootcamp — Courses & Community" },
@@ -46,11 +51,14 @@ export const Route = createFileRoute("/courses")({
 });
 
 function CoursesPage() {
+  const { checkout, session_id } = Route.useSearch();
   const { user, loading: sessionLoading } = useSession();
   const navigate = useNavigate();
   const isAdmin = (user?.email || "").toLowerCase().trim() === DESIGNATED_ADMIN_EMAIL;
   const fetchCommunity = useServerFn(getCommunity);
   const checkAccess = useServerFn(checkCommunityAccessFn);
+  const syncSession = useServerFn(syncCheckoutSessionFn);
+  const syncedSessionRef = useRef<string | null>(null);
   const { data } = useQuery({ queryKey: ["community"], queryFn: () => fetchCommunity() });
   const accessQuery = useQuery({
     queryKey: ["community-access-status", user?.id, user?.email],
@@ -64,11 +72,17 @@ function CoursesPage() {
   const hasAccess = isAdmin || Boolean(accessQuery.data?.hasAccess);
 
   useEffect(() => {
+    if (!session_id || syncedSessionRef.current === session_id) return;
+    syncedSessionRef.current = session_id;
+    void syncSession({ data: { sessionId: session_id } }).catch(() => undefined);
+  }, [session_id, syncSession]);
+
+  useEffect(() => {
     if (sessionLoading) return;
-    if (user && hasAccess) {
+    if (user && hasAccess && checkout !== "success") {
       navigate({ to: "/c", replace: true });
     }
-  }, [hasAccess, navigate, sessionLoading, user]);
+  }, [checkout, hasAccess, navigate, sessionLoading, user]);
   const [chatOpen, setChatOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -329,7 +343,7 @@ function CoursesPage() {
                   </div>
                 ))}
               </div>
-              {isAdmin ? (
+              {isAdmin || hasAccess ? (
                 <Link
                   to="/c"
                   className="mt-4 block w-full rounded-lg bg-join py-3.5 text-center text-sm font-semibold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 shadow-sm"
