@@ -272,6 +272,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   // The invoice.payment_succeeded webhook sends the canonical receipt email.
   // Keeping checkout.session.completed focused on entitlement activation avoids duplicate emails.
+  return synced;
 }
 
 async function handleInvoiceSucceeded(invoice: Stripe.Invoice) {
@@ -406,8 +407,12 @@ export async function syncCheckoutSession(sessionId: string) {
     session.subscription &&
     (session.payment_status === "paid" || session.status === "complete")
   ) {
-    await handleCheckoutCompleted(session);
-    return { ok: true };
+    const synced = await handleCheckoutCompleted(session);
+    return {
+      ok: true,
+      hasAccess: true,
+      status: synced?.row.status ?? "active",
+    };
   }
   return { ok: false };
 }
