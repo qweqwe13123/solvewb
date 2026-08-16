@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Bell, MessageSquare, Search, Send } from "lucide-react";
+import { Bell, Loader2, MessageSquare, Search, Send, Sparkles, Shield } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CourseSwitcher } from "@/components/CourseSwitcher";
@@ -39,6 +39,10 @@ function CommunityShell() {
     queryKey: ["community-access-status", user?.id, user?.email],
     queryFn: () => checkAccess({ data: { userId: user?.id, email: user?.email } }),
     enabled: !!user,
+    staleTime: 0,
+    refetchOnMount: "always",
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
   });
   const profile = data?.profile ?? null;
   const courses = data?.courses ?? [];
@@ -71,8 +75,11 @@ function CommunityShell() {
     (user && !isAdmin && accessQuery.isLoading)
   ) {
     return (
-      <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">
-        Checking access…
+      <div className="grid min-h-screen place-items-center bg-background text-sm font-medium text-muted-foreground">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="size-6 animate-spin text-foreground" />
+          <span>Verifying Pro access...</span>
+        </div>
       </div>
     );
   }
@@ -128,6 +135,17 @@ function CommunityShell() {
                 1
               </span>
             </button>
+            {isAdmin ? (
+              <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 px-3 py-1 text-xs font-bold text-purple-600 dark:text-purple-400 shadow-sm">
+                <Shield className="size-3.5 fill-current" />
+                <span>ADMIN</span>
+              </div>
+            ) : hasAccess ? (
+              <div className="flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-400 shadow-sm">
+                <Sparkles className="size-3.5 fill-amber-500" />
+                <span>PRO USER</span>
+              </div>
+            ) : null}
             {user ? (
               <UserMenu user={user} />
             ) : (

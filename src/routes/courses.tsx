@@ -7,7 +7,9 @@ import {
   Play,
   Search,
   Send,
+  Shield,
   ShieldCheck,
+  Sparkles,
   Tag,
   Users,
 } from "lucide-react";
@@ -54,6 +56,10 @@ function CoursesPage() {
     queryKey: ["community-access-status", user?.id, user?.email],
     queryFn: () => checkAccess({ data: { userId: user?.id, email: user?.email } }),
     enabled: !!user,
+    staleTime: 0,
+    refetchOnMount: "always",
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
   });
   const hasAccess = isAdmin || Boolean(accessQuery.data?.hasAccess);
 
@@ -185,6 +191,17 @@ function CoursesPage() {
               </div>
             ) : null}
             <Globe className="size-5 text-muted-foreground" />
+            {isAdmin ? (
+              <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 px-3 py-1 text-xs font-bold text-purple-600 dark:text-purple-400 shadow-sm">
+                <Shield className="size-3.5 fill-current" />
+                <span>ADMIN</span>
+              </div>
+            ) : hasAccess ? (
+              <div className="flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-400 shadow-sm">
+                <Sparkles className="size-3.5 fill-amber-500" />
+                <span>PRO USER</span>
+              </div>
+            ) : null}
             {user ? (
               <UserMenu user={user} />
             ) : (

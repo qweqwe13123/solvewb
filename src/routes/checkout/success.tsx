@@ -30,19 +30,24 @@ function CheckoutSuccessPage() {
 
     async function handleSyncAndRedirect() {
       if (session_id) {
-        try {
-          await syncSession({ data: { sessionId: session_id } });
-        } catch (err) {
-          console.warn("Session sync error:", err);
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            const res = await syncSession({ data: { sessionId: session_id } });
+            if (res && res.ok) {
+              break;
+            }
+          } catch (err) {
+            console.warn(`Session sync attempt ${attempt + 1} error:`, err);
+          }
+          if (attempt < 2) {
+            await new Promise((r) => setTimeout(r, 600));
+          }
         }
       }
 
       if (active) {
         setIsSyncing(false);
-        const timer = setTimeout(() => {
-          window.location.href = "/c";
-        }, 1500);
-        return () => clearTimeout(timer);
+        window.location.replace("/c");
       }
     }
 
