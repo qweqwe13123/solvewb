@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listMembers } from "@/lib/admin.functions";
+import {
+  cancelProUserSubscription,
+  listMembers,
+  listProUsers,
+} from "@/lib/admin.functions";
 import { useSession } from "@/hooks/useSession";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -26,6 +30,14 @@ function AdminMembersPage() {
   const { user } = useSession();
   const fetchMembers = useServerFn(listMembers);
   const membersQuery = useQuery({ queryKey: ["admin-members"], queryFn: () => fetchMembers() });
+  const fetchProUsers = useServerFn(listProUsers);
+  const proUsersQuery = useQuery({ queryKey: ["admin-pro-users"], queryFn: () => fetchProUsers() });
+  const queryClient = useQueryClient();
+  const cancelSubscription = useServerFn(cancelProUserSubscription);
+  const cancelMutation = useMutation({
+    mutationFn: (subscriptionId: string) => cancelSubscription({ data: { subscriptionId } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-pro-users"] }),
+  });
 
   return (
     <>
@@ -42,6 +54,58 @@ function AdminMembersPage() {
           <Stat label="Admins" value="1" />
           <Stat label="Price" value="$49/mo" />
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-card to-card p-6 shadow-sm sm:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-300">Pro access</span>
+              <span className="text-sm text-muted-foreground">{proUsersQuery.data?.total ?? "…"} active subscriptions</span>
+            </div>
+            <h2 className="mt-3 text-xl font-bold">Pro Users</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Manage paid users and schedule subscription cancellations without removing access before the paid period ends.</p>
+          </div>
+        </div>
+        {proUsersQuery.isLoading ? (
+          <p className="mt-5 text-sm text-muted-foreground">Loading Pro users…</p>
+        ) : proUsersQuery.isError ? (
+          <p className="mt-5 text-sm text-destructive">Failed to load Pro users.</p>
+        ) : proUsersQuery.data?.users.length ? (
+          <div className="mt-5 space-y-3">
+            {proUsersQuery.data.users.map((proUser) => (
+              <div key={proUser.subscriptionId} className="flex flex-col gap-4 rounded-xl border border-border bg-card/80 p-4 sm:flex-row sm:items-center">
+                <div className="grid size-10 shrink-0 place-items-center rounded-full bg-amber-500/15 text-sm font-bold text-amber-700 dark:text-amber-300">
+                  {proUser.name.slice(0, 1).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-bold">{proUser.name}</p>
+                  <p className="truncate text-sm text-muted-foreground">{proUser.email}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{proUser.plan.toUpperCase()} · {proUser.status}{proUser.currentPeriodEnd ? ` · renews ${new Date(proUser.currentPeriodEnd).toLocaleDateString()}` : ""}</p>
+                </div>
+                {proUser.cancelAtPeriodEnd ? (
+                  <span className="rounded-full bg-orange-500/10 px-3 py-2 text-xs font-semibold text-orange-700 dark:text-orange-300">Cancellation scheduled</span>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={cancelMutation.isPending}
+                    onClick={() => {
+                      if (window.confirm(`Cancel ${proUser.email}'s subscription at the end of the paid period?`)) {
+                        cancelMutation.mutate(proUser.subscriptionId);
+                      }
+                    }}
+                    className="rounded-lg border border-destructive/30 px-3 py-2 text-sm font-semibold text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {cancelMutation.isPending ? "Cancelling…" : "Cancel subscription"}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-xl bg-card/70 p-4 text-sm text-muted-foreground">No active Pro subscriptions yet.</p>
+        )}
+        {cancelMutation.isError ? <p className="mt-4 text-sm text-destructive">{cancelMutation.error instanceof Error ? cancelMutation.error.message : "Could not cancel subscription."}</p> : null}
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
