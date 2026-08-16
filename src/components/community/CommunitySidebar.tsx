@@ -3,17 +3,9 @@ import { Link as LinkIcon, ShieldCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCommunity } from "@/lib/community.functions";
-import { Avatar, CoverImage } from "@/components/Media";
+import { CoverImage } from "@/components/Media";
 
 const LINKS = ["Instagram", "Youtube", "Join The Skool Games"];
-
-const LEADERS = [
-  { rank: 1, name: "Nitya Nakum 🔥", points: "+1191" },
-  { rank: 2, name: "Marcus Doyle", points: "+904" },
-  { rank: 3, name: "Elena Ruiz", points: "+877" },
-  { rank: 4, name: "Ahmed Karim", points: "+812" },
-  { rank: 5, name: "Sofia Bianchi", points: "+790" },
-];
 
 export function CommunitySidebar() {
   const fetchCommunity = useServerFn(getCommunity);
@@ -69,9 +61,6 @@ export function CommunitySidebar() {
             ))}
           </div>
 
-          <button className="mt-4 w-full rounded-lg border border-border py-3 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:bg-accent">
-            Settings
-          </button>
           <RouterLink
             to="/refund-guarantee"
             className="mt-3 flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
@@ -82,21 +71,6 @@ export function CommunitySidebar() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-4">
-        <h2 className="font-bold">Leaderboard (30-day)</h2>
-        <ul className="mt-3 space-y-3">
-          {LEADERS.map((l) => (
-            <li key={l.rank} className="flex items-center gap-3">
-              <span className="grid size-6 shrink-0 place-items-center rounded-full bg-join text-xs font-bold text-join-foreground">
-                {l.rank}
-              </span>
-              <Avatar name={l.name} className="size-8 shrink-0 rounded-full text-[10px]" />
-              <span className="min-w-0 flex-1 truncate text-[15px]">{l.name}</span>
-              <span className="shrink-0 text-sm font-semibold text-brand">{l.points}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
     </aside>
   );
 }
