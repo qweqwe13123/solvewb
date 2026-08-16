@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, BadgeCheck, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -25,6 +25,7 @@ function CheckoutSuccessPage() {
   const syncSession = useServerFn(syncCheckoutSessionFn);
   const [isSyncing, setIsSyncing] = useState(true);
   const [syncFailed, setSyncFailed] = useState(false);
+  const handledSessionRef = useRef<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -37,6 +38,14 @@ function CheckoutSuccessPage() {
         }
         return;
       }
+
+      const storageKey = `solver:checkout-complete:${session_id}`;
+      if (handledSessionRef.current === session_id || window.sessionStorage.getItem(storageKey) === "1") {
+        window.location.replace("/c");
+        return;
+      }
+      handledSessionRef.current = session_id;
+      window.sessionStorage.setItem(storageKey, "1");
 
       let synced = false;
       for (let attempt = 0; attempt < 6; attempt++) {
