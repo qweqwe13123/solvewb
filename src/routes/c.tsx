@@ -9,7 +9,7 @@ import { useSession } from "@/hooks/useSession";
 import { getCommunity, checkCommunityAccessFn } from "@/lib/community.functions";
 
 const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
-const COMMUNITY_REDIRECT = "/checkout?plan=starter&period=monthly";
+const COMMUNITY_REDIRECT = "/c";
 
 export const Route = createFileRoute("/c")({
   component: CommunityShell,
@@ -59,8 +59,7 @@ function CommunityShell() {
     }
     if (!isAdmin && accessQuery.isSuccess && accessQuery.data && !hasAccess) {
       navigate({
-        to: "/checkout",
-        search: { plan: "starter", period: "monthly" },
+        to: "/courses",
         replace: true,
       });
     }
@@ -81,7 +80,7 @@ function CommunityShell() {
   if (user && !isAdmin && (accessQuery.isError || (accessQuery.isSuccess && !hasAccess))) {
     return (
       <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">
-        Redirecting to checkout…
+        Redirecting to courses…
       </div>
     );
   }

@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { checkCustomerActiveSubscription } from "@/lib/stripe-webhook.server";
 import type { Database } from "@/integrations/supabase/types";
 
 export type CommunityProfile = {
@@ -237,14 +239,13 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
       return { hasAccess: true, isAdmin: true, status: "admin" };
     }
 
-    if (!data.userId) {
+    if (!data.userId && !email) {
       return { hasAccess: false, isAdmin: false, status: "unauthenticated" };
     }
 
     try {
-      const supabase = publicClient();
       if (data.userId) {
-        const { data: sub, error } = await supabase
+        const { data: sub } = await supabaseAdmin
           .from("subscriptions")
           .select("status")
           .eq("user_id", data.userId)
@@ -252,13 +253,13 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
           .limit(1)
           .maybeSingle();
 
-        if (!error && sub && ["active", "trialing", "past_due"].includes(sub.status)) {
+        if (sub && ["active", "trialing", "past_due"].includes(sub.status)) {
           return { hasAccess: true, isAdmin: false, status: sub.status };
         }
       }
 
       if (email) {
-        const { data: profile } = await supabase
+        const { data: profile } = await supabaseAdmin
           .from("profiles")
           .select("id")
           .eq("email", email)
@@ -266,7 +267,7 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
           .maybeSingle();
 
         if (profile?.id) {
-          const { data: subByProfile } = await supabase
+          const { data: subByProfile } = await supabaseAdmin
             .from("subscriptions")
             .select("status")
             .eq("user_id", profile.id)
@@ -277,6 +278,12 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
           if (subByProfile && ["active", "trialing", "past_due"].includes(subByProfile.status)) {
             return { hasAccess: true, isAdmin: false, status: subByProfile.status };
           }
+        }
+
+        // Live check against Stripe API to detect and sync active subscriptions immediately
+        const hasLiveStripeSub = await checkCustomerActiveSubscription(email);
+        if (hasLiveStripeSub) {
+          return { hasAccess: true, isAdmin: false, status: "active" };
         }
       }
     } catch (err) {

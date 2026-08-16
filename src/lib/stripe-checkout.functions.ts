@@ -6,6 +6,8 @@ import type { BillingPeriod, PlanId } from "@/lib/stripe-config";
 const checkoutInputSchema = z.object({
   plan: z.enum(["starter", "pro", "ultra"]).default("starter"),
   period: z.enum(["monthly", "annually"]).default("monthly"),
+  userId: z.string().optional(),
+  email: z.string().optional(),
 });
 
 export const getCheckoutUrlFn = createServerFn({ method: "POST" })
@@ -14,6 +16,8 @@ export const getCheckoutUrlFn = createServerFn({ method: "POST" })
     const url = await createHostedCheckoutUrl({
       plan: data.plan as PlanId,
       period: data.period as BillingPeriod,
+      userId: data.userId,
+      email: data.email,
     });
     return { url };
   });

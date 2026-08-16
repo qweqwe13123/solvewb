@@ -5,6 +5,7 @@ import { Loader2, ShieldCheck } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getCheckoutUrlFn } from "@/lib/stripe-checkout.functions";
 import { useGlobalVideoUnlock } from "@/hooks/use-global-video-unlock";
+import { useSession } from "@/hooks/useSession";
 
 const PLAN_IDS = ["starter", "pro", "ultra"] as const;
 
@@ -21,14 +22,23 @@ export const Route = createFileRoute("/checkout")({
 function CheckoutRedirectPage() {
   useGlobalVideoUnlock();
   const { plan, period } = Route.useSearch();
+  const { user, loading: sessionLoading } = useSession();
   const getCheckout = useServerFn(getCheckoutUrlFn);
   const [directUrl, setDirectUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    if (sessionLoading) return;
     let isMounted = true;
     async function redirect() {
       try {
-        const res = await getCheckout({ data: { plan, period } });
+        const res = await getCheckout({
+          data: {
+            plan,
+            period,
+            userId: user?.id,
+            email: user?.email,
+          },
+        });
         if (isMounted && res?.url) {
           setDirectUrl(res.url);
           window.location.href = res.url;
@@ -45,7 +55,7 @@ function CheckoutRedirectPage() {
     return () => {
       isMounted = false;
     };
-  }, [getCheckout, period, plan]);
+  }, [getCheckout, period, plan, sessionLoading, user]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center font-sans text-foreground">

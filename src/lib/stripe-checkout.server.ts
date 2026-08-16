@@ -2,7 +2,12 @@ import { PLANS, type BillingPeriod, type PlanId } from "@/lib/stripe-config";
 import { getSiteEnv } from "@/lib/env.server";
 import { getStripe } from "@/lib/stripe.server";
 
-export async function createHostedCheckoutUrl(input: { plan: PlanId; period: BillingPeriod }) {
+export async function createHostedCheckoutUrl(input: {
+  plan: PlanId;
+  period: BillingPeriod;
+  userId?: string;
+  email?: string;
+}) {
   const stripe = getStripe();
   const origin = getSiteEnv().SITE_URL || "https://www.solverwebsite.com";
   const planConfig = PLANS[input.plan] || PLANS.starter;
@@ -12,7 +17,7 @@ export async function createHostedCheckoutUrl(input: { plan: PlanId; period: Bil
       : planConfig.monthlyPrice * 100;
   const interval = input.period === "annually" ? "year" : "month";
 
-  const session = await stripe.checkout.sessions.create({
+  const sessionParams: import("stripe").Stripe.Checkout.SessionCreateParams = {
     mode: "subscription",
     line_items: [
       {
@@ -33,11 +38,30 @@ export async function createHostedCheckoutUrl(input: { plan: PlanId; period: Bil
     success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/courses`,
     allow_promotion_codes: true,
-    metadata: { plan: input.plan, billing_period: input.period },
-    subscription_data: {
-      metadata: { plan: input.plan, billing_period: input.period },
+    metadata: {
+      plan: input.plan,
+      billing_period: input.period,
+      user_id: input.userId || "",
+      email: input.email || "",
     },
-  });
+    subscription_data: {
+      metadata: {
+        plan: input.plan,
+        billing_period: input.period,
+        user_id: input.userId || "",
+        email: input.email || "",
+      },
+    },
+  };
+
+  if (input.email) {
+    sessionParams.customer_email = input.email;
+  }
+  if (input.userId) {
+    sessionParams.client_reference_id = input.userId;
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams);
 
   if (!session.url) {
     throw new Error("Stripe Checkout session URL was not created.");

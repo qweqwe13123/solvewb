@@ -410,3 +410,27 @@ export async function syncCheckoutSession(sessionId: string) {
   }
   return { ok: false };
 }
+
+export async function checkCustomerActiveSubscription(email: string): Promise<boolean> {
+  if (!email) return false;
+  try {
+    const stripe = getStripe();
+    const customers = await stripe.customers.list({ email: email.toLowerCase().trim(), limit: 5 });
+    for (const customer of customers.data) {
+      const subs = await stripe.subscriptions.list({ customer: customer.id, status: "all", limit: 5 });
+      for (const sub of subs.data) {
+        if (["active", "trialing", "past_due"].includes(sub.status)) {
+          try {
+            await upsertSubscriptionRow(sub);
+          } catch (e) {
+            console.warn("Could not upsert live stripe subscription row:", e);
+          }
+          return true;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Stripe live customer subscription check error:", err);
+  }
+  return false;
+}
