@@ -63,13 +63,16 @@ function CoursesPage() {
     queryKey: ["community-access-status", user?.id, user?.email],
     queryFn: async () => {
       if (checkout === "success" && session_id) {
-        await syncSession({ data: { sessionId: session_id } }).catch(() => undefined);
+        const synced = await syncSession({ data: { sessionId: session_id } }).catch(() => null);
+        if (synced?.ok && synced.hasAccess) {
+          return { hasAccess: true, isAdmin: false, status: synced.status ?? "active" };
+        }
       }
       return checkAccess({ data: { userId: user?.id, email: user?.email } });
     },
     enabled: !!user,
-    staleTime: 0,
-    refetchOnMount: "always",
+    staleTime: 15_000,
+    refetchOnMount: false,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
   });
