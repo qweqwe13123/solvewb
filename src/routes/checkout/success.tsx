@@ -56,11 +56,10 @@ function CheckoutSuccessPage() {
 
       if (active) {
         setIsSyncing(false);
-        if (synced) {
-          window.location.replace("/c");
-        } else {
-          setSyncFailed(true);
-        }
+        if (!synced) setSyncFailed(true);
+        // Community performs its own live Stripe reconciliation, so never send
+        // a paid customer back to the checkout route when webhook sync is late.
+        window.location.replace("/c");
       }
     }
 
@@ -98,17 +97,17 @@ function CheckoutSuccessPage() {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:justify-start">
           <a
-            href={syncFailed ? `/checkout/success?session_id=${encodeURIComponent(session_id ?? "")}` : "/c"}
+            href="/c"
             className="inline-flex items-center gap-2 rounded-full bg-[#2c2824] px-8 py-3.5 text-base font-semibold text-white shadow-md transition-transform hover:scale-105 hover:bg-[#1f1b17]"
           >
             {isSyncing ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
-                {syncFailed ? "Retry activation" : "Entering community..."}
+                {syncFailed ? "Opening community..." : "Entering community..."}
               </>
             ) : (
               <>
-                {syncFailed ? "Retry activation" : "Enter community now"}
+                {syncFailed ? "Enter community" : "Enter community now"}
                 <ArrowRight className="h-5 w-5" />
               </>
             )}
