@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Check, Sparkles } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getCheckoutUrlFn } from "@/lib/stripe-checkout.functions";
@@ -70,10 +70,12 @@ function CheckoutButton({
   const getCheckout = useServerFn(getCheckoutUrlFn);
   const { user, loading: sessionLoading } = useSession();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const checkoutAttemptId = useRef<string | null>(null);
 
   async function startCheckout() {
     if (isRedirecting || sessionLoading) return;
     setIsRedirecting(true);
+    checkoutAttemptId.current ??= crypto.randomUUID();
     try {
       const result = await getCheckout({
         data: {
@@ -81,6 +83,7 @@ function CheckoutButton({
           period: billing,
           userId: user?.id,
           email: user?.email,
+          checkoutAttemptId: checkoutAttemptId.current,
         },
       });
       if (!result?.url) throw new Error("Checkout URL was not created.");
