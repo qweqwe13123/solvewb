@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RefreshCw } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -66,11 +67,23 @@ function AdminMembersPage() {
             <h2 className="mt-3 text-xl font-bold">Pro Users</h2>
             <p className="mt-1 text-sm text-muted-foreground">Manage paid users and schedule subscription cancellations without removing access before the paid period ends.</p>
           </div>
+          <button
+            type="button"
+            onClick={() => proUsersQuery.refetch()}
+            disabled={proUsersQuery.isFetching}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw className={`size-4 ${proUsersQuery.isFetching ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
         </div>
         {proUsersQuery.isLoading ? (
           <p className="mt-5 text-sm text-muted-foreground">Loading Pro users…</p>
         ) : proUsersQuery.isError ? (
-          <p className="mt-5 text-sm text-destructive">Failed to load Pro users.</p>
+          <div className="mt-5 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+            <p className="text-sm text-destructive">Failed to load Pro users.</p>
+            <button type="button" onClick={() => proUsersQuery.refetch()} className="mt-3 rounded-lg bg-join px-3 py-2 text-sm font-semibold text-join-foreground">Try again</button>
+          </div>
         ) : proUsersQuery.data?.users.length ? (
           <div className="mt-5 space-y-3">
             {proUsersQuery.data.users.map((proUser) => (
