@@ -7,6 +7,7 @@ export async function createHostedCheckoutUrl(input: {
   period: BillingPeriod;
   userId?: string;
   email?: string;
+  checkoutAttemptId?: string;
 }) {
   const stripe = getStripe();
   const origin = getSiteEnv().SITE_URL || "https://www.solverwebsite.com";
@@ -61,7 +62,12 @@ export async function createHostedCheckoutUrl(input: {
     },
     // Per-session branding requires Stripe API version 2025-09-30.clover;
     // the account-level Branding Settings remain unchanged.
-    { apiVersion: "2025-09-30.clover" as any },
+    {
+      apiVersion: "2025-09-30.clover" as any,
+      idempotencyKey: input.checkoutAttemptId
+        ? `checkout_${input.checkoutAttemptId}`
+        : undefined,
+    },
   );
 
   if (!session.url) {
