@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useSession } from "@/hooks/useSession";
 import { getCheckoutUrlFn } from "@/lib/stripe-checkout.functions";
@@ -25,10 +25,12 @@ function LegacyCheckoutRedirect() {
   const { plan, period } = Route.useSearch();
   const { user, loading: sessionLoading } = useSession();
   const getCheckout = useServerFn(getCheckoutUrlFn);
+  const checkoutAttemptId = useRef<string | null>(null);
 
   useEffect(() => {
     if (sessionLoading) return;
     let active = true;
+    checkoutAttemptId.current ??= crypto.randomUUID();
 
     void getCheckout({
       data: {
@@ -36,6 +38,7 @@ function LegacyCheckoutRedirect() {
         period,
         userId: user?.id,
         email: user?.email,
+        checkoutAttemptId: checkoutAttemptId.current,
       },
     })
       .then((result) => {
