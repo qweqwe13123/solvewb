@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Check, Sparkles } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { getCheckoutUrlFn } from "@/lib/stripe-checkout.functions";
+import { useSession } from "@/hooks/useSession";
 
 type Billing = "monthly" | "annually";
 
@@ -53,6 +56,55 @@ const PLANS: readonly Plan[] = [
 function displayPrice(monthlyPrice: number, billing: Billing) {
   if (billing === "monthly") return monthlyPrice;
   return Math.round(monthlyPrice * 0.8);
+}
+
+function CheckoutButton({
+  planId,
+  billing,
+  recommended,
+}: {
+  planId: string;
+  billing: Billing;
+  recommended?: boolean;
+}) {
+  const getCheckout = useServerFn(getCheckoutUrlFn);
+  const { user, loading: sessionLoading } = useSession();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  async function startCheckout() {
+    if (isRedirecting || sessionLoading) return;
+    setIsRedirecting(true);
+    try {
+      const result = await getCheckout({
+        data: {
+          plan: planId,
+          period: billing,
+          userId: user?.id,
+          email: user?.email,
+        },
+      });
+      if (!result?.url) throw new Error("Checkout URL was not created.");
+      window.location.assign(result.url);
+    } catch {
+      setIsRedirecting(false);
+      window.location.assign(`/api/stripe/checkout?plan=${planId}&period=${billing}`);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={startCheckout}
+      disabled={isRedirecting || sessionLoading}
+      className={`mt-6 flex w-full items-center justify-center rounded-xl py-3 text-sm font-semibold transition-colors disabled:cursor-wait disabled:opacity-70 ${
+        recommended
+          ? "bg-[#2563eb] text-white hover:bg-[#1d4ed8]"
+          : "border border-[#d1d5db] bg-white text-[#111] hover:bg-[#fafafa]"
+      }`}
+    >
+      {isRedirecting ? "Opening secure checkout…" : "Continue to secure checkout"}
+    </button>
+  );
 }
 
 export function PricingSection() {
@@ -129,16 +181,11 @@ export function PricingSection() {
                     <p className="mt-1 text-xs text-[#9ca3af]">Billed annually</p>
                   ) : null}
 
-                  <a
-                    href={`/checkout?plan=${plan.id}&period=${billing}`}
-                    className={`mt-6 flex w-full items-center justify-center rounded-xl py-3 text-sm font-semibold transition-colors ${
-                      plan.recommended
-                        ? "bg-[#2563eb] text-white hover:bg-[#1d4ed8]"
-                        : "border border-[#d1d5db] bg-white text-[#111] hover:bg-[#fafafa]"
-                    }`}
-                  >
-                    Continue to secure checkout
-                  </a>
+                  <CheckoutButton
+                    planId={plan.id}
+                    billing={billing}
+                    recommended={plan.recommended}
+                  />
 
                   <div className="my-6 h-px bg-[#e5e7eb]" />
 
