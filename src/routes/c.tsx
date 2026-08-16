@@ -19,9 +19,8 @@ const TABS = [
   { to: "/c", label: "Community", exact: true },
   { to: "/c/classroom", label: "Classroom" },
   { to: "/c/calendar", label: "Calendar" },
-  { to: "/c/members", label: "Members" },
-
-  { to: "/c/leaderboards", label: "Leaderboards" },
+  { to: "/c/members", label: "Members", comingSoon: true },
+  { to: "/c/leaderboards", label: "Leaderboards", comingSoon: true },
   { to: "/c/about", label: "About" },
 ] as const;
 
@@ -237,13 +236,25 @@ function CommunityShell() {
           <ul className="flex min-w-max items-center gap-7">
             {TABS.map((t) => (
               <li key={t.to}>
-                <Link
-                  to={t.to}
-                  activeOptions={{ exact: "exact" in t ? t.exact : false }}
-                  className="block border-b-2 border-transparent py-3 text-[15px] text-muted-foreground transition-colors hover:text-foreground [&.active]:border-foreground [&.active]:font-semibold [&.active]:text-foreground"
-                >
-                  {t.label}
-                </Link>
+                {t.comingSoon ? (
+                  <span
+                    aria-label={`${t.label} coming soon`}
+                    className="flex cursor-not-allowed items-center gap-2 border-b-2 border-transparent py-3 text-[15px] text-muted-foreground/60"
+                  >
+                    {t.label}
+                    <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Coming soon
+                    </span>
+                  </span>
+                ) : (
+                  <Link
+                    to={t.to}
+                    activeOptions={{ exact: "exact" in t ? t.exact : false }}
+                    className="block border-b-2 border-transparent py-3 text-[15px] text-muted-foreground transition-colors hover:text-foreground [&.active]:border-foreground [&.active]:font-semibold [&.active]:text-foreground"
+                  >
+                    {t.label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
