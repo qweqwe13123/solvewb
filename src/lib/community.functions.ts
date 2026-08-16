@@ -233,22 +233,24 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
       .safeParse(data || {});
     return parsed.success ? parsed.data : {};
   })
-  .handler(async ({ data }) => {
-    const email = (data.email || "").toLowerCase().trim();
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const userId = context.userId;
+    const email = (context.claims?.email || context.user?.email || "").toString().toLowerCase().trim();
     if (email && email === DESIGNATED_ADMIN_EMAIL.toLowerCase()) {
       return { hasAccess: true, isAdmin: true, status: "admin" };
     }
 
-    if (!data.userId && !email) {
+    if (!userId && !email) {
       return { hasAccess: false, isAdmin: false, status: "unauthenticated" };
     }
 
     try {
-      if (data.userId) {
+      if (userId) {
         const { data: sub } = await supabaseAdmin
           .from("subscriptions")
           .select("status")
-          .eq("user_id", data.userId)
+          .eq("user_id", userId)
           .in("status", ["active", "trialing"])
           .limit(1)
           .maybeSingle();
@@ -281,7 +283,10 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
         }
 
         // Live check against Stripe API to detect and sync active subscriptions immediately
-        const hasLiveStripeSub = await checkCustomerActiveSubscription(email);
+        const hasLiveStripeSub = await Promise.race([
+          checkCustomerActiveSubscription(email),
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3500)),
+        ]);
         if (hasLiveStripeSub) {
           return { hasAccess: true, isAdmin: false, status: "active" };
         }
