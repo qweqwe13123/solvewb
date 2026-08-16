@@ -8,6 +8,7 @@ const checkoutInputSchema = z.object({
   period: z.enum(["monthly", "annually"]).default("monthly"),
   userId: z.string().optional(),
   email: z.string().optional(),
+  checkoutAttemptId: z.string().min(8).max(100).optional(),
 });
 
 export const getCheckoutUrlFn = createServerFn({ method: "POST" })
@@ -18,6 +19,7 @@ export const getCheckoutUrlFn = createServerFn({ method: "POST" })
       period: data.period as BillingPeriod,
       userId: data.userId,
       email: data.email,
+      checkoutAttemptId: data.checkoutAttemptId,
     });
     return { url };
   });
