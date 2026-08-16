@@ -406,7 +406,11 @@ export async function syncCheckoutSession(sessionId: string) {
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ["subscription", "customer"],
   });
-  if (session.mode === "subscription" && session.subscription) {
+  if (
+    session.mode === "subscription" &&
+    session.subscription &&
+    (session.payment_status === "paid" || session.status === "complete")
+  ) {
     await handleCheckoutCompleted(session);
     return { ok: true };
   }
@@ -420,34 +424,15 @@ export async function checkCustomerActiveSubscription(email: string): Promise<bo
     const cleanEmail = email.toLowerCase().trim();
     const customers = await stripe.customers.list({ email: cleanEmail, limit: 10 });
     for (const customer of customers.data) {
-      const subs = await stripe.subscriptions.list({ customer: customer.id, status: "all", limit: 10 });
+      const subs = await stripe.subscriptions.list({ customer: customer.id, status: "active", limit: 5 });
       for (const sub of subs.data) {
-        if (["active", "trialing", "past_due"].includes(sub.status)) {
+        if (sub.status === "active" || sub.status === "trialing") {
           try {
             await upsertSubscriptionRow(sub);
           } catch (e) {
             console.warn("Could not upsert live stripe subscription row:", e);
           }
           return true;
-        }
-      }
-    }
-
-    // Also check recent completed checkout sessions for instant access without indexing delay
-    const recentSessions = await stripe.checkout.sessions.list({ limit: 10 });
-    for (const session of recentSessions.data) {
-      const sessionEmail = (
-        session.customer_details?.email ||
-        session.customer_email ||
-        session.metadata?.email ||
-        ""
-      ).toLowerCase().trim();
-      if (sessionEmail === cleanEmail && session.mode === "subscription" && session.subscription) {
-        try {
-          await handleCheckoutCompleted(session);
-          return true;
-        } catch (e) {
-          console.warn("Error handling recent session sync in checkCustomerActiveSubscription:", e);
         }
       }
     }

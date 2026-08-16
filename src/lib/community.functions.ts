@@ -249,11 +249,11 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
           .from("subscriptions")
           .select("status")
           .eq("user_id", data.userId)
-          .in("status", ["active", "trialing", "past_due"])
+          .in("status", ["active", "trialing"])
           .limit(1)
           .maybeSingle();
 
-        if (sub && ["active", "trialing", "past_due"].includes(sub.status)) {
+        if (sub && ["active", "trialing"].includes(sub.status)) {
           return { hasAccess: true, isAdmin: false, status: sub.status };
         }
       }
@@ -271,11 +271,11 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
             .from("subscriptions")
             .select("status")
             .eq("user_id", profile.id)
-            .in("status", ["active", "trialing", "past_due"])
+            .in("status", ["active", "trialing"])
             .limit(1)
             .maybeSingle();
 
-          if (subByProfile && ["active", "trialing", "past_due"].includes(subByProfile.status)) {
+          if (subByProfile && ["active", "trialing"].includes(subByProfile.status)) {
             return { hasAccess: true, isAdmin: false, status: subByProfile.status };
           }
         }
