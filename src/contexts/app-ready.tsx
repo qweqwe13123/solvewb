@@ -12,6 +12,7 @@ const AppReadyContext = createContext<AppReadyContextValue>({
 
 const MIN_LOADER_MS = 1200;
 const EXIT_ANIM_MS = 650;
+const MAX_WAIT_MS = 5000;
 
 export function AppReadyProvider({ children }: { children: ReactNode }) {
   const [exiting, setExiting] = useState(false);
@@ -20,8 +21,10 @@ export function AppReadyProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let exitTimer: number | undefined;
     let readyTimer: number | undefined;
+    let safetyTimer: number | undefined;
 
     const finish = () => {
+      if (exiting) return;
       setExiting(true);
       exitTimer = window.setTimeout(() => {
         setReady(true);
@@ -29,21 +32,26 @@ export function AppReadyProvider({ children }: { children: ReactNode }) {
     };
 
     const domReady =
-      document.readyState === "complete"
+      document.readyState === "interactive" || document.readyState === "complete"
         ? Promise.resolve()
         : new Promise<void>((resolve) => {
-            window.addEventListener("load", () => resolve(), { once: true });
+            window.addEventListener("DOMContentLoaded", () => resolve(), { once: true });
           });
 
     const minDelay = new Promise<void>((resolve) => {
       readyTimer = window.setTimeout(resolve, MIN_LOADER_MS);
     });
 
-    Promise.all([domReady, minDelay]).then(finish);
+    const safetyDelay = new Promise<void>((resolve) => {
+      safetyTimer = window.setTimeout(resolve, MAX_WAIT_MS);
+    });
+
+    Promise.race([Promise.all([domReady, minDelay]), safetyDelay]).then(finish);
 
     return () => {
       if (exitTimer) window.clearTimeout(exitTimer);
       if (readyTimer) window.clearTimeout(readyTimer);
+      if (safetyTimer) window.clearTimeout(safetyTimer);
     };
   }, []);
 
