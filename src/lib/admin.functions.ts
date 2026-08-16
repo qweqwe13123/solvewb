@@ -200,15 +200,51 @@ export const cancelProUserSubscription = createServerFn({ method: "POST" })
       throw new Error("Subscription is no longer active");
     }
 
-    const updated = await stripe.subscriptions.update(data.subscriptionId, {
-      cancel_at_period_end: true,
-    });
-    const currentPeriodEnd = new Date(updated.current_period_end * 1000).toISOString();
+    const updated = await stripe.subscriptions.cancel(data.subscriptionId);
+    const canceledAt = new Date().toISOString();
     const { error: updateError } = await supabaseAdmin
       .from("subscriptions")
-      .update({ cancel_at_period_end: true, current_period_end: currentPeriodEnd })
+      .update({ status: "canceled", cancel_at_period_end: false, canceled_at: canceledAt })
       .eq("stripe_subscription_id", data.subscriptionId);
     if (updateError) console.warn("Could not update mirrored subscription row:", updateError.message);
 
-    return { ok: true, cancelAtPeriodEnd: true, currentPeriodEnd };
+    return { ok: true, status: updated.status, canceledAt };
+  });
+
+
+export const cancelProUsers = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ subscriptionIds: z.array(z.string().min(1)).min(1).max(100) }).parse(data || {}),
+  )
+  .handler(async ({ context, data }) => {
+    await assertDesignatedAdmin(context);
+    const { getStripe } = await import("@/lib/stripe.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const stripe = getStripe();
+    const results = await Promise.allSettled(
+      data.subscriptionIds.map(async (subscriptionId) => {
+        const updated = await stripe.subscriptions.cancel(subscriptionId);
+        const canceledAt = new Date().toISOString();
+        const { error } = await supabaseAdmin
+          .from("subscriptions")
+          .update({ status: "canceled", cancel_at_period_end: false, canceled_at: canceledAt })
+          .eq("stripe_subscription_id", subscriptionId);
+        if (error) console.warn("Could not update mirrored subscription row:", error.message);
+        return { subscriptionId, status: updated.status };
+      }),
+    );
+    const canceledIds: string[] = [];
+    const failed: Array<{ subscriptionId: string; error: string }> = [];
+    results.forEach((result, index) => {
+      const subscriptionId = data.subscriptionIds[index];
+      if (result.status === "fulfilled") canceledIds.push(subscriptionId);
+      else {
+        failed.push({
+          subscriptionId,
+          error: result.reason instanceof Error ? result.reason.message : "Cancellation failed",
+        });
+      }
+    });
+    return { ok: failed.length === 0, canceledIds, failed };
   });
