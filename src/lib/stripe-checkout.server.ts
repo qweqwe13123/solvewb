@@ -42,7 +42,7 @@ export async function createHostedCheckoutUrl(input: {
       button_color: BRAND.color,
       logo: {
         type: "url",
-        url: `${BRAND.websiteUrl}/og-image.png`,
+        url: `${BRAND.websiteUrl}/favicon.png`,
       },
       icon: {
         type: "url",
