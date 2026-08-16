@@ -24,30 +24,43 @@ function CheckoutSuccessPage() {
   const { session_id } = Route.useSearch();
   const syncSession = useServerFn(syncCheckoutSessionFn);
   const [isSyncing, setIsSyncing] = useState(true);
+  const [syncFailed, setSyncFailed] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     async function handleSyncAndRedirect() {
-      if (session_id) {
-        for (let attempt = 0; attempt < 3; attempt++) {
+      if (!session_id) {
+        if (active) {
+          setSyncFailed(true);
+          setIsSyncing(false);
+        }
+        return;
+      }
+
+      let synced = false;
+      for (let attempt = 0; attempt < 6; attempt++) {
           try {
             const res = await syncSession({ data: { sessionId: session_id } });
             if (res && res.ok) {
+              synced = true;
               break;
             }
           } catch (err) {
             console.warn(`Session sync attempt ${attempt + 1} error:`, err);
           }
-          if (attempt < 2) {
-            await new Promise((r) => setTimeout(r, 600));
+          if (attempt < 5) {
+            await new Promise((r) => setTimeout(r, 800));
           }
         }
-      }
 
       if (active) {
         setIsSyncing(false);
-        window.location.replace("/c");
+        if (synced) {
+          window.location.replace("/c");
+        } else {
+          setSyncFailed(true);
+        }
       }
     }
 
@@ -78,22 +91,24 @@ function CheckoutSuccessPage() {
           You&apos;re in! Setting up your community access...
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#6f665c]">
-          Your subscription is activated. We&apos;re redirecting you straight to the community right now.
+          {syncFailed
+            ? "Payment was received, but access is still being prepared. You can retry safely or contact support if this continues."
+            : "Your subscription is being activated securely. We&apos;ll take you to the community as soon as Pro access is ready."}
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:justify-start">
           <a
-            href="/c"
+            href={syncFailed ? `/checkout/success?session_id=${encodeURIComponent(session_id ?? "")}` : "/c"}
             className="inline-flex items-center gap-2 rounded-full bg-[#2c2824] px-8 py-3.5 text-base font-semibold text-white shadow-md transition-transform hover:scale-105 hover:bg-[#1f1b17]"
           >
             {isSyncing ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
-                Entering community...
+                {syncFailed ? "Retry activation" : "Entering community..."}
               </>
             ) : (
               <>
-                Enter community now
+                {syncFailed ? "Retry activation" : "Enter community now"}
                 <ArrowRight className="h-5 w-5" />
               </>
             )}
