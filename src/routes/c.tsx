@@ -57,7 +57,7 @@ function CommunityShell() {
       });
       return;
     }
-    if (!isAdmin && accessQuery.isSuccess && !hasAccess) {
+    if (!isAdmin && accessQuery.isSuccess && accessQuery.data && !hasAccess) {
       navigate({
         to: "/checkout",
         search: { plan: "starter", period: "monthly" },

@@ -399,3 +399,14 @@ export async function processStripeWebhook(rawBody: string, signature: string | 
 
   return Response.json({ received: true });
 }
+
+
+export async function syncCheckoutSession(sessionId: string) {
+  const stripe = getStripe();
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  if (session.mode === "subscription" && session.subscription) {
+    await handleCheckoutCompleted(session);
+    return { ok: true };
+  }
+  return { ok: false };
+}

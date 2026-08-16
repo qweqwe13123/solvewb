@@ -17,3 +17,21 @@ export const getCheckoutUrlFn = createServerFn({ method: "POST" })
     });
     return { url };
   });
+
+
+import { syncCheckoutSession } from "@/lib/stripe-webhook.server";
+
+export const syncCheckoutSessionFn = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => {
+    const parsed = z.object({ sessionId: z.string().optional() }).safeParse(data || {});
+    return parsed.success ? parsed.data : {};
+  })
+  .handler(async ({ data }) => {
+    if (!data.sessionId) return { ok: false };
+    try {
+      return await syncCheckoutSession(data.sessionId);
+    } catch (error) {
+      console.warn("Failed to sync checkout session:", error);
+      return { ok: false };
+    }
+  });
