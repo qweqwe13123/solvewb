@@ -3,7 +3,6 @@ import { UseCasesSection } from "./UseCasesSection";
 import { AboutSection } from "./AboutSection";
 import { ServicesSection } from "./ServicesSection";
 import { ProjectsSection } from "./ProjectsSection";
-import { CoursesSection } from "./CoursesSection";
 import { ReviewsSection } from "./ReviewsSection";
 import { FooterSection } from "./FooterSection";
 
@@ -18,7 +17,6 @@ export function JackPortfolio() {
       <AboutSection />
       <ServicesSection />
       <ProjectsSection />
-      <CoursesSection />
       <ReviewsSection />
       <FooterSection />
     </div>
