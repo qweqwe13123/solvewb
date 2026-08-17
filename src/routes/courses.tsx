@@ -381,16 +381,7 @@ function CoursesPage() {
             </div>
           </div>
 
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Powered by {" "}
-            <span className="font-bold tracking-tight" aria-label="skool">
-              <span className="text-[#2f4e9b]">s</span>
-              <span className="text-[#e07a3f]">k</span>
-              <span className="text-[#c65a4a]">o</span>
-              <span className="text-[#5c8a55]">o</span>
-              <span className="text-[#d18a3c]">l</span>
-            </span>
-          </p>
+
         </aside>
       </main>
     </div>
