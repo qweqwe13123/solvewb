@@ -28,6 +28,7 @@ import { readProAccess, writeProAccess } from "@/lib/pro-access-cache";
 const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
 
 export const Route = createFileRoute("/courses")({
+  loader: async () => getCommunity(),
   validateSearch: (search: Record<string, unknown>) => ({
     checkout: search.checkout === "success" || search.checkout === "canceled" ? search.checkout : undefined,
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
@@ -58,7 +59,14 @@ function CoursesPage() {
   const fetchCommunity = useServerFn(getCommunity);
   const checkAccess = useServerFn(checkCommunityAccessFn);
   const syncSession = useServerFn(syncCheckoutSessionFn);
-  const { data } = useQuery({ queryKey: ["community"], queryFn: () => fetchCommunity() });
+  const initialCommunity = Route.useLoaderData();
+  const { data = initialCommunity } = useQuery({
+    queryKey: ["community"],
+    queryFn: () => fetchCommunity(),
+    initialData: initialCommunity,
+    staleTime: 60_000,
+    refetchOnMount: false,
+  });
   const accessQuery = useQuery({
     queryKey: ["community-access-status", user?.id, user?.email],
     queryFn: async () => {

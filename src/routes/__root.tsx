@@ -11,8 +11,7 @@ import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { siteMetaTags } from "../lib/site-meta";
-import { AppReadyProvider, useAppReady } from "../contexts/app-ready";
-import { SiteLoader } from "../components/SiteLoader";
+import { AppReadyProvider } from "../contexts/app-ready";
 
 function NotFoundComponent() {
   return (
@@ -108,16 +107,7 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootLayout() {
-  const { ready, exiting } = useAppReady();
-
-  return (
-    <>
-      {!ready && <SiteLoader exiting={exiting} />}
-      <div className="transition-opacity duration-500" style={{ opacity: ready ? 1 : 0 }}>
-        <Outlet />
-      </div>
-    </>
-  );
+  return <Outlet />;
 }
 
 function RootComponent() {
