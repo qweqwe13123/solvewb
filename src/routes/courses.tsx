@@ -301,7 +301,7 @@ That's only $1.60/day to stay ahead in AI Automation & Web Design.
                 {[
                   [membersLabel.replace(" members", ""), "Members"],
                   [String(onlineNumber), "Online"],
-                  [profile?.adminsLabel || "8", "Admins"],
+                  ["1", "Admins"],
                 ].map(([n, l]) => (
                   <div key={l}>
                     <div className="text-lg font-semibold">{n}</div>

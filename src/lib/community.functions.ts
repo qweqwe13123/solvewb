@@ -229,7 +229,7 @@ let inMemoryProfile: CommunityProfile = {
   body: "Master AI Video & AI Image Creation. Join 100 creators, monetise AI influencers and UGC ads.\n\nWelcome to the AI Video Bootcamp! In this community and course library, you will learn step-by-step how to create photorealistic AI videos, monetizable AI influencers, viral UGC ads, and short films.\n\nWhat you get inside:\n• Full Access to All Current & Future Courses\n• Private Creator Community & Feedback\n• Weekly Live Q&A and Breakdown Sessions\n• Prompt Templates, Workflow Guides & Cheat Sheets",
   handleLabel: "solverwebsite.com/courses",
   onlineLabel: "",
-  adminsLabel: "8",
+  adminsLabel: "1",
 };
 
 let inMemoryCourses: Course[] = [
