@@ -9,6 +9,10 @@ const checkoutInputSchema = z.object({
   userId: z.string().optional(),
   email: z.string().optional(),
   checkoutAttemptId: z.string().min(8).max(100).optional(),
+  priceId: z
+    .string()
+    .regex(/^price_/)
+    .optional(),
 });
 
 export const getCheckoutUrlFn = createServerFn({ method: "POST" })
@@ -20,10 +24,10 @@ export const getCheckoutUrlFn = createServerFn({ method: "POST" })
       userId: data.userId,
       email: data.email,
       checkoutAttemptId: data.checkoutAttemptId,
+      priceId: data.priceId,
     });
     return { url };
   });
-
 
 import { syncCheckoutSession } from "@/lib/stripe-webhook.server";
 

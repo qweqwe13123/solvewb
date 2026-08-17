@@ -28,8 +28,8 @@ export const PLANS: Record<PlanId, PlanConfig> = {
       "1 active request at a time",
     ],
     prices: {
-      monthly: "price_1U59iYFqPpInUxok9re7Gx6u",
-      annually: "price_1U59iZFqPpInUxokEvGLwRxC",
+      monthly: "price_1Tf82oFqPpInUxokl6jowzdi",
+      annually: "price_1Tf88BFqPpInUxokuJ5ysT65",
     },
   },
   pro: {
@@ -45,8 +45,8 @@ export const PLANS: Record<PlanId, PlanConfig> = {
       "Landing page & funnel tweaks",
     ],
     prices: {
-      monthly: "price_1U59iaFqPpInUxokHFLRTMc0",
-      annually: "price_1U59ibFqPpInUxokyI32eDkM",
+      monthly: "price_1Tf83hFqPpInUxokLnj2mj2D",
+      annually: "price_1Tf88BFqPpInUxokdw12Il78",
     },
   },
   ultra: {
@@ -61,13 +61,16 @@ export const PLANS: Record<PlanId, PlanConfig> = {
       "Custom automation & integrations",
     ],
     prices: {
-      monthly: "price_1U59icFqPpInUxokXOEPo3Jk",
-      annually: "price_1U59idFqPpInUxokH6lFGlXA",
+      monthly: "price_1Tf84OFqPpInUxokal3LrPpy",
+      annually: "price_1Tf88CFqPpInUxokNOUTON0h",
     },
   },
 };
 
 export const PLAN_LIST: PlanConfig[] = [PLANS.starter, PLANS.pro, PLANS.ultra];
+
+// Separate live subscription used by the Courses card Join button.
+export const COURSE_MONTHLY_PRICE_ID = "price_1TlnoNFqPpInUxokkoX7jS9A";
 
 export function displayPrice(monthlyPrice: number, billing: BillingPeriod): number {
   if (billing === "monthly") return monthlyPrice;

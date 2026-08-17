@@ -12,6 +12,10 @@ export const Route = createFileRoute("/checkout")({
       ? (search.plan as (typeof PLAN_IDS)[number])
       : "starter",
     period: search.period === "annually" ? "annually" : "monthly",
+    priceId:
+      typeof search.priceId === "string" && /^price_/.test(search.priceId)
+        ? search.priceId
+        : undefined,
   }),
   component: LegacyCheckoutRedirect,
 });
@@ -22,7 +26,7 @@ export const Route = createFileRoute("/checkout")({
  * invisible prevents bookmarked/legacy links from showing an intermediate UI.
  */
 function LegacyCheckoutRedirect() {
-  const { plan, period } = Route.useSearch();
+  const { plan, period, priceId } = Route.useSearch();
   const { user, loading: sessionLoading } = useSession();
   const getCheckout = useServerFn(getCheckoutUrlFn);
   const checkoutAttemptId = useRef<string | null>(null);
@@ -39,6 +43,7 @@ function LegacyCheckoutRedirect() {
         userId: user?.id,
         email: user?.email,
         checkoutAttemptId: checkoutAttemptId.current,
+        priceId,
       },
     })
       .then((result) => {
@@ -46,14 +51,17 @@ function LegacyCheckoutRedirect() {
       })
       .catch(() => {
         if (active) {
-          window.location.replace(`/api/stripe/checkout?plan=${plan}&period=${period}`);
+          const priceQuery = priceId ? `&priceId=${encodeURIComponent(priceId)}` : "";
+          window.location.replace(
+            `/api/stripe/checkout?plan=${plan}&period=${period}${priceQuery}`,
+          );
         }
       });
 
     return () => {
       active = false;
     };
-  }, [getCheckout, period, plan, sessionLoading, user]);
+  }, [getCheckout, period, plan, priceId, sessionLoading, user]);
 
   return null;
 }

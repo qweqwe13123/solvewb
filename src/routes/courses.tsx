@@ -11,6 +11,7 @@ import { syncCheckoutSessionFn } from "@/lib/stripe-checkout.functions";
 import { mediaUrl } from "@/lib/media";
 import { Avatar, CoverImage } from "@/components/Media";
 import { readProAccess, writeProAccess } from "@/lib/pro-access-cache";
+import { COURSE_MONTHLY_PRICE_ID } from "@/lib/stripe-config";
 
 const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
 const ONLINE_MIN = 10;
@@ -154,7 +155,7 @@ That's only $1.60/day to stay ahead in AI Automation & Web Design.
   const shortDescription = profile?.description?.includes("⭐ Top 1% Community on Skool")
     ? requestedDescription
     : profile?.description || requestedDescription;
-  const checkoutPath = "/checkout?plan=starter&period=monthly";
+  const checkoutPath = `/checkout?plan=starter&period=monthly&priceId=${COURSE_MONTHLY_PRICE_ID}`;
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
@@ -319,7 +320,11 @@ That's only $1.60/day to stay ahead in AI Automation & Web Design.
               ) : user ? (
                 <Link
                   to="/checkout"
-                  search={{ plan: "starter", period: "monthly" }}
+                  search={{
+                    plan: "starter",
+                    period: "monthly",
+                    priceId: COURSE_MONTHLY_PRICE_ID,
+                  }}
                   className="mt-4 block w-full rounded-lg bg-join py-3.5 text-center text-sm font-semibold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 shadow-sm"
                 >
                   Join {priceLabel}
