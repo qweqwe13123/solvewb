@@ -50,7 +50,7 @@ const BASE_MEMBER_COUNT = 100;
 const FIXED_PRICE_LABEL = "$49/month";
 const CURRENT_COURSE_TITLE = "Master AI Automation & Web Design + More";
 const CURRENT_COURSE_SUMMARY = "Master AI Automation & Web Design + More";
-const CURRENT_COURSE_IMAGE = "/og-image.png";
+const CURRENT_COURSE_IMAGE = "/2.png";
 const CURRENT_COURSE_DESCRIPTION = `Master AI Automation & Web Design
 Build AI agents, automate businesses, create premium websites, and turn your skills into a profitable online business.
 🚨 Founding Member Price: $49/month ‼️ Only available for the first 500 members. Once we hit 500 members, the price increases for all new members.
@@ -97,7 +97,11 @@ function publicClient() {
 }
 
 function normalizeCourseCover(path: string | null | undefined) {
-  if (!path || path === "/ryan-mitchell-avatar.jpg" || /^(asdasd|asdasdasd|ryan)$/i.test(path.trim())) {
+  if (
+    !path ||
+    path === "/ryan-mitchell-avatar.jpg" ||
+    /^(asdasd|asdasdasd|ryan)$/i.test(path.trim())
+  ) {
     return CURRENT_COURSE_IMAGE;
   }
   return path;
@@ -224,7 +228,9 @@ export const getCommunity = createServerFn({ method: "GET" }).handler(
       const fetchedProfile = profileRes.data
         ? { ...mapProfile(profileRes.data), membersLabel }
         : { ...inMemoryProfile, membersLabel };
-      const fetchedCourses = (coursesRes.data ?? []).map((row) => mapCourse(row, fetchedProfile.coverUrl));
+      const fetchedCourses = (coursesRes.data ?? []).map((row) =>
+        mapCourse(row, fetchedProfile.coverUrl),
+      );
 
       if (fetchedProfile) {
         inMemoryProfile = { ...inMemoryProfile, ...fetchedProfile };
@@ -277,7 +283,10 @@ export const checkCommunityAccessFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const userId = context.userId;
-    const email = (context.claims?.email || context.user?.email || "").toString().toLowerCase().trim();
+    const email = (context.claims?.email || context.user?.email || "")
+      .toString()
+      .toLowerCase()
+      .trim();
     if (email && email === DESIGNATED_ADMIN_EMAIL.toLowerCase()) {
       return { hasAccess: true, isAdmin: true, status: "admin" };
     }
@@ -357,7 +366,9 @@ export const adminGetCommunity = createServerFn({ method: "GET" })
             .order("created_at", { ascending: true }),
         ]);
         const fetchedProfile = profileRes.data ? mapProfile(profileRes.data) : null;
-        const fetchedCourses = (coursesRes.data ?? []).map((row) => mapCourse(row, fetchedProfile?.coverUrl));
+        const fetchedCourses = (coursesRes.data ?? []).map((row) =>
+          mapCourse(row, fetchedProfile?.coverUrl),
+        );
 
         if (fetchedProfile) inMemoryProfile = { ...inMemoryProfile, ...fetchedProfile };
         if (fetchedCourses.length > 0) inMemoryCourses = fetchedCourses;
@@ -365,7 +376,6 @@ export const adminGetCommunity = createServerFn({ method: "GET" })
         return {
           profile: fetchedProfile ? { ...inMemoryProfile, ...fetchedProfile } : inMemoryProfile,
           courses: fetchedCourses.length > 0 ? fetchedCourses : inMemoryCourses,
-
         };
       } catch {
         return {
@@ -523,7 +533,10 @@ export const saveCourse = createServerFn({ method: "POST" })
 
     try {
       if (data.id) {
-        const { error } = await context.supabase.from("courses").update(payload as any).eq("id", data.id);
+        const { error } = await context.supabase
+          .from("courses")
+          .update(payload as any)
+          .eq("id", data.id);
         if (error) throw error;
         const existingIndex = inMemoryCourses.findIndex(
           (c) => (data.id && c.id === data.id) || c.slug === data.slug,
