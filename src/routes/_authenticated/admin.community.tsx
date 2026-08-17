@@ -60,6 +60,7 @@ function AdminCommunityPage() {
   });
 
   const [profile, setProfile] = useState<CommunityProfile | null>(null);
+  const [publishedAt, setPublishedAt] = useState<number | null>(null);
   const [editing, setEditing] = useState<Course | null>(null);
 
   useEffect(() => {
@@ -80,7 +81,8 @@ function AdminCommunityPage() {
         qc.refetchQueries({ queryKey: ["admin-community"] }),
         qc.refetchQueries({ queryKey: ["community"] }),
       ]);
-      toast.success("Community profile and owner info saved!");
+      setPublishedAt(Date.now());
+      toast.success("Community changes are saved and published.");
     },
     onError: (error: Error) => toast.error(error.message || "Failed to save profile"),
   });
@@ -133,7 +135,11 @@ function AdminCommunityPage() {
         <SidebarCardForm
           profile={profile}
           pending={profileMutation.isPending}
-          onChange={setProfile}
+          publishedAt={publishedAt}
+          onChange={(nextProfile) => {
+            setProfile(nextProfile);
+            setPublishedAt(null);
+          }}
           onSave={() => profileMutation.mutate(profile)}
         />
       ) : null}
@@ -215,11 +221,13 @@ function AdminCommunityPage() {
 function SidebarCardForm({
   profile,
   pending,
+  publishedAt,
   onChange,
   onSave,
 }: {
   profile: CommunityProfile;
   pending: boolean;
+  publishedAt: number | null;
   onChange: (p: CommunityProfile) => void;
   onSave: () => void;
 }) {
@@ -229,6 +237,24 @@ function SidebarCardForm({
       <p className="mt-2 text-[15px] text-muted-foreground">
         Customize author name, owner profile avatar, community title, cover image, and description.
       </p>
+      {publishedAt ? (
+        <div
+          role="status"
+          className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm"
+        >
+          <span className="font-semibold text-emerald-700 dark:text-emerald-300">
+            Saved and published to the live Community.
+          </span>
+          <a
+            href={`/courses?community-published=${publishedAt}`}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-md border border-emerald-600/30 px-3 py-1.5 font-bold text-emerald-700 transition-colors hover:bg-emerald-500/10 dark:text-emerald-300"
+          >
+            View published page
+          </a>
+        </div>
+      ) : null}
       <form
         className="mt-6 space-y-6"
         onSubmit={(e) => {
@@ -347,7 +373,7 @@ function SidebarCardForm({
           disabled={pending}
           className="rounded-lg bg-join px-6 py-3 text-sm font-bold tracking-wide text-join-foreground uppercase transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
         >
-          {pending ? "Saving…" : "Save changes"}
+          {pending ? "Saving & publishing…" : "Save & publish"}
         </button>
       </form>
     </section>
