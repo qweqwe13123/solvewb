@@ -13,6 +13,21 @@ import { Avatar, CoverImage } from "@/components/Media";
 import { readProAccess, writeProAccess } from "@/lib/pro-access-cache";
 
 const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
+const ONLINE_MIN = 10;
+const ONLINE_MAX = 45;
+
+function getUtcHourKey(date: Date) {
+  return date.toISOString().slice(0, 13);
+}
+
+function getDeterministicOnlineNumber(hourKey: string) {
+  let hash = 2166136261;
+  for (let index = 0; index < hourKey.length; index += 1) {
+    hash ^= hourKey.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return ONLINE_MIN + ((hash >>> 0) % (ONLINE_MAX - ONLINE_MIN + 1));
+}
 
 export const Route = createFileRoute("/courses")({
   loader: async () => getCommunity(),
@@ -84,7 +99,20 @@ function CoursesPage() {
   }, [accessQuery.data?.hasAccess, accessQuery.isSuccess, isAdmin, user]);
 
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [onlineHourKey, setOnlineHourKey] = useState(() => getUtcHourKey(new Date()));
 
+  useEffect(() => {
+    const now = new Date();
+    const nextHour = new Date(now);
+    nextHour.setUTCMinutes(60, 0, 50);
+    const timer = window.setTimeout(
+      () => setOnlineHourKey(getUtcHourKey(new Date())),
+      Math.max(1000, nextHour.getTime() - now.getTime()),
+    );
+    return () => window.clearTimeout(timer);
+  }, [onlineHourKey]);
+
+  const onlineNumber = getDeterministicOnlineNumber(onlineHourKey);
   const profile = data?.profile ?? null;
   const courses = data?.courses ?? [];
   const name = profile?.name || "AI Video Bootcamp";
@@ -272,7 +300,7 @@ That's only $1.60/day to stay ahead in AI Automation & Web Design.
               <div className="mt-4 grid grid-cols-3 divide-x divide-border border-y border-border py-3 text-center">
                 {[
                   [membersLabel.replace(" members", ""), "Members"],
-                  [profile?.onlineLabel || "414", "Online"],
+                  [String(onlineNumber), "Online"],
                   [profile?.adminsLabel || "8", "Admins"],
                 ].map(([n, l]) => (
                   <div key={l}>
