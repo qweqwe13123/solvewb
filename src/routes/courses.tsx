@@ -297,11 +297,11 @@ function CoursesPage() {
             </span>
             <span className="flex items-center gap-2">
               <Avatar
-                name={profile?.ownerLabel || "Daniel Riley"}
-                path={profile?.ownerAvatar}
+                name="Ryan Mitchell"
+                path="/ryan-mitchell-avatar.jpg"
                 className="size-6 rounded-full text-[10px]"
               />
-              {profile?.ownerLabel || "By Daniel Riley"}
+              By Ryan Mitchell 💎 🔥
             </span>
           </div>
 
