@@ -1,18 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Bell,
-  Globe,
-  Lock,
-  MessageSquare,
-  Play,
-  Search,
-  Send,
-  Shield,
-  ShieldCheck,
-  Sparkles,
-  Tag,
-  Users,
-} from "lucide-react";
+import { Bell, Play, Search, Shield, ShieldCheck, Sparkles, Tag, Users } from "lucide-react";
 import { CourseSwitcher } from "@/components/CourseSwitcher";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -30,7 +17,8 @@ const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
 export const Route = createFileRoute("/courses")({
   loader: async () => getCommunity(),
   validateSearch: (search: Record<string, unknown>) => ({
-    checkout: search.checkout === "success" || search.checkout === "canceled" ? search.checkout : undefined,
+    checkout:
+      search.checkout === "success" || search.checkout === "canceled" ? search.checkout : undefined,
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
   }),
   head: () => ({
@@ -95,10 +83,7 @@ function CoursesPage() {
     writeProAccess(user.id, Boolean(accessQuery.data?.hasAccess));
   }, [accessQuery.data?.hasAccess, accessQuery.isSuccess, isAdmin, user]);
 
-  const [chatOpen, setChatOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
 
   const profile = data?.profile ?? null;
   const courses = data?.courses ?? [];
@@ -124,21 +109,9 @@ function CoursesPage() {
           <div className="relative flex items-center gap-2 sm:gap-3">
             <button
               type="button"
-              aria-label="Open chat"
-              onClick={() => {
-                setChatOpen((value) => !value);
-                setNotificationsOpen(false);
-              }}
-              className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <MessageSquare className="size-5" />
-            </button>
-            <button
-              type="button"
               aria-label="Open notifications"
               onClick={() => {
                 setNotificationsOpen((value) => !value);
-                setChatOpen(false);
               }}
               className="relative rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
@@ -147,56 +120,6 @@ function CoursesPage() {
                 1
               </span>
             </button>
-            {chatOpen ? (
-              <div className="absolute right-0 top-11 z-30 w-[min(92vw,360px)] rounded-xl border border-border bg-card p-4 shadow-lg">
-                <div className="flex items-center justify-between border-b border-border pb-3">
-                  <div>
-                    <p className="text-sm font-bold">Community chat</p>
-                    <p className="text-xs text-muted-foreground">Send a message to support</p>
-                  </div>
-                  <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">
-                    Online
-                  </span>
-                </div>
-                <div className="mt-3 max-h-52 space-y-2 overflow-y-auto">
-                  <div className="w-fit max-w-[85%] rounded-xl rounded-bl-sm bg-accent px-3 py-2 text-sm">
-                    Hi, how can we help?
-                  </div>
-                  {messages.map((item, index) => (
-                    <div
-                      key={`${item}-${index}`}
-                      className="ml-auto w-fit max-w-[85%] rounded-xl rounded-br-sm bg-join px-3 py-2 text-sm font-medium text-join-foreground"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-                <form
-                  className="mt-3 flex items-center gap-2 rounded-lg border border-border px-3 py-2"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    const trimmed = message.trim();
-                    if (!trimmed) return;
-                    setMessages((items) => [...items, trimmed]);
-                    setMessage("");
-                  }}
-                >
-                  <input
-                    value={message}
-                    onChange={(event) => setMessage(event.target.value)}
-                    placeholder="Write a message..."
-                    className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  />
-                  <button
-                    type="submit"
-                    aria-label="Send message"
-                    className="rounded-md bg-join p-2 text-join-foreground"
-                  >
-                    <Send className="size-4" />
-                  </button>
-                </form>
-              </div>
-            ) : null}
             {notificationsOpen ? (
               <div className="absolute right-0 top-11 z-30 w-[min(92vw,340px)] rounded-xl border border-border bg-card p-4 shadow-lg">
                 <p className="text-sm font-bold">Notifications</p>
@@ -208,7 +131,6 @@ function CoursesPage() {
                 </div>
               </div>
             ) : null}
-            <Globe className="size-5 text-muted-foreground" />
             {isAdmin ? (
               <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 px-3 py-1 text-xs font-bold text-purple-600 dark:text-purple-400 shadow-sm">
                 <Shield className="size-3.5 fill-current" />
@@ -380,8 +302,6 @@ function CoursesPage() {
               </Link>
             </div>
           </div>
-
-
         </aside>
       </main>
     </div>
