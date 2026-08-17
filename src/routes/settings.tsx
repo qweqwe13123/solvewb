@@ -44,13 +44,7 @@ function SettingsLayout() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-card">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-3">
-            <span
-              aria-hidden
-              className="size-9 shrink-0 rounded-lg bg-gradient-to-br from-muted to-accent"
-            />
-            <span className="text-lg font-semibold">AI Video Bootcamp</span>
-          </Link>
+          <div aria-hidden className="min-w-0" />
           {user ? (
             <UserMenu user={user} />
           ) : (
