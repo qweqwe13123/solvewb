@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { DESIGNATED_ADMIN_EMAIL } from "@/lib/admin.functions";
 import type { Database } from "@/integrations/supabase/types";
 
 export type Post = {
@@ -48,6 +49,17 @@ function publicClient() {
   });
 }
 
+const ADMIN_AUTHOR_NAME = "Ryan Mitchell";
+const ADMIN_AUTHOR_AVATAR = "/ryan-mitchell-avatar.jpg";
+
+function normalizePostAuthor(name: string | null, avatar: string | null) {
+  const normalizedName = (name ?? "").trim().toLowerCase();
+  if (normalizedName === DESIGNATED_ADMIN_EMAIL.toLowerCase() || normalizedName === "admin") {
+    return { name: ADMIN_AUTHOR_NAME, avatar: ADMIN_AUTHOR_AVATAR };
+  }
+  return { name: name ?? "", avatar };
+}
+
 function map(row: Row, likes = 0, comments = 0): Post {
   return {
     id: row.id,
@@ -58,8 +70,8 @@ function map(row: Row, likes = 0, comments = 0): Post {
     isPinned: row.is_pinned,
     isPublished: row.is_published,
     authorId: row.author_id,
-    authorName: row.author_name,
-    authorAvatar: row.author_avatar,
+    authorName: normalizePostAuthor(row.author_name, row.author_avatar).name,
+    authorAvatar: normalizePostAuthor(row.author_name, row.author_avatar).avatar,
     createdAt: row.created_at,
     likeCount: likes,
     commentCount: comments,
@@ -250,13 +262,19 @@ export const savePost = createServerFn({ method: "POST" })
       return { id: data.id };
     }
 
-    const meta = (context.claims as { user_metadata?: Record<string, unknown> } | null)
-      ?.user_metadata;
-    const name =
-      (meta?.["full_name"] as string | undefined) ??
-      (meta?.["name"] as string | undefined) ??
-      (context.claims as { email?: string } | null)?.email ??
-      "Admin";
+    const claims = context.claims as {
+      email?: string;
+      user_metadata?: Record<string, unknown>;
+    } | null;
+    const email = (claims?.email || context.user?.email || "").toLowerCase().trim();
+    const meta = claims?.user_metadata;
+    const isDesignatedAdmin = email === DESIGNATED_ADMIN_EMAIL.toLowerCase();
+    const name = isDesignatedAdmin
+      ? ADMIN_AUTHOR_NAME
+      : ((meta?.["full_name"] as string | undefined) ??
+        (meta?.["name"] as string | undefined) ??
+        claims?.email ??
+        "Admin");
 
     const { data: row, error } = await context.supabase
       .from("posts")
@@ -264,7 +282,9 @@ export const savePost = createServerFn({ method: "POST" })
         ...payload,
         author_id: context.userId,
         author_name: name,
-        author_avatar: (meta?.["avatar_url"] as string | undefined) ?? null,
+        author_avatar: isDesignatedAdmin
+          ? ADMIN_AUTHOR_AVATAR
+          : ((meta?.["avatar_url"] as string | undefined) ?? null),
       })
       .select("id")
       .single();
