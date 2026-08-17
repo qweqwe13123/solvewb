@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bell, Play, Search, Shield, ShieldCheck, Sparkles, Tag, Users } from "lucide-react";
+import { Bell, Lock, Play, Search, Shield, ShieldCheck, Sparkles, Tag, Users } from "lucide-react";
 import { CourseSwitcher } from "@/components/CourseSwitcher";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
