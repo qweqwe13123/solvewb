@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   Bell,
   Globe,
@@ -23,6 +23,7 @@ import { getCommunity, checkCommunityAccessFn, type Course } from "@/lib/communi
 import { syncCheckoutSessionFn } from "@/lib/stripe-checkout.functions";
 import { mediaUrl } from "@/lib/media";
 import { Avatar, CoverImage } from "@/components/Media";
+import { readProAccess, writeProAccess } from "@/lib/pro-access-cache";
 
 const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
 
@@ -52,8 +53,7 @@ export const Route = createFileRoute("/courses")({
 
 function CoursesPage() {
   const { checkout, session_id } = Route.useSearch();
-  const { user, loading: sessionLoading } = useSession();
-  const navigate = useNavigate();
+  const { user } = useSession();
   const isAdmin = (user?.email || "").toLowerCase().trim() === DESIGNATED_ADMIN_EMAIL;
   const fetchCommunity = useServerFn(getCommunity);
   const checkAccess = useServerFn(checkCommunityAccessFn);
@@ -71,6 +71,10 @@ function CoursesPage() {
       return checkAccess({ data: { userId: user?.id, email: user?.email } });
     },
     enabled: !!user,
+    placeholderData: () =>
+      user?.id && readProAccess(user.id)
+        ? { hasAccess: true, isAdmin: false, status: "active" }
+        : undefined,
     staleTime: 15_000,
     refetchOnMount: false,
     retry: 3,
@@ -79,11 +83,10 @@ function CoursesPage() {
   const hasAccess = isAdmin || Boolean(accessQuery.data?.hasAccess);
 
   useEffect(() => {
-    if (sessionLoading) return;
-    if (user && hasAccess && checkout !== "success") {
-      navigate({ to: "/c", replace: true });
-    }
-  }, [checkout, hasAccess, navigate, sessionLoading, user]);
+    if (!user || isAdmin || !accessQuery.isSuccess) return;
+    writeProAccess(user.id, Boolean(accessQuery.data?.hasAccess));
+  }, [accessQuery.data?.hasAccess, accessQuery.isSuccess, isAdmin, user]);
+
   const [chatOpen, setChatOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [message, setMessage] = useState("");
