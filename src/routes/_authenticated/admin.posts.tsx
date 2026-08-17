@@ -43,6 +43,7 @@ const emptyPost: Post = {
   coverUrl: null,
   isPinned: false,
   isPublished: true,
+  authorId: null,
   authorName: "",
   authorAvatar: null,
   createdAt: "",

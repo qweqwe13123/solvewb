@@ -12,6 +12,7 @@ export type Post = {
   coverUrl: string | null;
   isPinned: boolean;
   isPublished: boolean;
+  authorId: string | null;
   authorName: string;
   authorAvatar: string | null;
   createdAt: string;
@@ -56,6 +57,7 @@ function map(row: Row, likes = 0, comments = 0): Post {
     coverUrl: row.cover_url,
     isPinned: row.is_pinned,
     isPublished: row.is_published,
+    authorId: row.author_id,
     authorName: row.author_name,
     authorAvatar: row.author_avatar,
     createdAt: row.created_at,
@@ -176,6 +178,21 @@ export const deleteComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
+    const email = (context.claims?.email || context.user?.email || "").toLowerCase().trim();
+    const isAdmin = email === "turanoglumehmet1@gmail.com";
+    if (isAdmin) {
+      const { error } = await context.supabase.rpc("claim_admin_role");
+      if (error) throw new Error("Unable to verify administrator permissions");
+    }
+
+    const { data: comment, error: commentError } = await context.supabase
+      .from("post_comments")
+      .select("user_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (commentError || !comment) throw new Error("Comment was not found");
+    if (!isAdmin && comment.user_id !== context.userId) throw new Error("Forbidden");
+
     const { error } = await context.supabase.from("post_comments").delete().eq("id", data.id);
     if (error) throw new Error("Failed to delete comment");
     return { ok: true };
@@ -259,7 +276,25 @@ export const deletePost = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("posts").delete().eq("id", data.id);
-    if (error) throw new Error("Не удалось удалить пост");
+    const email = (context.claims?.email || context.user?.email || "").toLowerCase().trim();
+    if (email !== "turanoglumehmet1@gmail.com") throw new Error("Forbidden");
+
+    const { error: roleError } = await context.supabase.rpc("claim_admin_role");
+    if (roleError) throw new Error("Unable to verify administrator permissions");
+
+    const { data: post, error: postError } = await context.supabase
+      .from("posts")
+      .select("author_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (postError || !post) throw new Error("Post was not found");
+    if (post.author_id !== context.userId) throw new Error("You can delete only your own posts");
+
+    const { error } = await context.supabase
+      .from("posts")
+      .delete()
+      .eq("id", data.id)
+      .eq("author_id", context.userId);
+    if (error) throw new Error("Failed to delete post");
     return { ok: true };
   });

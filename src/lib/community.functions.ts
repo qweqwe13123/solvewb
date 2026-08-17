@@ -379,53 +379,52 @@ export const saveCommunityProfile = createServerFn({ method: "POST" })
     };
 
     try {
+      let savedRow: ProfileRow;
+
       if (data.id && data.id !== "default-id") {
-        const { error } = await context.supabase
+        const { data: row, error } = await context.supabase
           .from("community_profile")
           .update(payload as any)
-          .eq("id", data.id);
-        if (error) throw error;
-        inMemoryProfile = {
-          ...inMemoryProfile,
-          ...data,
-          ownerAvatar: data.ownerAvatar ?? inMemoryProfile.ownerAvatar,
-        };
-        return { ok: true };
-      }
-
-      const { data: existing } = await context.supabase
-        .from("community_profile")
-        .select("id")
-        .limit(1)
-        .maybeSingle();
-
-      if (existing?.id) {
-        const { error } = await context.supabase
+          .eq("id", data.id)
+          .select("*")
+          .single();
+        if (error || !row) throw error ?? new Error("Community profile was not found");
+        savedRow = row;
+      } else {
+        const { data: existing, error: existingError } = await context.supabase
           .from("community_profile")
-          .update(payload as any)
-          .eq("id", existing.id);
-        if (error) throw error;
-        inMemoryProfile = {
-          ...inMemoryProfile,
-          ...data,
-          ownerAvatar: data.ownerAvatar ?? inMemoryProfile.ownerAvatar,
-        };
-        return { ok: true };
+          .select("id")
+          .limit(1)
+          .maybeSingle();
+        if (existingError) throw existingError;
+
+        if (existing?.id) {
+          const { data: row, error } = await context.supabase
+            .from("community_profile")
+            .update(payload as any)
+            .eq("id", existing.id)
+            .select("*")
+            .single();
+          if (error || !row) throw error ?? new Error("Community profile was not found");
+          savedRow = row;
+        } else {
+          const { data: row, error } = await context.supabase
+            .from("community_profile")
+            .insert(payload as any)
+            .select("*")
+            .single();
+          if (error || !row) throw error ?? new Error("Community profile was not created");
+          savedRow = row;
+        }
       }
 
-      const { error } = await context.supabase.from("community_profile").insert(payload as any);
-      if (error) throw error;
-      inMemoryProfile = {
-        ...inMemoryProfile,
-        ...data,
-        ownerAvatar: data.ownerAvatar ?? inMemoryProfile.ownerAvatar,
-      };
+      const savedProfile = mapProfile(savedRow);
+      inMemoryProfile = { ...inMemoryProfile, ...savedProfile };
+      return { ok: true, profile: savedProfile };
     } catch (err) {
       console.warn("Could not persist community_profile to DB:", err);
       throw new Error("Community settings were not saved in Supabase");
     }
-
-    return { ok: true };
   });
 
 const courseSchema = z.object({

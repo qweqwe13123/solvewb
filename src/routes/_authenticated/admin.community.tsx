@@ -68,12 +68,21 @@ function AdminCommunityPage() {
 
   const profileMutation = useMutation({
     mutationFn: (p: CommunityProfile) => saveProfileFn({ data: p }),
-    onSuccess: () => {
+    onSuccess: async (result) => {
+      setProfile(result.profile);
+      qc.setQueryData<{ profile: CommunityProfile; courses: Course[] }>(["admin-community"], (current) =>
+        current ? { ...current, profile: result.profile } : current,
+      );
+      qc.setQueryData<{ profile: CommunityProfile; courses: Course[] }>(["community"], (current) =>
+        current ? { ...current, profile: result.profile } : current,
+      );
+      await Promise.all([
+        qc.refetchQueries({ queryKey: ["admin-community"] }),
+        qc.refetchQueries({ queryKey: ["community"] }),
+      ]);
       toast.success("Community profile and owner info saved!");
-      qc.invalidateQueries({ queryKey: ["admin-community"] });
-      qc.invalidateQueries({ queryKey: ["community"] });
     },
-    onError: () => toast.error("Failed to save profile"),
+    onError: (error: Error) => toast.error(error.message || "Failed to save profile"),
   });
 
   const courseMutation = useMutation({
@@ -93,21 +102,25 @@ function AdminCommunityPage() {
           sortOrder: c.sortOrder,
         },
       }),
-    onSuccess: () => {
-      toast.success("Course saved");
+    onSuccess: async () => {
       setEditing(null);
-      qc.invalidateQueries({ queryKey: ["admin-community"] });
-      qc.invalidateQueries({ queryKey: ["community"] });
+      await Promise.all([
+        qc.refetchQueries({ queryKey: ["admin-community"] }),
+        qc.refetchQueries({ queryKey: ["community"] }),
+      ]);
+      toast.success("Course saved");
     },
     onError: (e: Error) => toast.error(e.message || "Failed to save course"),
   });
 
   const removeMutation = useMutation({
     mutationFn: (id: string) => deleteCourseFn({ data: { id } }),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await Promise.all([
+        qc.refetchQueries({ queryKey: ["admin-community"] }),
+        qc.refetchQueries({ queryKey: ["community"] }),
+      ]);
       toast.success("Course deleted");
-      qc.invalidateQueries({ queryKey: ["admin-community"] });
-      qc.invalidateQueries({ queryKey: ["community"] });
     },
     onError: () => toast.error("Failed to delete course"),
   });

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Pin, MessageCircle, ThumbsUp, Send } from "lucide-react";
+import { Pin, MessageCircle, ThumbsUp, Send, Trash2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import { getIsAdmin } from "@/lib/admin.functions";
 import {
   addComment,
   deleteComment,
+  deletePost,
   listComments,
   listMyLikes,
   listPosts,
@@ -91,7 +92,13 @@ function CommunityFeed() {
         ) : (
           <ul className="mt-5 space-y-5">
             {posts.map((p) => (
-              <PostCard key={p.id} post={p} liked={likedIds.has(p.id)} userId={user?.id ?? null} />
+              <PostCard
+                key={p.id}
+                post={p}
+                liked={likedIds.has(p.id)}
+                userId={user?.id ?? null}
+                isAdmin={Boolean(adminQuery.data?.isAdmin)}
+              />
             ))}
           </ul>
         )}
@@ -102,7 +109,17 @@ function CommunityFeed() {
   );
 }
 
-function PostCard({ post, liked, userId }: { post: Post; liked: boolean; userId: string | null }) {
+function PostCard({
+  post,
+  liked,
+  userId,
+  isAdmin,
+}: {
+  post: Post;
+  liked: boolean;
+  userId: string | null;
+  isAdmin: boolean;
+}) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
@@ -111,6 +128,7 @@ function PostCard({ post, liked, userId }: { post: Post; liked: boolean; userId:
   const fetchComments = useServerFn(listComments);
   const addFn = useServerFn(addComment);
   const removeFn = useServerFn(deleteComment);
+  const removePostFn = useServerFn(deletePost);
 
   const commentsQuery = useQuery({
     queryKey: ["comments", post.id],
@@ -126,8 +144,47 @@ function PostCard({ post, liked, userId }: { post: Post; liked: boolean; userId:
 
   const likeMutation = useMutation({
     mutationFn: () => likeFn({ data: { postId: post.id } }),
-    onSuccess: invalidate,
-    onError: () => toast.error("Failed to update like"),
+    onMutate: async () => {
+      await Promise.all([
+        qc.cancelQueries({ queryKey: ["posts"] }),
+        qc.cancelQueries({ queryKey: ["my-likes"] }),
+      ]);
+
+      const previousPosts = qc.getQueryData<{ posts: Post[] }>(["posts"]);
+      const previousLikes = qc.getQueryData<{ postIds: string[] }>(["my-likes"]);
+      const nextLiked = !liked;
+
+      qc.setQueryData<{ posts: Post[] }>(["posts"], (current) => {
+        if (!current) return current;
+        return {
+          ...current,
+          posts: current.posts.map((item) =>
+            item.id === post.id
+              ? { ...item, likeCount: Math.max(0, item.likeCount + (nextLiked ? 1 : -1)) }
+              : item,
+          ),
+        };
+      });
+      qc.setQueryData<{ postIds: string[] }>(["my-likes"], (current) => {
+        const postIds = current?.postIds ?? [];
+        return {
+          postIds: nextLiked
+            ? Array.from(new Set([...postIds, post.id]))
+            : postIds.filter((id) => id !== post.id),
+        };
+      });
+
+      return { previousPosts, previousLikes };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousPosts) qc.setQueryData(["posts"], context.previousPosts);
+      if (context?.previousLikes) qc.setQueryData(["my-likes"], context.previousLikes);
+      toast.error("Failed to update like");
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["posts"] });
+      qc.invalidateQueries({ queryKey: ["my-likes"] });
+    },
   });
 
   const commentMutation = useMutation({
@@ -141,8 +198,20 @@ function PostCard({ post, liked, userId }: { post: Post; liked: boolean; userId:
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => removeFn({ data: { id } }),
-    onSuccess: invalidate,
-    onError: () => toast.error("Failed to delete comment"),
+    onSuccess: () => {
+      invalidate();
+      toast.success("Comment deleted");
+    },
+    onError: (error: Error) => toast.error(error.message || "Failed to delete comment"),
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: () => removePostFn({ data: { id: post.id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["posts"] });
+      toast.success("Post deleted");
+    },
+    onError: (error: Error) => toast.error(error.message || "Failed to delete post"),
   });
 
   return (
@@ -163,11 +232,28 @@ function PostCard({ post, liked, userId }: { post: Post; liked: boolean; userId:
             </div>
           </div>
         </div>
-        {post.isPinned ? (
-          <span className="flex shrink-0 items-center gap-2 text-sm font-semibold">
-            <Pin className="size-4" /> Pinned
-          </span>
-        ) : null}
+        <div className="flex shrink-0 items-center gap-2">
+          {post.isPinned ? (
+            <span className="flex items-center gap-2 text-sm font-semibold">
+              <Pin className="size-4" /> Pinned
+            </span>
+          ) : null}
+          {isAdmin && post.authorId === userId ? (
+            <button
+              type="button"
+              aria-label={`Delete post ${post.title}`}
+              disabled={deletePostMutation.isPending}
+              onClick={() => {
+                if (confirm(`Delete the post “${post.title}”? This cannot be undone.`)) {
+                  deletePostMutation.mutate();
+                }
+              }}
+              className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+            >
+              <Trash2 className="size-4" />
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <h3 className="mt-4 flex items-center gap-2 text-xl font-bold">
@@ -190,14 +276,16 @@ function PostCard({ post, liked, userId }: { post: Post; liked: boolean; userId:
 
       <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
         <button
+          type="button"
+          disabled={likeMutation.isPending}
           onClick={() => {
             if (!userId) {
               toast.error("Log in to like this post");
               return;
             }
-            likeMutation.mutate();
+            if (!likeMutation.isPending) likeMutation.mutate();
           }}
-          className={`flex items-center gap-2 transition-colors hover:text-foreground ${
+          className={`flex items-center gap-2 transition-colors hover:text-foreground disabled:cursor-wait disabled:opacity-70 ${
             liked ? "font-bold text-brand" : ""
           }`}
         >
@@ -225,10 +313,16 @@ function PostCard({ post, liked, userId }: { post: Post; liked: boolean; userId:
                   <div className="flex items-center gap-2">
                     <span className="truncate text-sm font-bold">{c.authorName}</span>
                     <span className="text-xs text-muted-foreground">{formatDate(c.createdAt)}</span>
-                    {userId === c.userId ? (
+                    {isAdmin || userId === c.userId ? (
                       <button
-                        onClick={() => deleteMutation.mutate(c.id)}
-                        className="ml-auto text-xs text-muted-foreground hover:text-destructive"
+                        type="button"
+                        disabled={deleteMutation.isPending}
+                        onClick={() => {
+                          if (confirm("Delete this comment? This cannot be undone.")) {
+                            deleteMutation.mutate(c.id);
+                          }
+                        }}
+                        className="ml-auto rounded px-1.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
                       >
                         Delete
                       </button>
