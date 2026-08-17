@@ -36,17 +36,7 @@ function SettingsLayout() {
   const visibleNav = isAdmin
     ? nav
     : nav.filter((item) =>
-        [
-          "/settings/profile",
-          "/settings/affiliates",
-          "/settings/payouts",
-          "/settings/account",
-          "/settings/notifications",
-          "/settings/chat",
-          "/settings/payment-methods",
-          "/settings/theme",
-          "/reach-us",
-        ].includes(item.to),
+        ["/settings/profile", "/reach-us"].includes(item.to),
       );
 
   return (
