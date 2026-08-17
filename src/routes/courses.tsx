@@ -95,9 +95,37 @@ function CoursesPage() {
   const logoPath = coverPath;
   const introVideo = profile?.videoUrl ? mediaUrl(profile.videoUrl) : null;
   const gallery = profile?.gallery ?? [];
-  const body =
-    profile?.body ||
-    "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰\n\nWelcome to the AI Video Bootcamp! In this community and course library, you will learn step-by-step how to create photorealistic AI videos, monetizable AI influencers, viral UGC ads, and short films.\n\nWhat you get inside:\n• Full Access to All Current & Future Courses\n• Private Creator Community & Feedback\n• Weekly Live Q&A and Breakdown Sessions\n• Prompt Templates, Workflow Guides & Cheat Sheets";
+  const requestedDescription = `Master AI Automation & Web Design
+Build AI agents, automate businesses, create premium websites, and turn your skills into a profitable online business.
+🚨 Founding Member Price: $49/month ‼️ Only available for the first 500 members. Once we hit 500 members, the price increases for all new members.
+What's inside?
+✅ 🤖 Build AI Agents & powerful automations
+✅ 🌐 Design premium websites clients pay for
+✅ ⚡ Automate real business workflows
+✅ 🎨 Master modern UI/UX & web animations
+✅ 🧠 Learn expert-level prompting
+✅ 🔥 Stay up-to-date with the latest AI tools
+✅ 💰 Build AI ads & digital systems brands pay for
+✅ 📈 Learn client acquisition & lead generation
+✅ 📁 Create real portfolio projects
+✅ 💬 Private community, feedback & weekly updates
+✅ 🎁 Exclusive templates, resources & challenges
+
+Perfect if you're tired of:
+❌ Guessing with AI
+❌ Weak prompts & fake-looking results
+❌ Repetitive manual work
+❌ Not knowing how to get high-paying clients
+
+⚡ Start today. Lock in $49/month.
+That's only $1.60/day to stay ahead in AI Automation & Web Design.
+✅ Cancel anytime.`;
+  const body = profile?.body?.includes("⭐ Top 1% Community on Skool")
+    ? requestedDescription
+    : profile?.body || requestedDescription;
+  const shortDescription = profile?.description?.includes("⭐ Top 1% Community on Skool")
+    ? requestedDescription
+    : profile?.description || requestedDescription;
   const checkoutPath = "/checkout?plan=starter&period=monthly";
 
   return (
@@ -254,8 +282,7 @@ function CoursesPage() {
                   : "solverwebsite.com/courses"}
               </p>
               <p className="mt-3 text-[15px] leading-6">
-                {profile?.description ||
-                  "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰"}
+                {shortDescription}
               </p>
               <div className="mt-4 grid grid-cols-3 divide-x divide-border border-y border-border py-3 text-center">
                 {[
