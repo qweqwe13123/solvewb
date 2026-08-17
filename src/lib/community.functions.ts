@@ -84,6 +84,10 @@ function normalizePriceLabel(label: string | null | undefined) {
   return value;
 }
 
+function normalizeCreatorsCount(text: string | null | undefined) {
+  return (text || "").replace(/26\.4k creators/gi, "100 creators");
+}
+
 const videoTypeCache = new Map<string, Promise<boolean>>();
 
 function mediaProbeUrl(path: string) {
@@ -151,7 +155,7 @@ function mapProfile(row: ProfileRow): CommunityProfile {
     id: row.id,
     name: isLegacyProfile ? CURRENT_COURSE_TITLE : row.name,
     tagline: row.tagline,
-    description: row.description,
+    description: normalizeCreatorsCount(row.description),
     priceLabel: normalizePriceLabel(row.price_label),
     membersLabel: row.members_label,
     privacyLabel: row.privacy_label,
@@ -202,7 +206,9 @@ function mapCourse(row: CourseRow, fallbackCoverUrl?: string | null): Course {
     slug: row.slug,
     title: isLegacyCourse ? CURRENT_COURSE_TITLE : row.title,
     summary: isLegacyCourse ? CURRENT_COURSE_SUMMARY : row.summary,
-    description: isLegacyCourse ? CURRENT_COURSE_DESCRIPTION : row.description,
+    description: isLegacyCourse
+      ? CURRENT_COURSE_DESCRIPTION
+      : normalizeCreatorsCount(row.description),
     priceLabel: normalizePriceLabel(row.price_label),
     coverUrl: normalizeCourseCover(fallbackCoverUrl || row.cover_url),
     videoUrl: row.video_url,
