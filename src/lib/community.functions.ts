@@ -50,6 +50,31 @@ const BASE_MEMBER_COUNT = 100;
 const FIXED_PRICE_LABEL = "$49/month";
 const CURRENT_COURSE_TITLE = "Master AI Automation & Web Design + More";
 const CURRENT_COURSE_SUMMARY = "Master AI Automation & Web Design + More";
+const CURRENT_COURSE_DESCRIPTION = `Master AI Automation & Web Design
+Build AI agents, automate businesses, create premium websites, and turn your skills into a profitable online business.
+🚨 Founding Member Price: $49/month ‼️ Only available for the first 500 members. Once we hit 500 members, the price increases for all new members.
+What's inside?
+✅ 🤖 Build AI Agents & powerful automations
+✅ 🌐 Design premium websites clients pay for
+✅ ⚡ Automate real business workflows
+✅ 🎨 Master modern UI/UX & web animations
+✅ 🧠 Learn expert-level prompting
+✅ 🔥 Stay up-to-date with the latest AI tools
+✅ 💰 Build AI ads & digital systems brands pay for
+✅ 📈 Learn client acquisition & lead generation
+✅ 📁 Create real portfolio projects
+✅ 💬 Private community, feedback & weekly updates
+✅ 🎁 Exclusive templates, resources & challenges
+
+Perfect if you're tired of:
+❌ Guessing with AI
+❌ Weak prompts & fake-looking results
+❌ Repetitive manual work
+❌ Not knowing how to get high-paying clients
+
+⚡ Start today. Lock in $49/month.
+That's only $1.60/day to stay ahead in AI Automation & Web Design.
+✅ Cancel anytime.`;
 
 function normalizePriceLabel(label: string | null | undefined) {
   const value = (label || "").trim();
@@ -126,7 +151,7 @@ function mapCourse(row: CourseRow, fallbackCoverUrl?: string | null): Course {
     slug: row.slug,
     title: isLegacyCourse ? CURRENT_COURSE_TITLE : row.title,
     summary: isLegacyCourse ? CURRENT_COURSE_SUMMARY : row.summary,
-    description: row.description,
+    description: isLegacyCourse ? CURRENT_COURSE_DESCRIPTION : row.description,
     priceLabel: normalizePriceLabel(row.price_label),
     coverUrl: fallbackCoverUrl || row.cover_url,
     videoUrl: row.video_url,
@@ -162,8 +187,7 @@ let inMemoryCourses: Course[] = [
     slug: "ai-video-mastery",
     title: CURRENT_COURSE_TITLE,
     summary: CURRENT_COURSE_SUMMARY,
-    description:
-      "Complete guide to generating cinematic AI video clips, camera controls, and monetizing UGC ads.",
+    description: CURRENT_COURSE_DESCRIPTION,
     priceLabel: FIXED_PRICE_LABEL,
     coverUrl: "/assets/community-cover.jpg",
     videoUrl: null,
