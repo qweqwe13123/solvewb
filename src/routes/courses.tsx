@@ -381,38 +381,6 @@ function CoursesPage() {
             </div>
           </div>
 
-          {courses.length > 0 ? (
-            <div className="mt-6 rounded-xl border border-border bg-card p-4">
-              <h2 className="font-semibold">Courses</h2>
-              <ul className="mt-3 space-y-3">
-                {courses.map((c: Course) => (
-                  <li key={c.id}>
-                    <Link
-                      to="/course/$slug"
-                      params={{ slug: c.slug }}
-                      className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-accent"
-                    >
-                      <CoverImage
-                        path={c.coverUrl || coverPath}
-                        alt={c.title}
-                        loading="lazy"
-                        width={64}
-                        height={44}
-                        className="h-11 w-16 shrink-0 rounded-md object-cover"
-                      />
-                      <span className="min-w-0">
-                        <span className="block truncate text-[15px] font-semibold">{c.title}</span>
-                        <span className="block truncate text-xs text-muted-foreground">
-                          {c.summary || c.priceLabel}
-                        </span>
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
           <p className="mt-4 text-center text-sm text-muted-foreground">
             Powered by {" "}
             <span className="font-bold tracking-tight" aria-label="skool">
