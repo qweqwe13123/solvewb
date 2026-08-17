@@ -1,5 +1,8 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useSession } from "@/hooks/useSession";
+import { getIsAdmin } from "@/lib/admin.functions";
 import { UserMenu } from "@/components/UserMenu";
 
 export const Route = createFileRoute("/settings")({
@@ -22,6 +25,20 @@ const nav = [
 function SettingsLayout() {
   const { user } = useSession();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const checkAdmin = useServerFn(getIsAdmin);
+  const { data: adminData } = useQuery({
+    queryKey: ["is-admin", user?.id],
+    queryFn: () => checkAdmin(),
+    enabled: Boolean(user),
+  });
+  const isAdmin = adminData?.isAdmin === true;
+  const visibleNav = isAdmin
+    ? nav
+    : nav.filter((item) =>
+        ["/settings/profile", "/settings/account", "/settings/notifications", "/settings/theme"].includes(
+          item.to,
+        ),
+      );
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -50,7 +67,7 @@ function SettingsLayout() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[240px_1fr]">
         <nav className="lg:sticky lg:top-24 lg:self-start">
           <ul className="flex gap-1 overflow-x-auto pb-2 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
-            {nav.map((item) => {
+            {visibleNav.map((item) => {
               const active = pathname === item.to;
               return (
                 <li key={item.to}>

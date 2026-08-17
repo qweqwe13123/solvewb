@@ -79,14 +79,18 @@ export function UserMenu({ user }: { user: User }) {
             </DropdownMenuItem>
           ) : null}
 
-          <DropdownMenuItem asChild className="px-4 py-2.5 text-[15px] font-bold">
-            <Link to="/settings/profile">Profile</Link>
-          </DropdownMenuItem>
+          {isAdmin ? (
+            <>
+              <DropdownMenuItem asChild className="px-4 py-2.5 text-[15px] font-bold">
+                <Link to="/settings/profile">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="px-4 py-2.5 text-[15px] font-bold">
+                <Link to="/settings/affiliates">Affiliates</Link>
+              </DropdownMenuItem>
+            </>
+          ) : null}
           <DropdownMenuItem asChild className="px-4 py-2.5 text-[15px] font-bold">
             <Link to="/settings/account">Settings</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="px-4 py-2.5 text-[15px] font-bold">
-            <Link to="/settings/affiliates">Affiliates</Link>
           </DropdownMenuItem>
         </div>
 
