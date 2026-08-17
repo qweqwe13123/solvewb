@@ -50,6 +50,7 @@ const BASE_MEMBER_COUNT = 100;
 const FIXED_PRICE_LABEL = "$49/month";
 const CURRENT_COURSE_TITLE = "Master AI Automation & Web Design + More";
 const CURRENT_COURSE_SUMMARY = "Master AI Automation & Web Design + More";
+const CURRENT_COURSE_IMAGE = "/ryan-mitchell-avatar.jpg";
 const CURRENT_COURSE_DESCRIPTION = `Master AI Automation & Web Design
 Build AI agents, automate businesses, create premium websites, and turn your skills into a profitable online business.
 🚨 Founding Member Price: $49/month ‼️ Only available for the first 500 members. Once we hit 500 members, the price increases for all new members.
@@ -96,9 +97,10 @@ function publicClient() {
 }
 
 function mapProfile(row: ProfileRow): CommunityProfile {
+  const isLegacyProfile = /^(asdasd|asdasdasd|ryan)$/i.test(row.name.trim());
   return {
     id: row.id,
-    name: row.name,
+    name: isLegacyProfile ? CURRENT_COURSE_TITLE : row.name,
     tagline: row.tagline,
     description: row.description,
     priceLabel: normalizePriceLabel(row.price_label),
@@ -106,7 +108,7 @@ function mapProfile(row: ProfileRow): CommunityProfile {
     privacyLabel: row.privacy_label,
     ownerLabel: row.owner_label,
     ownerAvatar: (row as any).owner_avatar || null,
-    coverUrl: row.cover_url,
+    coverUrl: CURRENT_COURSE_IMAGE,
     videoUrl: row.video_url,
     gallery: Array.isArray(row.gallery) ? (row.gallery as string[]) : [],
     body: row.body,
@@ -163,7 +165,7 @@ function mapCourse(row: CourseRow, fallbackCoverUrl?: string | null): Course {
 
 let inMemoryProfile: CommunityProfile = {
   id: "default-id",
-  name: "AI Video Bootcamp",
+  name: CURRENT_COURSE_TITLE,
   tagline: "How AI Content Creators Make Real Money",
   description:
     "Master AI Video & AI Image Creation. Then use your skill to make AI Adverts, Social Media Content and Films to earn 💰",
@@ -172,7 +174,7 @@ let inMemoryProfile: CommunityProfile = {
   privacyLabel: "Private",
   ownerLabel: "By Daniel Riley",
   ownerAvatar: null,
-  coverUrl: "/assets/community-cover.jpg",
+  coverUrl: CURRENT_COURSE_IMAGE,
   videoUrl: null,
   gallery: [],
   body: "Master AI Video & AI Image Creation. Join 100 creators, monetise AI influencers and UGC ads.\n\nWelcome to the AI Video Bootcamp! In this community and course library, you will learn step-by-step how to create photorealistic AI videos, monetizable AI influencers, viral UGC ads, and short films.\n\nWhat you get inside:\n• Full Access to All Current & Future Courses\n• Private Creator Community & Feedback\n• Weekly Live Q&A and Breakdown Sessions\n• Prompt Templates, Workflow Guides & Cheat Sheets",
@@ -189,7 +191,7 @@ let inMemoryCourses: Course[] = [
     summary: CURRENT_COURSE_SUMMARY,
     description: CURRENT_COURSE_DESCRIPTION,
     priceLabel: FIXED_PRICE_LABEL,
-    coverUrl: "/assets/community-cover.jpg",
+    coverUrl: CURRENT_COURSE_IMAGE,
     videoUrl: null,
     gallery: [],
     isPublished: true,
