@@ -48,6 +48,8 @@ const DEFAULT_SUPABASE_PUBLISHABLE_KEY =
 const DESIGNATED_ADMIN_EMAIL = "turanoglumehmet1@gmail.com";
 const BASE_MEMBER_COUNT = 100;
 const FIXED_PRICE_LABEL = "$49/month";
+const CURRENT_COURSE_TITLE = "Master AI Automation & Web Design + More";
+const CURRENT_COURSE_SUMMARY = "Master AI Automation & Web Design + More";
 
 function normalizePriceLabel(label: string | null | undefined) {
   const value = (label || "").trim();
@@ -115,15 +117,18 @@ function assertDesignatedAdmin(context: {
   }
 }
 
-function mapCourse(row: CourseRow): Course {
+function mapCourse(row: CourseRow, fallbackCoverUrl?: string | null): Course {
+  const isLegacyCourse =
+    /^(ryan|asdasd|asdasdasd)$/i.test(row.title.trim()) ||
+    /^(ryan|asdasd|asdasdasd)$/i.test(row.summary.trim());
   return {
     id: row.id,
     slug: row.slug,
-    title: row.title,
-    summary: row.summary,
+    title: isLegacyCourse ? CURRENT_COURSE_TITLE : row.title,
+    summary: isLegacyCourse ? CURRENT_COURSE_SUMMARY : row.summary,
     description: row.description,
     priceLabel: normalizePriceLabel(row.price_label),
-    coverUrl: row.cover_url,
+    coverUrl: fallbackCoverUrl || row.cover_url,
     videoUrl: row.video_url,
     gallery: Array.isArray(row.gallery) ? (row.gallery as string[]) : [],
     isPublished: row.is_published,
@@ -155,8 +160,8 @@ let inMemoryCourses: Course[] = [
   {
     id: "c1",
     slug: "ai-video-mastery",
-    title: "AI Video Bootcamp",
-    summary: "Master AI Video & AI Image Creation with 100 creators.",
+    title: CURRENT_COURSE_TITLE,
+    summary: CURRENT_COURSE_SUMMARY,
     description:
       "Complete guide to generating cinematic AI video clips, camera controls, and monetizing UGC ads.",
     priceLabel: FIXED_PRICE_LABEL,
@@ -186,7 +191,7 @@ export const getCommunity = createServerFn({ method: "GET" }).handler(
       const fetchedProfile = profileRes.data
         ? { ...mapProfile(profileRes.data), membersLabel }
         : { ...inMemoryProfile, membersLabel };
-      const fetchedCourses = (coursesRes.data ?? []).map(mapCourse);
+      const fetchedCourses = (coursesRes.data ?? []).map((row) => mapCourse(row, fetchedProfile.coverUrl));
 
       if (fetchedProfile) {
         inMemoryProfile = { ...inMemoryProfile, ...fetchedProfile };
@@ -213,13 +218,16 @@ export const getCourseBySlug = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<{ course: Course | null }> => {
     try {
       const supabase = publicClient();
-      const { data: row } = await supabase
-        .from("courses")
-        .select("*")
-        .eq("slug", data.slug)
-        .eq("is_published", true)
-        .maybeSingle();
-      if (row) return { course: mapCourse(row) };
+      const [{ data: row }, { data: profileRow }] = await Promise.all([
+        supabase
+          .from("courses")
+          .select("*")
+          .eq("slug", data.slug)
+          .eq("is_published", true)
+          .maybeSingle(),
+        supabase.from("community_profile").select("cover_url").limit(1).maybeSingle(),
+      ]);
+      if (row) return { course: mapCourse(row, profileRow?.cover_url || inMemoryProfile.coverUrl) };
     } catch {}
 
     const found = inMemoryCourses.find((c) => c.slug === data.slug);
@@ -316,7 +324,7 @@ export const adminGetCommunity = createServerFn({ method: "GET" })
             .order("created_at", { ascending: true }),
         ]);
         const fetchedProfile = profileRes.data ? mapProfile(profileRes.data) : null;
-        const fetchedCourses = (coursesRes.data ?? []).map(mapCourse);
+        const fetchedCourses = (coursesRes.data ?? []).map((row) => mapCourse(row, fetchedProfile?.coverUrl));
 
         if (fetchedProfile) inMemoryProfile = { ...inMemoryProfile, ...fetchedProfile };
         if (fetchedCourses.length > 0) inMemoryCourses = fetchedCourses;
@@ -324,6 +332,7 @@ export const adminGetCommunity = createServerFn({ method: "GET" })
         return {
           profile: fetchedProfile ? { ...inMemoryProfile, ...fetchedProfile } : inMemoryProfile,
           courses: fetchedCourses.length > 0 ? fetchedCourses : inMemoryCourses,
+
         };
       } catch {
         return {

@@ -17,10 +17,10 @@ export const Route = createFileRoute("/course/$slug")({
       };
     }
     const { course } = loaderData;
-    const description = course.summary || `${course.title} — AI Video Bootcamp course.`;
+    const description = course.summary || `${course.title} course.`;
     return {
       meta: [
-        { title: `${course.title} — AI Video Bootcamp` },
+        { title: course.title },
         { name: "description", content: description },
         { property: "og:title", content: course.title },
         { property: "og:description", content: description },
@@ -57,12 +57,12 @@ function CoursePage() {
           <Link to="/" className="flex items-center gap-3">
             <CoverImage
               path={course?.coverUrl ?? null}
-              alt="AI Video Bootcamp"
+              alt={course.title}
               width={36}
               height={36}
               className="size-9 rounded-lg object-cover"
             />
-            <span className="text-lg font-semibold">AI Video Bootcamp</span>
+            <span className="text-lg font-semibold">{course.title}</span>
           </Link>
         </div>
       </header>
@@ -108,7 +108,7 @@ function CoursePage() {
               <Lock className="size-4 text-muted-foreground" /> Private
             </span>
             <span className="flex items-center gap-2">
-              <Users className="size-4 text-muted-foreground" /> AI Video Bootcamp
+              <Users className="size-4 text-muted-foreground" /> {course.title}
             </span>
             <span className="flex items-center gap-2">
               <Tag className="size-4 text-muted-foreground" /> {course.priceLabel}
