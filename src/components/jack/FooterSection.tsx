@@ -2,8 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Mail } from "lucide-react";
 import { TelegramIcon } from "@/components/icons/TelegramIcon";
-import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
-import { CONTACT_EMAIL, TELEGRAM_URL, WHATSAPP_URL } from "@/lib/contact";
+import { CONTACT_EMAIL, TELEGRAM_URL } from "@/lib/contact";
 
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -49,18 +48,6 @@ export function FooterSection() {
               <a href={`mailto:${CONTACT_EMAIL}`} className="transition hover:text-white">
                 {CONTACT_EMAIL}
               </a>
-            </div>
-            <div className="flex items-center gap-3">
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-[#25D366] transition hover:border-[#25D366]/50 hover:bg-white/5"
-                aria-label="Chat on WhatsApp"
-              >
-                <WhatsAppIcon className="h-5 w-5" />
-              </a>
-              <span className="text-white/45">WhatsApp</span>
             </div>
             <div className="flex items-center gap-3">
               <a
