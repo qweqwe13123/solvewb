@@ -20,6 +20,7 @@ const nav = [
   { label: "Payment methods", to: "/settings/payment-methods" },
   { label: "Payment history", to: "/settings/payment-history" },
   { label: "Theme", to: "/settings/theme" },
+  { label: "Help center", to: "/reach-us" },
 ] as const;
 
 function SettingsLayout() {
@@ -35,9 +36,17 @@ function SettingsLayout() {
   const visibleNav = isAdmin
     ? nav
     : nav.filter((item) =>
-        ["/settings/profile", "/settings/account", "/settings/notifications", "/settings/theme"].includes(
-          item.to,
-        ),
+        [
+          "/settings/profile",
+          "/settings/affiliates",
+          "/settings/payouts",
+          "/settings/account",
+          "/settings/notifications",
+          "/settings/chat",
+          "/settings/payment-methods",
+          "/settings/theme",
+          "/reach-us",
+        ].includes(item.to),
       );
 
   return (
