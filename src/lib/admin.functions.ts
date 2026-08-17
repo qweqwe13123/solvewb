@@ -131,6 +131,7 @@ export const listProUsers = createServerFn({ method: "GET" })
       const customer = stripeCustomerDetails(subscription.customer);
       const metadata = subscription.metadata || {};
       const itemPriceId = subscription.items.data[0]?.price?.id || "";
+      const currentPeriodEnd = subscription.items.data[0]?.current_period_end;
       const userId = metadata.user_id || `stripe:${customer.id}`;
       usersBySubscription.set(subscription.id, {
         subscriptionId: subscription.id,
@@ -140,9 +141,7 @@ export const listProUsers = createServerFn({ method: "GET" })
         plan: metadata.plan || "paid",
         status: subscription.status,
         cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end),
-        currentPeriodEnd: subscription.current_period_end
-          ? new Date(subscription.current_period_end * 1000).toISOString()
-          : null,
+        currentPeriodEnd: currentPeriodEnd ? new Date(currentPeriodEnd * 1000).toISOString() : null,
         createdAt: new Date(subscription.created * 1000).toISOString(),
       });
       void itemPriceId;

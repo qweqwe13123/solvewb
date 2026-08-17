@@ -23,7 +23,7 @@ function RefundGuaranteePage() {
         variant="dark"
         showDesktopCta={false}
         backLink={
-          <Link to="/courses" className="text-sm text-white/70 transition-colors hover:text-white">
+          <Link to="/courses" search={{ checkout: undefined, session_id: undefined }} className="text-sm text-white/70 transition-colors hover:text-white">
             Back to courses
           </Link>
         }

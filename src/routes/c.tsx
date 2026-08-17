@@ -64,6 +64,7 @@ function CommunityShell() {
     if (!isAdmin && accessQuery.isSuccess && accessQuery.data && !hasAccess) {
       navigate({
         to: "/courses",
+        search: { checkout: undefined, session_id: undefined },
         replace: true,
       });
     }
@@ -236,7 +237,7 @@ function CommunityShell() {
           <ul className="flex min-w-max items-center gap-7">
             {TABS.map((t) => (
               <li key={t.to}>
-                {t.comingSoon ? (
+                {("comingSoon" in t && t.comingSoon) ? (
                   <span
                     aria-label={`${t.label} coming soon`}
                     className="flex cursor-not-allowed items-center gap-2 border-b-2 border-transparent py-3 text-[15px] text-muted-foreground/60"
