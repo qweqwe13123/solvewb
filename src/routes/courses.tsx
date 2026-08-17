@@ -52,8 +52,8 @@ function CoursesPage() {
     queryKey: ["community"],
     queryFn: () => fetchCommunity(),
     initialData: initialCommunity,
-    staleTime: 60_000,
-    refetchOnMount: false,
+    staleTime: 0,
+    refetchOnMount: true,
   });
   const accessQuery = useQuery({
     queryKey: ["community-access-status", user?.id, user?.email],

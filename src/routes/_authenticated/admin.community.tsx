@@ -71,15 +71,16 @@ function AdminCommunityPage() {
     mutationFn: (p: CommunityProfile) => saveProfileFn({ data: p }),
     onSuccess: async (result) => {
       setProfile(result.profile);
-      qc.setQueryData<{ profile: CommunityProfile; courses: Course[] }>(["admin-community"], (current) =>
-        current ? { ...current, profile: result.profile } : current,
+      qc.setQueryData<{ profile: CommunityProfile; courses: Course[] }>(
+        ["admin-community"],
+        (current) => (current ? { ...current, profile: result.profile } : current),
       );
       qc.setQueryData<{ profile: CommunityProfile; courses: Course[] }>(["community"], (current) =>
         current ? { ...current, profile: result.profile } : current,
       );
       await Promise.all([
-        qc.refetchQueries({ queryKey: ["admin-community"] }),
-        qc.refetchQueries({ queryKey: ["community"] }),
+        qc.invalidateQueries({ queryKey: ["admin-community"], refetchType: "all" }),
+        qc.invalidateQueries({ queryKey: ["community"], refetchType: "all" }),
       ]);
       setPublishedAt(Date.now());
       toast.success("Community changes are saved and published.");
