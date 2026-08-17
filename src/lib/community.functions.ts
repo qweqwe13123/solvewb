@@ -84,6 +84,44 @@ function normalizePriceLabel(label: string | null | undefined) {
   return value;
 }
 
+const videoTypeCache = new Map<string, Promise<boolean>>();
+
+function mediaProbeUrl(path: string) {
+  if (/^data:video\//i.test(path)) return path;
+  if (/^https?:\/\//i.test(path)) return path;
+  const origin =
+    process.env["SITE_URL"] || process.env["VITE_SITE_ORIGIN"] || "https://www.solverwebsite.com";
+  if (path.startsWith("/")) return new URL(path, origin).toString();
+  return `https://bwxiiqpuhgcvouuqvmbi.supabase.co/storage/v1/object/public/community-media/${path.replace(/^\/+/, "")}`;
+}
+
+async function isPlayableVideo(path: string | null | undefined) {
+  if (!path) return false;
+  if (/^data:video\//i.test(path)) return true;
+  const cached = videoTypeCache.get(path);
+  if (cached) return cached;
+  const probe = (async () => {
+    try {
+      const response = await fetch(mediaProbeUrl(path), {
+        method: "HEAD",
+        headers: { Accept: "video/*" },
+      });
+      return (
+        response.ok &&
+        (response.headers.get("content-type") || "").toLowerCase().startsWith("video/")
+      );
+    } catch {
+      return false;
+    }
+  })();
+  videoTypeCache.set(path, probe);
+  return probe;
+}
+
+async function playableVideoUrl(path: string | null | undefined) {
+  return path && (await isPlayableVideo(path)) ? path : null;
+}
+
 function publicClient() {
   const url =
     process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || DEFAULT_SUPABASE_URL;
@@ -226,10 +264,17 @@ export const getCommunity = createServerFn({ method: "GET" }).handler(
       ]);
 
       const fetchedProfile = profileRes.data
-        ? { ...mapProfile(profileRes.data), membersLabel }
+        ? {
+            ...mapProfile(profileRes.data),
+            membersLabel,
+            videoUrl: await playableVideoUrl(profileRes.data.video_url),
+          }
         : { ...inMemoryProfile, membersLabel };
-      const fetchedCourses = (coursesRes.data ?? []).map((row) =>
-        mapCourse(row, fetchedProfile.coverUrl),
+      const fetchedCourses = await Promise.all(
+        (coursesRes.data ?? []).map(async (row) => ({
+          ...mapCourse(row, fetchedProfile.coverUrl),
+          videoUrl: await playableVideoUrl(row.video_url),
+        })),
       );
 
       if (fetchedProfile) {
@@ -266,7 +311,14 @@ export const getCourseBySlug = createServerFn({ method: "GET" })
           .maybeSingle(),
         supabase.from("community_profile").select("cover_url").limit(1).maybeSingle(),
       ]);
-      if (row) return { course: mapCourse(row, profileRow?.cover_url || inMemoryProfile.coverUrl) };
+      if (row) {
+        return {
+          course: {
+            ...mapCourse(row, profileRow?.cover_url || inMemoryProfile.coverUrl),
+            videoUrl: await playableVideoUrl(row.video_url),
+          },
+        };
+      }
     } catch {}
 
     const found = inMemoryCourses.find((c) => c.slug === data.slug);

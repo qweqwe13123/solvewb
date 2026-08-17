@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bell, Lock, Play, Search, Shield, ShieldCheck, Sparkles, Tag, Users } from "lucide-react";
+import { Bell, Lock, Search, Shield, ShieldCheck, Sparkles, Tag, Users } from "lucide-react";
 import { CourseSwitcher } from "@/components/CourseSwitcher";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -197,26 +197,13 @@ That's only $1.60/day to stay ahead in AI Automation & Web Design.
               className="mt-5 aspect-video w-full rounded-lg bg-black object-cover"
             />
           ) : (
-            <div className="relative mt-5 overflow-hidden rounded-lg bg-black">
-              <CoverImage
-                path={coverPath}
-                alt="Community intro video preview"
-                width={1280}
-                height={720}
-                className="aspect-video w-full object-cover opacity-90"
-              />
-              <button
-                aria-label="Play intro video"
-                className="absolute inset-0 grid place-items-center"
-              >
-                <span className="grid size-20 place-items-center rounded-full bg-card shadow-lg transition-transform hover:scale-105">
-                  <Play className="size-8 translate-x-0.5 fill-current" />
-                </span>
-              </button>
-              <span className="absolute bottom-3 right-3 rounded bg-black/70 px-2 py-1 text-xs text-white">
-                3 min
-              </span>
-            </div>
+            <CoverImage
+              path={coverPath}
+              alt={`${name} cover`}
+              width={1280}
+              height={720}
+              className="mt-5 aspect-video w-full rounded-lg object-cover"
+            />
           )}
 
           {gallery.length > 0 ? (
@@ -281,9 +268,7 @@ That's only $1.60/day to stay ahead in AI Automation & Web Design.
                   ? profile.handleLabel
                   : "solverwebsite.com/courses"}
               </p>
-              <p className="mt-3 text-[15px] leading-6">
-                {shortDescription}
-              </p>
+              <p className="mt-3 text-[15px] leading-6">{shortDescription}</p>
               <div className="mt-4 grid grid-cols-3 divide-x divide-border border-y border-border py-3 text-center">
                 {[
                   [membersLabel.replace(" members", ""), "Members"],
