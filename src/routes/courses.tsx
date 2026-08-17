@@ -106,7 +106,7 @@ function CoursesPage() {
   const priceLabel = profile?.priceLabel || "$49/month";
   const membersLabel = profile?.membersLabel || "100 members";
   const privacyLabel = profile?.privacyLabel || "Private";
-  const coverPath = profile?.coverUrl || "/assets/community-cover.jpg";
+  const coverPath = profile?.coverUrl || "/og-image.png";
   const logoPath = courses[0]?.coverUrl || coverPath;
   const introVideo = profile?.videoUrl ? mediaUrl(profile.videoUrl) : null;
   const gallery = profile?.gallery ?? [];

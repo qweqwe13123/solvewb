@@ -50,7 +50,7 @@ const BASE_MEMBER_COUNT = 100;
 const FIXED_PRICE_LABEL = "$49/month";
 const CURRENT_COURSE_TITLE = "Master AI Automation & Web Design + More";
 const CURRENT_COURSE_SUMMARY = "Master AI Automation & Web Design + More";
-const CURRENT_COURSE_IMAGE = "/ryan-mitchell-avatar.jpg";
+const CURRENT_COURSE_IMAGE = "/og-image.png";
 const CURRENT_COURSE_DESCRIPTION = `Master AI Automation & Web Design
 Build AI agents, automate businesses, create premium websites, and turn your skills into a profitable online business.
 🚨 Founding Member Price: $49/month ‼️ Only available for the first 500 members. Once we hit 500 members, the price increases for all new members.
@@ -96,6 +96,13 @@ function publicClient() {
   });
 }
 
+function normalizeCourseCover(path: string | null | undefined) {
+  if (!path || path === "/ryan-mitchell-avatar.jpg" || /^(asdasd|asdasdasd|ryan)$/i.test(path.trim())) {
+    return CURRENT_COURSE_IMAGE;
+  }
+  return path;
+}
+
 function mapProfile(row: ProfileRow): CommunityProfile {
   const isLegacyProfile = /^(asdasd|asdasdasd|ryan)$/i.test(row.name.trim());
   return {
@@ -108,7 +115,7 @@ function mapProfile(row: ProfileRow): CommunityProfile {
     privacyLabel: row.privacy_label,
     ownerLabel: row.owner_label,
     ownerAvatar: (row as any).owner_avatar || null,
-    coverUrl: CURRENT_COURSE_IMAGE,
+    coverUrl: normalizeCourseCover(row.cover_url),
     videoUrl: row.video_url,
     gallery: Array.isArray(row.gallery) ? (row.gallery as string[]) : [],
     body: row.body,
@@ -155,7 +162,7 @@ function mapCourse(row: CourseRow, fallbackCoverUrl?: string | null): Course {
     summary: isLegacyCourse ? CURRENT_COURSE_SUMMARY : row.summary,
     description: isLegacyCourse ? CURRENT_COURSE_DESCRIPTION : row.description,
     priceLabel: normalizePriceLabel(row.price_label),
-    coverUrl: fallbackCoverUrl || row.cover_url,
+    coverUrl: normalizeCourseCover(fallbackCoverUrl || row.cover_url),
     videoUrl: row.video_url,
     gallery: Array.isArray(row.gallery) ? (row.gallery as string[]) : [],
     isPublished: row.is_published,

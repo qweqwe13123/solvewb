@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useSession } from "@/hooks/useSession";
@@ -43,7 +44,14 @@ function SettingsLayout() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-card">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <div aria-hidden className="min-w-0" />
+          <Link
+            to="/courses"
+            search={{ checkout: undefined, session_id: undefined }}
+            aria-label="Back to Courses"
+            className="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <ArrowLeft className="size-5" />
+          </Link>
           {user ? (
             <UserMenu user={user} />
           ) : (
