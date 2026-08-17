@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -34,13 +35,26 @@ function AdminLayout() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-card">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-3">
-            <span
-              aria-hidden
-              className="size-9 shrink-0 rounded-lg bg-gradient-to-br from-muted to-accent"
-            />
-            <span className="text-lg font-semibold">Admin</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/courses"
+              search={{ checkout: undefined, session_id: undefined }}
+              aria-label="Back to Courses"
+              className="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <ArrowLeft className="size-5" />
+            </Link>
+            <Link to="/" className="flex items-center gap-3">
+              <img
+                src="/ryan-mitchell-avatar.jpg"
+                alt="Ryan Mitchell"
+                width={36}
+                height={36}
+                className="size-9 shrink-0 rounded-full object-cover"
+              />
+              <span className="text-lg font-semibold">Ryan Mitchell</span>
+            </Link>
+          </div>
           {user ? <UserMenu user={user} /> : null}
         </div>
       </header>

@@ -19,6 +19,8 @@ export function UserMenu({ user }: { user: User }) {
   const navigate = useNavigate();
   const name = (user.user_metadata?.["full_name"] as string) ?? user.email ?? "Account";
   const avatar = user.user_metadata?.["avatar_url"] as string | undefined;
+  const adminName = "Ryan Mitchell";
+  const adminAvatar = "/ryan-mitchell-avatar.jpg";
   const checkAdmin = useServerFn(getIsAdmin);
   const checkAccess = useServerFn(checkCommunityAccessFn);
   const { data: adminData } = useQuery({
@@ -30,6 +32,8 @@ export function UserMenu({ user }: { user: User }) {
     queryFn: () => checkAccess({ data: { userId: user.id, email: user.email } }),
   });
   const isAdmin = adminData?.isAdmin === true;
+  const displayName = isAdmin ? adminName : name;
+  const displayAvatar = isAdmin ? adminAvatar : avatar;
   const isPro = accessData?.hasAccess === true && !isAdmin;
 
   async function signOut() {
@@ -40,24 +44,25 @@ export function UserMenu({ user }: { user: User }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
-        {avatar ? (
+        {displayAvatar ? (
           <img
-            src={avatar}
-            alt={name}
+            src={displayAvatar}
+            alt={displayName}
             width={36}
             height={36}
             className="size-9 rounded-full object-cover"
           />
         ) : (
           <span className="grid size-9 place-items-center rounded-full bg-muted text-sm font-semibold">
-            {name.slice(0, 1).toUpperCase()}
+            {displayName.slice(0, 1).toUpperCase()}
           </span>
         )}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" sideOffset={10} className="w-64 rounded-xl p-0 py-1">
         <DropdownMenuLabel className="px-4 py-3">
-          <div className="truncate text-[15px] font-bold text-foreground">{user.email}</div>
+          <div className="truncate text-[15px] font-bold text-foreground">{displayName}</div>
+          <div className="mt-0.5 truncate text-xs text-muted-foreground">{user.email}</div>
           {isAdmin ? (
             <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-purple-600 dark:text-purple-400">
               <Shield className="size-3.5" /> Administrator
